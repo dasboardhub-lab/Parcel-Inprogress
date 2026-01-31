@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Monitoring Paket - Pro View</title>
+    <title>Dashboard Monitoring Paket</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -80,24 +80,17 @@
         .island-spinner { border: 2px solid rgba(255,255,255,0.2); border-top: 2px solid #60a5fa; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- MODERN TABLE CONTAINER --- */
+        /* --- MODERN TABLE --- */
         .modern-table-container { 
             background: white; border-radius: 12px; 
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0; 
-            overflow: hidden; /* Hide overflow from rounded corners */
+            border: 1px solid #e2e8f0; overflow: hidden;
             display: flex; flex-direction: column;
         }
         
-        .table-scroll-area { 
-            overflow: auto; 
-            flex: 1; 
-            position: relative;
-            scroll-behavior: smooth;
-            border-radius: 0 0 12px 12px;
-        }
+        .table-scroll-area { overflow: auto; flex: 1; position: relative; scroll-behavior: smooth; }
         
-        /* SINGLE TABLE STRUCTURE for Alignment */
+        /* TABLE STYLING - UNIFIED */
         .pivot-table { 
             width: 100%; 
             border-collapse: separate; 
@@ -108,7 +101,7 @@
         /* Header Sticky Top */
         .pivot-table thead th { 
             position: sticky; top: 0; z-index: 20;
-            background: #f1f5f9; /* Slate 100 */
+            background: #e2e8f0; 
             color: #475569;
             font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 10px;
             height: 44px; padding: 0 8px;
@@ -122,7 +115,7 @@
         /* Footer Sticky Bottom */
         .pivot-table tfoot td {
             position: sticky; bottom: 0; z-index: 20;
-            background-color: #eff6ff !important; /* Blue 50 */
+            background-color: #eff6ff !important;
             font-weight: 800 !important;
             color: #1e3a8a !important;
             border-top: 2px solid #bfdbfe;
@@ -268,7 +261,6 @@
                 `);
             </script>
             <script>
-                // Urutan: Total -> First -> Trans -> Mid -> 3PL -> Mitra -> Last
                 kpiCard('kpiTotal', 'Total AWB', 'slate', 'gray', 'ph-stack', 0);
                 kpiCard('kpiFirstMile', 'First Mile', 'indigo', 'violet', 'ph-storefront', 100);
                 kpiCard('kpiTransport', 'Transport', 'cyan', 'blue', 'ph-airplane-in-flight', 200);
@@ -342,7 +334,7 @@
             </div>
         </div>
 
-        <!-- 4. STAGING TABLE (Screen 3 - Reduced to 45vh) -->
+        <!-- 4. STAGING TABLE (Screen 3 - 45vh Height) -->
         <div class="grid grid-cols-12 gap-4 h-[45vh] flex flex-col">
             <div class="col-span-12 h-full flex flex-col">
                 <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
@@ -390,7 +382,6 @@
             return num ? num.toLocaleString('id-ID') : '0';
         }
 
-        // --- DYNAMIC ISLAND SYSTEM ---
         const island = document.getElementById('dynamicIsland');
         function showIsland(type, msg, onConfirm = null) {
             island.className = 'active'; 
@@ -421,7 +412,6 @@
             island.style.opacity = '1';
         }
 
-        // --- AUTH & INIT ---
         signInAnonymously(auth).catch(e => showIsland('error', "Auth Error"));
 
         onAuthStateChanged(auth, (user) => {
@@ -445,11 +435,9 @@
             onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
                 allData = [];
                 snapshot.forEach(doc => allData.push(doc.data()));
-                
                 const now = new Date();
                 const lastUpd = document.getElementById('lastUpdated');
                 if(lastUpd) lastUpd.innerText = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-                
                 populateDropdowns(allData);
                 renderDashboard();
                 forceHideLoading();
@@ -471,7 +459,6 @@
         }
 
         function getBaseFilteredData() {
-            // Returns data filtered by Date, Dropdowns, but IGNORING HUB X Toggle
             const startDateEl = document.getElementById('filterStartDate');
             if (!startDateEl) return allData;
 
@@ -502,7 +489,6 @@
         }
 
         function getFilteredData() {
-            // Returns data filtered by EVERYTHING including HUB X Toggle
             const base = getBaseFilteredData();
             return base.filter(row => {
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
@@ -625,17 +611,8 @@
 
         // 1. KPI (Updated Logic with baseData)
         function generateKPIRecap(baseData, filteredData) {
-            // Using baseData to ensure MM Nas is always full data even if toggle is active
-            // But we need to group by HUB from filteredData to only show relevant hubs if filter is applied?
-            // Actually, usually we want to see rows for Hubs that match the filters. 
-            // Let's iterate filteredData to get the HUB list, but calculate counts from baseData for specific columns if needed.
-            // Simplified: Just use baseData for everything inside the row loop, but only for hubs present in filteredData?
-            // User requirement: "MM Nasional ... all data HUB X". 
-            // The cleanest way: Iterate baseData. Check HUB X condition for each column.
-            
             const hubs = {}; const totals = { total: 0, nas: 0, reg: 0, trans: 0, hub: 0 };
             
-            // We use baseData (which ignores Toggle) to calculate everything correctly according to rules
             baseData.forEach(r => {
                 const h = r['delivery_hub'] || "?";
                 const hubX = (r['HUB X']||"").toLowerCase().trim();
@@ -643,10 +620,6 @@
                 
                 if (!hubs[h]) hubs[h] = { t:0, nas:0, reg:0, trans:0, hub:0 };
                 
-                // Total here depends on view... usually Total in KPI matches the Cards. 
-                // If Toggle is active, Total should match Toggle. 
-                // But MM Nas ignores Toggle. 
-                // So Total column depends on isGustiadiOnly.
                 if (!isGustiadiOnly || hubX === 'gustiadi') {
                     hubs[h].t++; totals.total++;
                 }
@@ -665,11 +638,7 @@
                 if(pos === 'mid mile' && hubX === 'gustiadi') { hubs[h].hub++; totals.hub++; }
             });
 
-            // Only show hubs that are in filteredData? Or all hubs in baseData? 
-            // Usually dashboard shows what's in filter. 
-            // Let's show all hubs found in baseData to be safe, sorted.
             const keys = Object.keys(hubs).sort();
-            
             const cell = (v, t, isWarn=false) => {
                 const pct = t>0?(v/t)*100:0;
                 let warnIcon = ""; let cls = "text-slate-700";
@@ -738,6 +707,8 @@
             data.forEach(r => { const s = r['service_code'] || "?"; svcMap[s] = (svcMap[s]||0)+1; });
             const keys = Object.keys(svcMap).sort((a,b) => svcMap[b] - svcMap[a]);
             let gt = 0;
+            const colGroup = `<colgroup><col style="width:40%"><col style="width:30%"><col style="width:30%"></colgroup>`;
+
             let html = `<thead><tr><th class="text-left w-40">Service</th><th class="text-center w-24 text-indigo-700 bg-indigo-50/50">Total</th><th class="text-center w-24">%</th></tr></thead><tbody>`;
             keys.forEach(s => {
                 const c = svcMap[s]; gt += c;
