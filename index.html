@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Monitoring Paket - Pro View</title>
+    <title>Dashboard Monitoring Paket - Balanced Pro View</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -29,10 +29,6 @@
                     },
                     colors: {
                         slate: { 850: '#151F32' }
-                    },
-                    boxShadow: {
-                        'glow': '0 0 20px rgba(79, 70, 229, 0.15)',
-                        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
                     }
                 }
             }
@@ -40,13 +36,13 @@
     </script>
 
     <style>
-        body { background-color: #f1f5f9; color: #0f172a; font-size: 12px; }
+        body { background-color: #f8fafc; color: #0f172a; font-size: 13px; } /* Base font size increased */
         .hidden-section { display: none !important; }
         
         /* Smooth Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 2px solid #f8fafc; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         /* Loading Overlay */
@@ -65,7 +61,7 @@
 
         /* --- DYNAMIC ISLAND --- */
         #dynamicIsland {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
             background: rgba(15, 23, 42, 0.95); color: white;
             border-radius: 999px; padding: 0;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -74,16 +70,16 @@
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             width: 0; height: 0; opacity: 0; overflow: hidden;
         }
-        #dynamicIsland.active { width: auto; min-width: 160px; height: 44px; padding: 0 20px; opacity: 1; }
+        #dynamicIsland.active { width: auto; min-width: 160px; height: 48px; padding: 0 24px; opacity: 1; }
         #dynamicIsland.expanded { border-radius: 28px; width: 320px; height: auto; padding: 28px; flex-direction: column; }
-        .island-content { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; }
-        .island-spinner { border: 2px solid rgba(255,255,255,0.2); border-top: 2px solid #60a5fa; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        .island-content { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
+        .island-spinner { border: 2px solid rgba(255,255,255,0.2); border-top: 2px solid #60a5fa; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* --- MODERN TABLE --- */
         .modern-table-container { 
-            background: white; border-radius: 12px; 
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            background: white; border-radius: 16px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
             border: 1px solid #e2e8f0; overflow: hidden;
             display: flex; flex-direction: column;
         }
@@ -92,45 +88,45 @@
             overflow: auto; 
             flex: 1; 
             position: relative;
-            scroll-behavior: smooth;
         }
         
-        /* TABLE STYLING - UNIFIED */
+        /* TABLE STYLING - Adjusted for readibility */
         .pivot-table { 
             width: 100%; 
             border-collapse: separate; 
             border-spacing: 0; 
-            font-size: 11px; 
-            /* Hapus table-layout: fixed agar kolom menyesuaikan isi, atau atur manual via colgroup */
+            font-size: 12px; /* Increased font size */
         }
         
         /* Header Sticky Top */
         .pivot-table thead th { 
             position: sticky; top: 0; z-index: 30;
-            background: #e2e8f0; 
+            background: #f1f5f9; 
             color: #475569;
-            font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 10px;
-            height: 44px; padding: 0 8px;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 11px;
+            height: 48px; padding: 0 12px; /* Taller header */
             border-bottom: 2px solid #cbd5e1;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            text-align: center;
         }
-        .pivot-table thead th:first-child { text-align: left; padding-left: 12px; z-index: 31; }
+        .pivot-table thead th:first-child { text-align: left; padding-left: 20px; z-index: 31; }
         
         /* Footer Sticky Bottom */
         .pivot-table tfoot td {
             position: sticky; bottom: 0; z-index: 30;
-            background-color: #eff6ff !important; /* Solid color required to cover body */
+            background-color: #eff6ff !important;
             font-weight: 800 !important;
             color: #1e3a8a !important;
             border-top: 2px solid #bfdbfe;
-            height: 40px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            height: 44px; /* Taller footer */
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            font-size: 12px;
         }
 
         /* Cells */
         .pivot-table td { 
-            height: 40px; padding: 6px 8px;
+            height: 50px; padding: 4px 12px; /* Taller rows */
             border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;
             color: #334155; font-weight: 500;
             vertical-align: middle;
@@ -140,30 +136,30 @@
         .pivot-table td:last-child { border-right: none; }
         
         /* Specifics */
-        .pivot-val { font-weight: 700; color: #0f172a; font-size: 12px; }
-        .pivot-pct { font-size: 10px; color: #64748b; font-weight: 600; margin-left: 2px; }
-        .row-group-header { background: #fff; font-weight: 700; border-right: 2px solid #e2e8f0 !important; vertical-align: top !important; }
+        .pivot-val { font-weight: 700; color: #0f172a; font-size: 13px; } /* Bigger numbers */
+        .pivot-pct { font-size: 11px; color: #64748b; font-weight: 600; margin-left: 2px; }
+        .row-group-header { background: #fff; font-weight: 700; border-right: 2px solid #e2e8f0 !important; vertical-align: top !important; padding-top: 16px !important; }
 
         /* Cards & Widgets */
         .glass-panel {
             background: white; border: 1px solid #e2e8f0;
-            border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         }
         
         .kpi-card { 
-            background: white; border-radius: 14px; 
+            background: white; border-radius: 20px; 
             border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative; overflow: hidden;
         }
-        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(79, 70, 229, 0.1); border-color: #c7d2fe; }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(79, 70, 229, 0.15); border-color: #c7d2fe; }
         
         /* Modern Switch */
-        .toggle-switch { appearance: none; width: 32px; height: 18px; background: #e2e8f0; border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s; }
-        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .toggle-switch { appearance: none; width: 44px; height: 24px; background: #e2e8f0; border-radius: 99px; position: relative; cursor: pointer; transition: 0.3s; }
+        .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .toggle-switch:checked { background: #4f46e5; }
-        .toggle-switch:checked::after { left: 16px; }
+        .toggle-switch:checked::after { left: 23px; }
 
     </style>
 </head>
@@ -171,16 +167,24 @@
 
     <!-- INITIAL LOADING -->
     <div id="initialLoading">
-        <div class="flex flex-col items-center justify-center p-6">
-            <div class="relative">
+        <div class="flex flex-col items-center justify-center p-8 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50">
+            <div class="relative mb-6">
                 <div class="animate-bounce-truck relative z-10">
-                    <i class="ph-duotone ph-van text-7xl text-indigo-600 drop-shadow-2xl"></i>
-                    <i class="ph-fill ph-package text-orange-500 text-xl absolute -top-1 right-2 animate-bounce"></i>
+                    <i class="ph-duotone ph-van text-8xl text-indigo-600 drop-shadow-2xl"></i>
+                    <i class="ph-fill ph-package text-orange-500 text-3xl absolute -top-2 right-4 animate-bounce" style="animation-duration: 2s;"></i>
                 </div>
             </div>
-            <p class="mt-6 text-xs font-extrabold text-slate-500 tracking-[0.2em] uppercase">Mengantar Data...</p>
+            <div class="w-64 h-2 bg-slate-100 rounded-full overflow-hidden relative mb-4">
+                <div class="absolute top-0 left-0 w-[200%] h-full flex gap-8 animate-road">
+                    <div class="w-16 h-full bg-slate-300 rounded-full"></div>
+                    <div class="w-24 h-full bg-slate-300 rounded-full"></div>
+                    <div class="w-10 h-full bg-slate-300 rounded-full"></div>
+                    <div class="w-20 h-full bg-slate-300 rounded-full"></div>
+                </div>
+            </div>
+            <p class="text-sm font-extrabold text-slate-400 tracking-[0.25em] uppercase">Memuat Data...</p>
         </div>
-        <button id="skipLoadingBtn" class="mt-4 px-5 py-2 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm hidden-section" onclick="forceHideLoading()">
+        <button id="skipLoadingBtn" class="mt-8 px-6 py-3 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm hidden-section" onclick="forceHideLoading()">
             Buka Mode Offline
         </button>
     </div>
@@ -189,160 +193,179 @@
     <div id="dynamicIsland"></div>
 
     <!-- MAIN WRAPPER -->
-    <div class="w-full max-w-[99%] mx-auto py-3 pb-8">
+    <div class="w-full max-w-[98%] mx-auto py-5 pb-12">
         
-        <!-- HEADER -->
-        <header class="glass-panel px-4 py-2 mb-4 flex flex-col xl:flex-row justify-between items-center gap-3 sticky top-2 z-50 bg-white/95 backdrop-blur-md shadow-md">
-            <div class="flex items-center gap-3 w-full xl:w-auto">
-                <div class="bg-gradient-to-br from-indigo-600 to-violet-600 w-8 h-8 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                    <i class="ph-bold ph-chart-polar text-lg"></i>
+        <!-- HEADER & FILTERS (BIGGER) -->
+        <header class="glass-panel px-6 py-4 mb-6 flex flex-col xl:flex-row justify-between items-center gap-6 sticky top-4 z-40 bg-white/95 backdrop-blur-md shadow-lg">
+            <div class="flex items-center gap-5 w-full xl:w-auto">
+                <div class="bg-gradient-to-br from-indigo-600 to-violet-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-200">
+                    <i class="ph-bold ph-chart-polar text-2xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-sm font-extrabold text-slate-800 tracking-tight leading-tight">MONITORING PAKET</h1>
-                    <div class="flex items-center gap-3 text-[10px] font-medium text-slate-500">
-                        <span id="connectionStatus" class="flex items-center gap-1 text-emerald-600 font-bold">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
+                    <h1 class="text-xl font-black text-slate-800 tracking-tight leading-none mb-1">MONITORING PAKET</h1>
+                    <div class="flex items-center gap-4 text-xs font-semibold text-slate-500">
+                        <span id="connectionStatus" class="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online
                         </span>
-                        <span class="flex items-center gap-1"><i class="ph-bold ph-clock"></i> <span id="lastUpdated">--:--</span></span>
+                        <span class="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-full border border-slate-100"><i class="ph-bold ph-clock text-slate-400"></i> <span id="lastUpdated">--:--</span></span>
                     </div>
                 </div>
             </div>
 
-            <!-- CONTROLS -->
-            <div class="flex items-center gap-2 flex-wrap justify-end w-full xl:w-auto">
-                <div class="flex items-center bg-slate-50 p-0.5 rounded-lg border border-slate-200">
-                    <input type="date" id="filterStartDate" class="bg-transparent text-[10px] font-semibold text-slate-600 px-2 py-1 focus:outline-none cursor-pointer">
-                    <span class="text-slate-300 text-[10px] px-1">→</span>
-                    <input type="date" id="filterEndDate" class="bg-transparent text-[10px] font-semibold text-slate-600 px-2 py-1 focus:outline-none cursor-pointer">
+            <!-- CONTROLS (LARGER INPUTS) -->
+            <div class="flex items-center gap-3 flex-wrap justify-end w-full xl:w-auto p-1 rounded-2xl bg-slate-50 border border-slate-200">
+                
+                <!-- Date -->
+                <div class="flex items-center bg-white border border-slate-200 rounded-xl px-2 py-1 shadow-sm">
+                    <input type="date" id="filterStartDate" class="bg-transparent text-xs font-bold text-slate-600 px-2 py-2 focus:outline-none cursor-pointer uppercase border-r border-slate-100">
+                    <span class="text-slate-300 text-[10px] px-2 font-bold">→</span>
+                    <input type="date" id="filterEndDate" class="bg-transparent text-xs font-bold text-slate-600 px-2 py-2 focus:outline-none cursor-pointer uppercase">
                 </div>
+
+                <!-- Dropdowns -->
                 <div class="relative group">
-                    <select id="filterHub" class="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-[10px] font-bold rounded-lg px-3 py-1.5 pr-6 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:bg-white hover:shadow-sm">
+                    <select id="filterHub" class="appearance-none bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-4 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:border-indigo-300 shadow-sm min-w-[140px]">
                         <option value="">HUB: Semua</option>
                     </select>
-                    <i class="ph-bold ph-caret-down absolute right-2 top-2 text-slate-400 pointer-events-none"></i>
+                    <i class="ph-bold ph-caret-down absolute right-3 top-3 text-slate-400 pointer-events-none group-hover:text-indigo-500 transition-colors"></i>
                 </div>
+
                 <div class="relative group">
-                    <select id="filterService" class="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-[10px] font-bold rounded-lg px-3 py-1.5 pr-6 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:bg-white hover:shadow-sm">
+                    <select id="filterService" class="appearance-none bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-4 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:border-indigo-300 shadow-sm min-w-[130px]">
                         <option value="">Svc: Semua</option>
                     </select>
-                    <i class="ph-bold ph-caret-down absolute right-2 top-2 text-slate-400 pointer-events-none"></i>
+                    <i class="ph-bold ph-caret-down absolute right-3 top-3 text-slate-400 pointer-events-none group-hover:text-indigo-500 transition-colors"></i>
                 </div>
+
                 <div class="relative group">
-                    <select id="filterPosisi" class="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-[10px] font-bold rounded-lg px-3 py-1.5 pr-6 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:bg-white hover:shadow-sm w-28">
+                    <select id="filterPosisi" class="appearance-none bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-4 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:border-indigo-300 shadow-sm min-w-[140px]">
                         <option value="">Posisi: Semua</option>
                     </select>
-                    <i class="ph-bold ph-caret-down absolute right-2 top-2 text-slate-400 pointer-events-none"></i>
+                    <i class="ph-bold ph-caret-down absolute right-3 top-3 text-slate-400 pointer-events-none group-hover:text-indigo-500 transition-colors"></i>
                 </div>
-                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-lg">
-                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider" id="toggleLabel">Semua</span>
-                    <input type="checkbox" id="statusToggle" class="toggle-switch">
+
+                <!-- Toggle -->
+                <div class="flex items-center gap-3 bg-white border border-slate-200 px-4 py-2.5 rounded-xl shadow-sm cursor-pointer hover:border-indigo-300 transition-colors" onclick="document.getElementById('statusToggle').click()">
+                    <span class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider select-none" id="toggleLabel">Semua</span>
+                    <input type="checkbox" id="statusToggle" class="toggle-switch pointer-events-none">
                 </div>
-                <label class="group flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold cursor-pointer hover:bg-indigo-600 transition-all shadow-md active:scale-95">
-                    <i class="ph-bold ph-upload-simple text-sm"></i>
-                    <span>Upload</span>
+
+                <!-- Upload -->
+                <label class="group flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-600 transition-all shadow-lg shadow-slate-300 hover:shadow-indigo-200 active:scale-95 border border-slate-800">
+                    <i class="ph-bold ph-upload-simple text-lg group-hover:animate-bounce"></i>
+                    <span>Upload CSV</span>
                     <input type='file' class="hidden" id="csvFileInput" accept=".csv" />
                 </label>
             </div>
         </header>
 
-        <!-- 1. KPI CARDS -->
-        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-4">
+        <!-- 1. KPI CARDS (LARGER & BOLDER) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-5 mb-8">
             <script>
-                const kpiCard = (id, label, gradFrom, gradTo, icon, delay) => document.write(`
-                    <div class="kpi-card p-3 flex flex-col justify-between h-20 animate-fade-in" style="animation-delay: ${delay}ms">
+                const kpiCard = (id, label, color, icon, delay) => document.write(`
+                    <div class="kpi-card p-5 flex flex-col justify-between h-32 animate-fade-in-up hover:bg-${color}-50/10" style="animation-delay: ${delay}ms">
                         <div class="flex justify-between items-start">
-                            <div class="w-6 h-6 rounded-md bg-gradient-to-br from-${gradFrom}-500 to-${gradTo}-600 flex items-center justify-center text-white shadow-sm">
-                                <i class="ph-bold ${icon} text-xs"></i>
+                            <div class="w-10 h-10 rounded-xl bg-${color}-50 flex items-center justify-center text-${color}-600 border border-${color}-100">
+                                <i class="ph-duotone ${icon} text-xl"></i>
                             </div>
-                            <div class="text-[9px] font-bold text-slate-400 bg-slate-50 px-1 py-0.5 rounded border border-slate-100" id="${id}Pct">0%</div>
+                            <div class="text-[10px] font-extrabold text-${color}-600 bg-${color}-50/50 px-2 py-1 rounded-lg border border-${color}-100" id="${id}Pct">0%</div>
                         </div>
                         <div>
-                            <h3 class="text-lg font-extrabold text-slate-800 tracking-tight mt-1 leading-none" id="${id}">0</h3>
-                            <p class="text-[9px] font-semibold text-slate-500 uppercase tracking-wide mt-0.5">${label}</p>
+                            <h3 class="text-3xl font-black text-slate-800 tracking-tight mt-3 leading-none group-hover:text-${color}-600 transition-colors" id="${id}">0</h3>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">${label}</p>
                         </div>
                     </div>
                 `);
             </script>
             <script>
-                // Urutan: Total -> First -> Trans -> Mid -> 3PL -> Mitra -> Last
-                kpiCard('kpiTotal', 'Total AWB', 'slate', 'gray', 'ph-stack', 0);
-                kpiCard('kpiFirstMile', 'First Mile', 'indigo', 'violet', 'ph-storefront', 100);
-                kpiCard('kpiTransport', 'Transport', 'cyan', 'blue', 'ph-airplane-in-flight', 200);
-                kpiCard('kpiMidMile', 'Mid Mile', 'orange', 'amber', 'ph-factory', 300);
-                kpiCard('kpiVendor', 'Vendor 3PL', 'purple', 'fuchsia', 'ph-truck-trailer', 400);
-                kpiCard('kpiMitra', 'Mitra Usaha', 'emerald', 'teal', 'ph-briefcase', 500);
-                kpiCard('kpiLastMile', 'Last Mile', 'blue', 'sky', 'ph-moped', 600);
+                // Urutan: Total, First, Trans, Mid, 3PL, Mitra, Last
+                kpiCard('kpiTotal', 'Total AWB', 'slate', 'ph-stack', 0);
+                kpiCard('kpiFirstMile', 'First Mile', 'indigo', 'ph-storefront', 100);
+                kpiCard('kpiTransport', 'Transport', 'cyan', 'ph-airplane-in-flight', 200);
+                kpiCard('kpiMidMile', 'Mid Mile', 'orange', 'ph-factory', 300);
+                kpiCard('kpiVendor', 'Vendor 3PL', 'purple', 'ph-truck-trailer', 400);
+                kpiCard('kpiMitra', 'Mitra Usaha', 'emerald', 'ph-briefcase', 500);
+                kpiCard('kpiLastMile', 'Last Mile', 'blue', 'ph-moped', 600);
             </script>
         </div>
 
-        <!-- 2. CHARTS SECTION -->
-        <div class="grid grid-cols-12 gap-4 mb-4">
-            <div class="col-span-12 lg:col-span-6 glass-panel p-4 h-[50vh] flex flex-col">
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-[11px] font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wide">
-                        <span class="w-2 h-2 rounded-full bg-violet-500"></span> Tren Tahunan (HUB)
+        <!-- 2. CHARTS SECTION (SMALLER HEIGHT) -->
+        <div class="grid grid-cols-12 gap-6 mb-6">
+            <!-- Tahunan -->
+            <div class="col-span-12 lg:col-span-6 glass-panel p-6 h-[350px] flex flex-col relative overflow-hidden">
+                <div class="flex justify-between items-center mb-4 z-10">
+                    <h4 class="text-sm font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wide">
+                        <span class="w-3 h-3 rounded-full bg-violet-500 ring-2 ring-violet-100"></span> Tren Tahunan (HUB)
                     </h4>
                 </div>
-                <div class="flex-1 w-full relative"><canvas id="yearlyChart"></canvas></div>
+                <div class="flex-1 w-full relative z-10"><canvas id="yearlyChart"></canvas></div>
+                <!-- Deco BG -->
+                <div class="absolute top-0 right-0 w-40 h-40 bg-violet-50 rounded-full blur-3xl -z-0 opacity-40"></div>
             </div>
-            <div class="col-span-12 lg:col-span-6 glass-panel p-4 h-[50vh] flex flex-col">
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-[11px] font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wide">
-                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Tren Bulanan (HUB)
+            
+            <!-- Bulanan -->
+            <div class="col-span-12 lg:col-span-6 glass-panel p-6 h-[350px] flex flex-col relative overflow-hidden">
+                <div class="flex justify-between items-center mb-4 z-10">
+                    <h4 class="text-sm font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wide">
+                        <span class="w-3 h-3 rounded-full bg-blue-500 ring-2 ring-blue-100"></span> Tren Bulanan (HUB)
                     </h4>
                 </div>
-                <div class="flex-1 w-full relative"><canvas id="monthlyChart"></canvas></div>
-            </div>
-        </div>
-
-        <!-- 3. DAILY CHART & MAIN TABLES -->
-        <div class="grid grid-cols-12 gap-4 mb-4">
-            <div class="col-span-12 glass-panel p-4 h-[40vh] flex flex-col">
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-[11px] font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wide">
-                        <span class="w-2 h-2 rounded-full bg-orange-500"></span> Tren Harian (Bulan Ini)
-                    </h4>
-                    <span id="currentMonthLabel" class="text-[9px] font-bold px-2 py-0.5 bg-orange-50 text-orange-600 rounded-full border border-orange-100"></span>
-                </div>
-                <div class="flex-1 w-full relative"><canvas id="dailyChart"></canvas></div>
+                <div class="flex-1 w-full relative z-10"><canvas id="monthlyChart"></canvas></div>
+                <div class="absolute top-0 right-0 w-40 h-40 bg-blue-50 rounded-full blur-3xl -z-0 opacity-40"></div>
             </div>
         </div>
 
-        <!-- 3 Tables Side-by-Side (COMPACT HEIGHT - [35vh]) -->
-        <div class="grid grid-cols-12 gap-4 h-[35vh] min-h-[350px] mb-4 items-start">
+        <!-- 3. DAILY CHART & MAIN TABLES (Grid Row) -->
+        <!-- Daily Chart - Moderate Height -->
+        <div class="grid grid-cols-12 gap-6 mb-6">
+            <div class="col-span-12 glass-panel p-6 h-[300px] flex flex-col relative overflow-hidden">
+                <div class="flex justify-between items-center mb-2 z-10">
+                    <h4 class="text-sm font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wide">
+                        <span class="w-3 h-3 rounded-full bg-orange-500 ring-2 ring-orange-100"></span> Tren Harian
+                    </h4>
+                    <span id="currentMonthLabel" class="text-[10px] font-extrabold px-3 py-1 bg-white text-orange-600 rounded-lg border border-orange-100 shadow-sm uppercase tracking-wide"></span>
+                </div>
+                <div class="flex-1 w-full relative z-10"><canvas id="dailyChart"></canvas></div>
+                <div class="absolute top-0 right-0 w-40 h-40 bg-orange-50 rounded-full blur-3xl -z-0 opacity-40"></div>
+            </div>
+        </div>
+
+        <!-- 3 Tables Side-by-Side (OPTIMIZED HEIGHT [500px]) -->
+        <div class="grid grid-cols-12 gap-6 h-[500px] mb-8 items-start">
+            
             <!-- Monitoring KPI (4 Columns) -->
             <div class="col-span-12 lg:col-span-4 flex flex-col h-full">
-                <div class="bg-indigo-600 text-white px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
-                    <i class="ph-bold ph-monitor text-xs"></i> <h3 class="text-[11px] font-bold">Monitoring KPI</h3>
+                <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-5 py-3 rounded-t-2xl flex items-center gap-2 shadow-lg shadow-indigo-200 z-10">
+                    <i class="ph-bold ph-monitor text-lg"></i> <h3 class="text-xs font-bold uppercase tracking-wider">Monitoring KPI</h3>
                 </div>
                 <div id="containerKPI" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
             </div>
 
-            <!-- Rekapan HUB (6 Columns) - WIDER -->
+            <!-- Rekapan HUB (6 Columns) -->
             <div class="col-span-12 lg:col-span-6 flex flex-col h-full">
-                <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex justify-between items-center shadow-sm shrink-0">
+                <div class="bg-white border border-slate-200 border-b-0 px-5 py-3 rounded-t-2xl flex justify-between items-center shadow-sm z-10">
                     <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-buildings text-orange-500 text-xs"></i> 
-                        <h3 class="text-[11px] font-bold text-slate-700">Rekapan HUB</h3>
+                        <i class="ph-duotone ph-buildings text-orange-500 text-xl"></i> 
+                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Rekapan HUB</h3>
                     </div>
                 </div>
                 <div id="containerHub" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
             </div>
 
-            <!-- Service (2 Columns) - NARROWER -->
+            <!-- Service (2 Columns) -->
             <div class="col-span-12 lg:col-span-2 flex flex-col h-full">
-                <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
-                    <i class="ph-bold ph-tag text-emerald-500 text-xs"></i> <h3 class="text-[11px] font-bold text-slate-700">Service</h3>
+                <div class="bg-white border border-slate-200 border-b-0 px-5 py-3 rounded-t-2xl flex items-center gap-2 shadow-sm z-10">
+                    <i class="ph-duotone ph-tag text-emerald-500 text-xl"></i> <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Service</h3>
                 </div>
                 <div id="containerService" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
             </div>
         </div>
 
-        <!-- 4. STAGING TABLE (Screen 3 - Reduced to 45vh) -->
-        <div class="grid grid-cols-12 gap-4 h-[45vh] flex flex-col">
+        <!-- 4. STAGING TABLE (600px Height) -->
+        <div class="grid grid-cols-12 gap-6 h-[600px] flex flex-col">
             <div class="col-span-12 h-full flex flex-col">
-                <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
-                    <i class="ph-bold ph-warehouse text-blue-500 text-xs"></i> <h3 class="text-[11px] font-bold text-slate-700">Rekapan Staging</h3>
+                <div class="bg-white border border-slate-200 border-b-0 px-5 py-3 rounded-t-2xl flex items-center gap-2 shadow-sm z-10">
+                    <i class="ph-duotone ph-warehouse text-blue-500 text-xl"></i> <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Rekapan Staging</h3>
                 </div>
                 <div id="containerStaging" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
             </div>
@@ -386,6 +409,7 @@
             return num ? num.toLocaleString('id-ID') : '0';
         }
 
+        // --- DYNAMIC ISLAND SYSTEM ---
         const island = document.getElementById('dynamicIsland');
         function showIsland(type, msg, onConfirm = null) {
             island.className = 'active'; 
@@ -416,6 +440,7 @@
             island.style.opacity = '1';
         }
 
+        // --- AUTH & INIT ---
         signInAnonymously(auth).catch(e => showIsland('error', "Auth Error"));
 
         onAuthStateChanged(auth, (user) => {
@@ -439,9 +464,11 @@
             onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
                 allData = [];
                 snapshot.forEach(doc => allData.push(doc.data()));
+                
                 const now = new Date();
                 const lastUpd = document.getElementById('lastUpdated');
                 if(lastUpd) lastUpd.innerText = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+                
                 populateDropdowns(allData);
                 renderDashboard();
                 forceHideLoading();
@@ -451,28 +478,34 @@
         function renderDashboard() {
             const filteredData = getFilteredData();
             calculateKPIs(filteredData);
+            
             generateKPIRecap(filteredData);
             generateHubRecap(filteredData);
             generateServiceRecap(filteredData);
             generateStagingRecap(filteredData);
+            
             updateCharts(filteredData);
         }
 
         function getFilteredData() {
             const startDateEl = document.getElementById('filterStartDate');
             if (!startDateEl) return allData;
+
             const startDateVal = startDateEl.value;
             const endDateVal = document.getElementById('filterEndDate').value;
             const hubVal = document.getElementById('filterHub') ? document.getElementById('filterHub').value : '';
             const serviceVal = document.getElementById('filterService') ? document.getElementById('filterService').value : '';
             const posisiVal = document.getElementById('filterPosisi') ? document.getElementById('filterPosisi').value : '';
+            
             const startDate = startDateVal ? new Date(startDateVal) : null;
             const endDate = endDateVal ? new Date(endDateVal) : null;
             if(startDate) startDate.setHours(0,0,0,0);
             if(endDate) endDate.setHours(23,59,59,999);
+
             return allData.filter(row => {
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
                 if (isGustiadiOnly && hubX !== 'gustiadi') return false;
+
                 if (startDate || endDate) {
                     const rowDate = parseDateStr(row['Tanggal']);
                     if (rowDate) {
@@ -480,9 +513,11 @@
                         if (endDate && rowDate > endDate) return false;
                     }
                 }
+
                 if (hubVal && row.delivery_hub !== hubVal) return false;
                 if (serviceVal && row.service_code !== serviceVal) return false;
                 if (posisiVal && row.Posisi !== posisiVal) return false;
+
                 return true;
             });
         }
@@ -496,6 +531,7 @@
                 if(r.service_code) services.add(r.service_code);
                 if(r.Posisi) posisis.add(r.Posisi); 
             });
+            
             const fill = (id, label, set) => {
                 const select = document.getElementById(id);
                 if(!select || select.options.length > 1) return;
@@ -518,9 +554,11 @@
             return null;
         }
 
+        // --- CHARTS (Updated with Gradients & Better Config) ---
         function updateCharts(data) {
             const yearly = {}; const monthly = {}; const daily = {};
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            
             let latestDate = new Date(0);
             data.forEach(row => {
                 const d = parseDateStr(row['Tanggal']);
@@ -528,13 +566,17 @@
             });
             const cmIdx = latestDate.getMonth();
             const cy = latestDate.getFullYear();
+            
             const mLabel = document.getElementById('currentMonthLabel');
             if (mLabel) mLabel.innerText = `${months[cmIdx]} ${cy}`;
+
             data.forEach(row => {
                 const pos = (row['Posisi'] || "").toLowerCase();
                 const filterPosisiEl = document.getElementById('filterPosisi');
                 const selectedPos = filterPosisiEl ? filterPosisiEl.value : '';
+                
                 if (!selectedPos && pos !== 'mid mile') return;
+
                 const date = parseDateStr(row['Tanggal']);
                 if (date) {
                     const y = date.getFullYear();
@@ -547,8 +589,10 @@
                     }
                 }
             });
+
             const sortMonth = (a,b) => new Date(`1 ${a}`) - new Date(`1 ${b}`);
             const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
+
             renderChart('yearlyChart', 'bar', Object.keys(yearly).sort(), Object.values(yearly), ['#8b5cf6', '#6d28d9']);
             renderChart('monthlyChart', 'line', Object.keys(monthly).sort(sortMonth), Object.keys(monthly).sort(sortMonth).map(k=>monthly[k]), ['#3b82f6', '#1d4ed8']);
             renderChart('dailyChart', 'bar', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), ['#f97316', '#c2410c']);
@@ -557,19 +601,26 @@
         function renderChart(id, type, labels, data, colors) {
             const ctx = document.getElementById(id).getContext('2d');
             if (chartInstances[id]) chartInstances[id].destroy();
+
             const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            if(type === 'bar') { gradient.addColorStop(0, colors[0]); gradient.addColorStop(1, colors[1]); }
-            else { gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)'); gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)'); }
+            if(type === 'bar') {
+                gradient.addColorStop(0, colors[0]);
+                gradient.addColorStop(1, colors[1]);
+            } else {
+                gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+                gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+            }
+
             chartInstances[id] = new Chart(ctx, {
                 type: type,
                 data: {
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: type === 'line' ? gradient : colors[0],
+                        backgroundColor: type === 'line' ? gradient : colors[0], 
                         borderColor: colors[0],
                         borderWidth: 0,
-                        borderRadius: 3,
+                        borderRadius: 4,
                         tension: 0.3,
                         pointBackgroundColor: '#fff',
                         pointBorderColor: colors[0],
@@ -580,18 +631,30 @@
                     }]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         tooltip: { enabled: false },
-                        datalabels: { anchor: 'end', align: 'top', color: '#64748b', font: { size: 10, weight: 'bold', family: 'Plus Jakarta Sans' }, offset: -2, formatter: (val) => formatNumber(val) }
+                        datalabels: {
+                            anchor: 'end', align: 'top', color: '#64748b',
+                            font: { size: 10, weight: 'bold', family: 'Plus Jakarta Sans' },
+                            offset: -2, formatter: (val) => formatNumber(val)
+                        }
                     },
-                    scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 10, family: 'Plus Jakarta Sans', weight: '500' }, color: '#94a3b8' } } },
+                    scales: {
+                        y: { display: false },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: { size: 10, family: 'Plus Jakarta Sans', weight: '600' }, color: '#94a3b8' } 
+                        }
+                    },
                     layout: { padding: { top: 25 } }
                 }
             });
         }
 
+        // --- HELPER UNTUK RENDER TABEL (Fixed Layout) ---
         function renderStructuredTable(containerId, theadHTML, tbodyHTML, tfootHTML) {
             const container = document.getElementById(containerId);
             if(!container) return;
