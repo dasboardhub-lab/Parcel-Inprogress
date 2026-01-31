@@ -1050,6 +1050,7 @@
         function updateCharts(data) {
             const yearly = {}; const monthly = {}; const daily = {};
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            
             let latestDate = new Date(0);
             data.forEach(row => {
                 const d = parseDateStr(row['Tanggal']);
@@ -1057,27 +1058,50 @@
             });
             const cmIdx = latestDate.getMonth();
             const cy = latestDate.getFullYear();
+            
             const mLabel = document.getElementById('currentMonthLabel');
             if (mLabel) mLabel.innerText = `${months[cmIdx]} ${cy}`;
+
             data.forEach(row => {
-                const pos = (row['Posisi'] || "").toLowerCase();
+                const pos = (row['Posisi'] || "").toLowerCase().trim();
+                const hubX = (row['HUB X'] || "").toLowerCase().trim();
                 const filterPosisiEl = document.getElementById('filterPosisi');
                 const selectedPos = filterPosisiEl ? filterPosisiEl.value : '';
-                if (!selectedPos && pos !== 'mid mile') return;
+                
+                // LOGIKA CHART BARU:
+                // Default: Menampilkan (Mid Mile + Transport) DAN (HUB X = Gustiadi)
+                // Jika user memilih posisi spesifik, tampilkan sesuai pilihan.
+                let includeInChart = false;
+                if (selectedPos) {
+                    includeInChart = true; // Gunakan data yang sudah difilter
+                } else {
+                    // Filter khusus Chart jika Posisi = Semua
+                    if ( (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi' ) {
+                        includeInChart = true;
+                    }
+                }
+
+                if (!includeInChart) return;
+
                 const date = parseDateStr(row['Tanggal']);
                 if (date) {
                     const y = date.getFullYear();
                     const mKey = `${months[date.getMonth()]} ${y}`;
+                    
                     yearly[y] = (yearly[y] || 0) + 1;
                     monthly[mKey] = (monthly[mKey] || 0) + 1;
+                    
+                    // Daily: Only for current month & year
                     if (date.getMonth() === cmIdx && date.getFullYear() === cy) {
                         const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
                         daily[dKey] = (daily[dKey] || 0) + 1;
                     }
                 }
             });
+
             const sortMonth = (a,b) => new Date(`1 ${a}`) - new Date(`1 ${b}`);
             const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
+
             renderChart('yearlyChart', 'bar', Object.keys(yearly).sort(), Object.values(yearly), ['#8b5cf6', '#6d28d9']);
             renderChart('monthlyChart', 'line', Object.keys(monthly).sort(sortMonth), Object.keys(monthly).sort(sortMonth).map(k=>monthly[k]), ['#3b82f6', '#1d4ed8']);
             renderChart('dailyChart', 'bar', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), ['#f97316', '#c2410c']);
