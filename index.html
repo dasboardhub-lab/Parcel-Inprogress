@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Monitoring Paket</title>
+    <title>Dashboard SLA Inprogress</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -79,6 +79,23 @@
         .island-content { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; }
         .island-spinner { border: 2px solid rgba(255,255,255,0.2); border-top: 2px solid #60a5fa; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- SUMMARY MODAL --- */
+        #summaryModalOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+            z-index: 200; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #summaryModalOverlay.open { opacity: 1; pointer-events: auto; }
+        .summary-card {
+            background: white; width: 95%; max-width: 700px; border-radius: 20px;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.2);
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid #e2e8f0; max-height: 90vh; overflow-y: auto;
+            display: flex; flex-direction: column;
+        }
+        #summaryModalOverlay.open .summary-card { transform: scale(1); }
 
         /* --- MODERN TABLE --- */
         .modern-table-container { 
@@ -184,6 +201,64 @@
 
     <!-- DYNAMIC ISLAND -->
     <div id="dynamicIsland"></div>
+
+    <!-- SUMMARY MODAL (UPDATED WITH ORIGIN & FEEDBACK) -->
+    <div id="summaryModalOverlay">
+        <div class="summary-card">
+            <!-- Header -->
+            <div class="bg-slate-50 px-6 py-4 rounded-t-2xl border-b border-slate-100 flex justify-between items-center sticky top-0 z-10">
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 border border-indigo-200"><i class="ph-bold ph-chart-pie-slice text-xl"></i></div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800" id="summaryTitle">Analisis HUB & Trans</h3>
+                        <p class="text-[10px] text-slate-500 font-medium flex items-center gap-1"><i class="ph-fill ph-info"></i> In Area Gustiadi (Mid Mile + Transport)</p>
+                    </div>
+                </div>
+                <button onclick="closeSummary()" class="text-slate-400 hover:text-red-500 transition bg-white p-1 rounded-full shadow-sm border border-slate-200"><i class="ph-bold ph-x text-lg"></i></button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 overflow-y-auto">
+                <!-- 1. Top 3 Origin -->
+                <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <i class="ph-fill ph-map-pin text-orange-500"></i> Top 3 Origin (Penyumbang Terbanyak)
+                </h4>
+                <div class="grid grid-cols-3 gap-3 mb-6" id="topOriginsContainer">
+                    <!-- JS Injected -->
+                    <div class="bg-slate-50 rounded-xl p-3 text-center border border-slate-100"><span class="text-xs text-slate-400">-</span></div>
+                    <div class="bg-slate-50 rounded-xl p-3 text-center border border-slate-100"><span class="text-xs text-slate-400">-</span></div>
+                    <div class="bg-slate-50 rounded-xl p-3 text-center border border-slate-100"><span class="text-xs text-slate-400">-</span></div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 2. Feedback Breakdown -->
+                    <div>
+                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <i class="ph-fill ph-chat-text text-indigo-500"></i> Feedback (Status)
+                        </h4>
+                        <div class="space-y-3" id="feedbackBreakdown">
+                            <!-- JS injected -->
+                        </div>
+                    </div>
+
+                    <!-- 3. Service Breakdown -->
+                    <div>
+                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <i class="ph-fill ph-tag text-emerald-500"></i> Service Type
+                        </h4>
+                        <div class="space-y-3" id="serviceBreakdown">
+                            <!-- JS injected -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="bg-slate-50 px-6 py-3 rounded-b-2xl border-t border-slate-100 text-center sticky bottom-0">
+                <p class="text-[10px] text-slate-400 font-medium">Total Data Dianalisa: <span class="font-bold text-slate-700" id="totalAnalyzed">0</span> Paket</p>
+            </div>
+        </div>
+    </div>
 
     <!-- MAIN WRAPPER -->
     <div class="w-full max-w-[99%] mx-auto py-3 pb-8">
@@ -304,7 +379,7 @@
             </div>
         </div>
 
-        <!-- 3 Tables Side-by-Side (COMPACT HEIGHT - [35vh]) -->
+        <!-- 3 Tables Side-by-Side -->
         <div class="grid grid-cols-12 gap-4 h-[35vh] min-h-[350px] mb-4 items-start">
             <!-- Monitoring KPI (4 Columns) -->
             <div class="col-span-12 lg:col-span-4 flex flex-col h-full">
@@ -334,7 +409,7 @@
             </div>
         </div>
 
-        <!-- 4. STAGING TABLE (Screen 3 - 45vh Height) -->
+        <!-- 4. STAGING TABLE -->
         <div class="grid grid-cols-12 gap-4 h-[45vh] flex flex-col">
             <div class="col-span-12 h-full flex flex-col">
                 <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
@@ -344,7 +419,6 @@
             </div>
         </div>
 
-        <!-- Hidden Raw Table for Data -->
         <div class="hidden-section">
             <table id="tableRawBody"></table>
             <div id="rawCount"></div>
@@ -382,6 +456,109 @@
             return num ? num.toLocaleString('id-ID') : '0';
         }
 
+        // --- MODAL LOGIC (UPDATED: Feedback & Origins) ---
+        window.openHubSummary = (hubName) => {
+            if(!hubName) return;
+            const modal = document.getElementById('summaryModalOverlay');
+            const title = document.getElementById('summaryTitle');
+            const breakdown = document.getElementById('serviceBreakdown');
+            const feedbackList = document.getElementById('feedbackBreakdown');
+            const originsContainer = document.getElementById('topOriginsContainer');
+            const totalAnalyzed = document.getElementById('totalAnalyzed');
+
+            // Logic: HUB & Trans (Gustiadi Context)
+            const stuckData = allData.filter(r => 
+                (r['delivery_hub'] === hubName) &&
+                (['mid mile', 'transport'].includes((r['Posisi'] || "").toLowerCase().trim())) &&
+                ((r['HUB X'] || "").toLowerCase().trim() === 'gustiadi')
+            );
+
+            title.innerText = `Analisis HUB & Trans - ${hubName}`;
+            totalAnalyzed.innerText = formatNumber(stuckData.length);
+            
+            const services = {};
+            const feedbacks = {};
+            const origins = {};
+
+            stuckData.forEach(r => {
+                // Origin (pickup_hub)
+                const origin = r['pickup_hub'] || 'Unknown';
+                origins[origin] = (origins[origin] || 0) + 1;
+
+                // Service
+                const svc = r['service_code'] || 'Unknown';
+                services[svc] = (services[svc] || 0) + 1;
+
+                // Feedback
+                let fb = r['Feedback'] ? r['Feedback'].trim() : "Belum ada Feedback";
+                if(!fb) fb = "Belum ada Feedback";
+                feedbacks[fb] = (feedbacks[fb] || 0) + 1;
+            });
+
+            // 1. Render Top 3 Origins
+            const sortedOrigins = Object.entries(origins).sort((a,b) => b[1] - a[1]).slice(0, 3);
+            originsContainer.innerHTML = sortedOrigins.map(([org, count], idx) => {
+                const pct = (count / stuckData.length) * 100;
+                const colors = ['bg-orange-50 border-orange-100 text-orange-700', 'bg-blue-50 border-blue-100 text-blue-700', 'bg-slate-50 border-slate-100 text-slate-700'];
+                return `
+                    <div class="${colors[idx] || colors[2]} border rounded-xl p-3 text-center shadow-sm">
+                        <p class="text-xs font-bold mb-1 opacity-70">Top ${idx+1}</p>
+                        <p class="text-xl font-black leading-none mb-1">${org}</p>
+                        <p class="text-[10px] font-semibold opacity-80">${count} (${pct.toFixed(0)}%)</p>
+                    </div>
+                `;
+            }).join('') || '<div class="col-span-3 text-center text-slate-400 italic text-[10px]">Data origin tidak tersedia</div>';
+
+            // 2. Render Feedback (Top 5)
+            const sortedFeedback = Object.entries(feedbacks).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            feedbackList.innerHTML = sortedFeedback.map(([fb, count]) => {
+                const pct = (count / stuckData.length) * 100;
+                let barColor = "bg-indigo-500";
+                if(fb.toLowerCase().includes("kendala") || fb.toLowerCase().includes("rusak") || fb.toLowerCase().includes("bencana")) barColor = "bg-red-500";
+                
+                return `
+                    <div class="mb-2">
+                        <div class="flex justify-between text-[10px] font-bold text-slate-600 mb-1">
+                            <span class="truncate pr-2 w-48">${fb}</span>
+                            <span>${count}</span>
+                        </div>
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden flex items-center">
+                            <div class="h-full ${barColor} rounded-full" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            if(stuckData.length === 0) feedbackList.innerHTML = `<p class="text-center text-slate-400 italic text-[10px] py-2">Tidak ada data.</p>`;
+
+            // 3. Render Services (Top 5)
+            const sortedSvc = Object.entries(services).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            breakdown.innerHTML = sortedSvc.map(([svc, count]) => {
+                const pct = (count / stuckData.length) * 100;
+                return `
+                    <div class="flex items-center justify-between text-[11px] mb-2 border-b border-dashed border-slate-100 pb-1 last:border-0">
+                        <span class="font-bold text-slate-600">${svc}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-emerald-600">${count}</span>
+                            <span class="text-[9px] text-slate-400 font-medium bg-slate-50 px-1 rounded">${pct.toFixed(0)}%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            modal.classList.add('open');
+        }
+
+        window.closeSummary = () => {
+            document.getElementById('summaryModalOverlay').classList.remove('open');
+        }
+
+        document.getElementById('summaryModalOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('summaryModalOverlay')) {
+                window.closeSummary();
+            }
+        });
+
+        // --- DYNAMIC ISLAND SYSTEM ---
         const island = document.getElementById('dynamicIsland');
         function showIsland(type, msg, onConfirm = null) {
             island.className = 'active'; 
@@ -412,6 +589,7 @@
             island.style.opacity = '1';
         }
 
+        // --- AUTH & INIT ---
         signInAnonymously(auth).catch(e => showIsland('error', "Auth Error"));
 
         onAuthStateChanged(auth, (user) => {
@@ -602,11 +780,19 @@
             });
         }
 
-        // --- HELPER UNTUK RENDER TABEL (Single Table for Alignment) ---
-        function renderTableHTML(containerId, content) {
+        // --- HELPER UNTUK RENDER TABEL (Fixed Layout) ---
+        function renderStructuredTable(containerId, theadHTML, tbodyHTML, tfootHTML) {
             const container = document.getElementById(containerId);
             if(!container) return;
-            container.innerHTML = `<div class="table-scroll-area h-full"><table class="pivot-table">${content}</table></div>`;
+            container.innerHTML = `
+                <div class="table-scroll-area h-full">
+                    <table class="pivot-table">
+                        <thead>${theadHTML}</thead>
+                        <tbody>${tbodyHTML}</tbody>
+                        <tfoot>${tfootHTML}</tfoot>
+                    </table>
+                </div>
+            `;
         }
 
         // 1. KPI (Updated Logic with baseData)
@@ -631,29 +817,46 @@
                 // 2. MM REG (HUB X = Gustiadi)
                 if(groupFull.includes(pos) && hubX === 'gustiadi') { hubs[h].reg++; totals.reg++; }
                 
-                // 3. Trans+3PL (HUB X = Gustiadi)
-                if(['vendor 3pl','transport'].includes(pos) && hubX === 'gustiadi') { hubs[h].trans++; totals.trans++; }
+                // 3. Vendor 3PL (HUB X = Gustiadi) - NEW NAME & LOGIC
+                if(pos === 'vendor 3pl' && hubX === 'gustiadi') { hubs[h].trans++; totals.trans++; }
                 
-                // 4. HUB (HUB X = Gustiadi)
-                if(pos === 'mid mile' && hubX === 'gustiadi') { hubs[h].hub++; totals.hub++; }
+                // 4. HUB & Trans (HUB X = Gustiadi) - NEW NAME & LOGIC
+                if(['mid mile', 'transport'].includes(pos) && hubX === 'gustiadi') { hubs[h].hub++; totals.hub++; }
             });
 
             const keys = Object.keys(hubs).sort();
-            const cell = (v, t, isWarn=false) => {
+            const cell = (v, t, isWarn=false, hubName) => {
                 const pct = t>0?(v/t)*100:0;
                 let warnIcon = ""; let cls = "text-slate-700";
-                if(isWarn && pct>5) { warnIcon = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px] mr-1"></i>`; cls = "text-red-600 font-bold"; }
+                
+                if (isWarn) {
+                    if (pct > 5.0) {
+                        warnIcon = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px] mr-1"></i>`;
+                        cls = "text-red-600 font-bold cursor-pointer hover:bg-red-50 rounded px-2 transition-colors";
+                    } else {
+                        cls = "cursor-pointer hover:bg-slate-100 rounded px-2 transition-colors";
+                    }
+                    return `<div class="flex flex-col items-center" onclick="openHubSummary('${hubName}')">
+                                <div class="pivot-val ${cls}">${v>0?formatNumber(v):'-'}</div>
+                                <div class="pivot-pct flex items-center">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div>
+                            </div>`;
+                }
+
                 return `<div class="flex flex-col items-center"><div class="pivot-val ${cls}">${v>0?formatNumber(v):'-'}</div><div class="pivot-pct flex items-center">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div></div>`;
             }
             
-            let html = `<thead><tr><th class="w-20">HUB</th><th class="text-center w-24 text-indigo-700 bg-indigo-50/50">Total</th><th class="text-center w-24">MM Nas</th><th class="text-center w-24">MM Reg</th><th class="text-center w-24">Trans+3PL</th><th class="text-center w-24">HUB</th></tr></thead><tbody>`;
+            // Header UPDATED
+            let theadContent = `<tr><th style="width:25%">HUB</th><th style="width:15%" class="text-center text-indigo-700 bg-indigo-50/50">Total</th><th style="width:15%" class="text-center">MM Nas</th><th style="width:15%" class="text-center">MM Reg</th><th style="width:15%" class="text-center">Vendor 3PL</th><th style="width:15%" class="text-center">HUB & Trans</th></tr>`;
+            
+            let tbodyContent = "";
             keys.forEach(h => {
                 const d = hubs[h];
-                html += `<tr><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/50">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t, true)}</td></tr>`;
+                tbodyContent += `<tr><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/50">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t, true, h)}</td></tr>`;
             });
-            html += `</tbody><tfoot><tr><td class="px-3">TOTAL</td><td class="text-center text-indigo-700">${formatNumber(totals.total)}</td><td class="text-center">${cell(totals.nas,totals.total)}</td><td class="text-center">${cell(totals.reg,totals.total)}</td><td class="text-center">${cell(totals.trans,totals.total)}</td><td class="text-center">${cell(totals.hub,totals.total)}</td></tr></tfoot>`;
-            
-            renderTableHTML('containerKPI', html);
+
+            let tfootContent = `<tr><td class="px-3">TOTAL</td><td class="text-center text-indigo-700">${formatNumber(totals.total)}</td><td class="text-center">${cell(totals.nas,totals.total)}</td><td class="text-center">${cell(totals.reg,totals.total)}</td><td class="text-center">${cell(totals.trans,totals.total)}</td><td class="text-center">${cell(totals.hub,totals.total)}</td></tr>`;
+
+            renderStructuredTable('containerKPI', theadContent, tbodyContent, tfootContent);
         }
 
         // 2. HUB RECAP
@@ -669,10 +872,18 @@
             const sortedHubs = Object.keys(hubs).sort();
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            let html = `<thead><tr><th class="w-40">HUB</th><th class="text-center w-24 bg-indigo-50/50 text-indigo-700">${title}</th>`;
-            sortedPos.forEach(p => html += `<th class="text-center w-24">${p}</th>`);
-            html += `</tr></thead><tbody>`;
+            // Width Calc
+            const colCount = sortedPos.length + 2;
+            const hubW = 20; const dataW = 80/(colCount-1);
+            let colGroup = `<colgroup><col style="width:${hubW}%">`;
+            for(let i=0; i<colCount-1; i++) colGroup += `<col style="width:${dataW}%">`;
+            colGroup += `</colgroup>`;
 
+            let theadContent = `${colGroup}<tr><th>HUB</th><th class="text-center bg-indigo-50/50 text-indigo-700">${title}</th>`;
+            sortedPos.forEach(p => theadContent += `<th class="text-center">${p}</th>`);
+            theadContent += `</tr>`;
+
+            let tbodyContent = colGroup;
             let gt = 0;
             sortedHubs.forEach(h => {
                 const d = hubs[h]; gt += d.t;
@@ -680,7 +891,7 @@
                 let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                 let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
 
-                html += `<tr><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold bg-indigo-50/50 text-indigo-700">${formatNumber(d.t)}</td>`;
+                tbodyContent += `<tr><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold bg-indigo-50/50 text-indigo-700">${formatNumber(d.t)}</td>`;
                 sortedPos.forEach(p => {
                     const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
                     let content = `<span class="text-slate-300">-</span>`;
@@ -690,15 +901,16 @@
                         else if(c===maxOther) warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px] mr-1"></i>`;
                         content = `<div>${formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
                     }
-                    html += `<td class="text-center" style="background-color:${bg}">${content}</td>`;
+                    tbodyContent += `<td class="text-center" style="background-color:${bg}">${content}</td>`;
                 });
-                html += `</tr>`;
+                tbodyContent += `</tr>`;
             });
-            html += `</tbody><tfoot><tr><td class="px-3">ALL</td><td class="text-center text-indigo-700">${formatNumber(gt)}</td>`;
-            sortedPos.forEach(p => html += `<td class="text-center text-indigo-900">${formatNumber(posTotals[p]||0)}</td>`);
-            html += `</tr></tfoot>`;
             
-            renderTableHTML('containerHub', html);
+            let tfootContent = `${colGroup}<tr><td class="px-3">ALL</td><td class="text-center text-indigo-700">${formatNumber(gt)}</td>`;
+            sortedPos.forEach(p => tfootContent += `<td class="text-center text-indigo-900">${formatNumber(posTotals[p]||0)}</td>`);
+            tfootContent += `</tr>`;
+
+            renderStructuredTable('containerHub', theadContent, tbodyContent, tfootContent);
         }
 
         // 3. SERVICE RECAP
@@ -709,20 +921,22 @@
             let gt = 0;
             const colGroup = `<colgroup><col style="width:40%"><col style="width:30%"><col style="width:30%"></colgroup>`;
 
-            let html = `<thead><tr><th class="text-left w-40">Service</th><th class="text-center w-24 text-indigo-700 bg-indigo-50/50">Total</th><th class="text-center w-24">%</th></tr></thead><tbody>`;
+            let theadContent = `${colGroup}<tr><th class="text-left">Service</th><th class="text-center text-indigo-700 bg-indigo-50/50">Total</th><th class="text-center">%</th></tr>`;
+            let tbodyContent = colGroup;
             keys.forEach(s => {
                 const c = svcMap[s]; gt += c;
                 const pct = data.length>0?(c/data.length)*100:0;
-                html += `<tr><td class="font-bold px-3 text-slate-700">${s}</td><td class="text-center font-bold bg-indigo-50/20 text-indigo-700">${formatNumber(c)}</td><td class="text-center text-[10px] text-slate-500 font-semibold">${pct.toFixed(1)}%</td></tr>`;
+                tbodyContent += `<tr><td class="font-bold px-3 text-slate-700">${s}</td><td class="text-center font-bold bg-indigo-50/20 text-indigo-700">${formatNumber(c)}</td><td class="text-center text-[10px] text-slate-500 font-semibold">${pct.toFixed(1)}%</td></tr>`;
             });
-            html += `</tbody><tfoot><tr><td class="px-3">TOTAL</td><td class="text-center text-indigo-700">${formatNumber(gt)}</td><td class="text-center text-indigo-900">100%</td></tr></tfoot>`;
-            
-            renderTableHTML('containerService', html);
+            let tfootContent = `${colGroup}<tr><td class="px-3">TOTAL</td><td class="text-center text-indigo-700">${formatNumber(gt)}</td><td class="text-center text-indigo-900">100%</td></tr>`;
+
+            renderStructuredTable('containerService', theadContent, tbodyContent, tfootContent);
         }
 
         // 4. STAGING RECAP
         function generateStagingRecap(data) {
             const grouping = {}; const posTotals = {};
+            
             data.forEach(r => {
                 const h = r['delivery_hub']; const s = r['delivery_staging']; const p = r['Posisi'];
                 posTotals[p] = (posTotals[p]||0)+1;
@@ -730,14 +944,27 @@
                 if(!grouping[h][s]) grouping[h][s]={t:0,c:{}};
                 grouping[h][s].t++; grouping[h][s].c[p] = (grouping[h][s].c[p]||0)+1;
             });
+
             const sortedPos = Object.keys(posTotals).sort((a,b)=>posTotals[b]-posTotals[a]);
             const sortedHubs = Object.keys(grouping).sort();
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            let html = `<thead><tr><th class="w-40">HUB</th><th class="w-40">Staging</th><th class="text-center w-24 bg-indigo-50/50 text-indigo-700">${title}</th>`;
-            sortedPos.forEach(p => html += `<th class="text-center w-24">${p}</th>`);
-            html += `</tr></thead><tbody>`;
+            // Widths Calculation
+            const hubW = 10;
+            const stagingW = 14;
+            const remainingW = 100 - (hubW + stagingW);
+            const dataCount = sortedPos.length + 1;
+            const dataW = remainingW / dataCount;
 
+            let colGroup = `<colgroup><col style="width:${hubW}%"><col style="width:${stagingW}%"><col style="width:${dataW}%">`;
+            for(let i=0; i<sortedPos.length; i++) colGroup += `<col style="width:${dataW}%">`;
+            colGroup += `</colgroup>`;
+
+            let theadContent = `${colGroup}<tr><th>HUB</th><th>Staging</th><th class="text-center bg-indigo-50/50 text-indigo-700">${title}</th>`;
+            sortedPos.forEach(p => theadContent += `<th class="text-center">${p}</th>`);
+            theadContent += `</tr>`;
+
+            let tbodyContent = colGroup;
             let grandTotal = 0;
             sortedHubs.forEach(h => {
                 const stagings = Object.keys(grouping[h]).sort();
@@ -748,9 +975,9 @@
                     let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                     let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
 
-                    html += `<tr>`;
-                    if(i===0) html += `<td class="row-group-header border-b px-3 text-slate-700 font-bold" rowspan="${stagings.length}">${h}</td>`;
-                    html += `<td class="text-slate-600 border-r px-3 font-medium">${ss}</td><td class="text-center font-bold bg-indigo-50/30 text-indigo-700 border-r">${formatNumber(d.t)}</td>`;
+                    tbodyContent += `<tr>`;
+                    if(i===0) tbodyContent += `<td class="row-group-header border-b px-3 text-slate-700 font-bold" rowspan="${stagings.length}">${h}</td>`;
+                    tbodyContent += `<td class="text-slate-600 border-r px-3 font-medium">${ss}</td><td class="text-center font-bold bg-indigo-50/30 text-indigo-700 border-r">${formatNumber(d.t)}</td>`;
                     
                     sortedPos.forEach(p => {
                         const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
@@ -761,16 +988,16 @@
                             else if(c===maxOther) warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px] mr-1"></i>`;
                             content = `<div>${formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
                         }
-                        html += `<td class="text-center border-r" style="background-color:${bg}">${content}</td>`;
+                        tbodyContent += `<td class="text-center border-r" style="background-color:${bg}">${content}</td>`;
                     });
-                    html += `</tr>`;
+                    tbodyContent += `</tr>`;
                 });
             });
-            html += `</tbody><tfoot><tr><td colspan="2" class="px-3">GRAND TOTAL</td><td class="text-center text-indigo-800">${formatNumber(grandTotal)}</td>`;
-            sortedPos.forEach(pos => html += `<td class="text-center border-r border-slate-200 text-slate-700">${formatNumber(posTotals[pos]||0)}</td>`);
-            html += `</tr></tfoot>`;
+            let tfootContent = `${colGroup}<tr><td colspan="2" class="px-3">GRAND TOTAL</td><td class="text-center text-indigo-800">${formatNumber(grandTotal)}</td>`;
+            sortedPos.forEach(pos => tfootContent += `<td class="text-center border-r border-slate-200 text-slate-700">${formatNumber(posTotals[pos]||0)}</td>`);
+            tfootContent += `</tr>`;
 
-            renderTableHTML('containerStaging', html);
+            renderStructuredTable('containerStaging', theadContent, tbodyContent, tfootContent);
         }
 
         function getGradient(val, min, max) {
