@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Monitoring Paket - Pro View</title>
+    <title>Dashboard Monitoring Paket - Premium View</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,286 +17,309 @@
 
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: { 850: '#151F32' } // Custom dark slate
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(79, 70, 229, 0.15)',
+                        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; font-size: 12px; }
+        body { background-color: #f1f5f9; color: #0f172a; font-size: 12px; }
         .hidden-section { display: none !important; }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        /* Smooth Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* Loading Overlay (Initial Load) */
+        /* Loading Overlay */
         #initialLoading {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff; z-index: 9999;
+            background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.5s ease;
         }
 
-        /* --- DYNAMIC ISLAND NOTIFICATION --- */
+        /* --- DYNAMIC ISLAND --- */
         #dynamicIsland {
-            position: fixed;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #0f172a; /* Slate 900 */
-            color: white;
-            border-radius: 9999px;
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95); color: white;
+            border-radius: 999px; padding: 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1);
+            z-index: 100; display: flex; align-items: center; justify-content: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             width: 0; height: 0; opacity: 0; overflow: hidden;
         }
+        #dynamicIsland.active { width: auto; min-width: 160px; height: 44px; padding: 0 20px; opacity: 1; }
+        #dynamicIsland.expanded { border-radius: 28px; width: 320px; height: auto; padding: 28px; flex-direction: column; }
+        .island-content { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; }
+        .island-spinner { border: 2px solid rgba(255,255,255,0.2); border-top: 2px solid #60a5fa; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        #dynamicIsland.active {
-            width: auto; min-width: 140px; height: 36px; padding: 0 16px; opacity: 1;
+        /* --- MODERN TABLE --- */
+        .modern-table-container { 
+            background: white; border-radius: 16px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e2e8f0; overflow: hidden;
         }
-
-        #dynamicIsland.expanded {
-            border-radius: 24px; width: 300px; height: auto; padding: 24px; flex-direction: column;
-        }
-
-        .island-content { display: flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 600; font-size: 13px; }
-        .island-spinner { border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; }
-        
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* --- UNIFORM TABLE STYLING --- */
-        .table-container { border-radius: 8px; border: 1px solid #e2e8f0; background: white; }
-        
-        .pivot-table { border-collapse: collapse; width: 100%; font-size: 11px; }
-        
-        /* Header Uniformity */
+        .pivot-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; }
         .pivot-table thead th { 
             position: sticky; top: 0; z-index: 10;
-            background-color: #f8fafc; /* Slate 50 */
-            color: #475569; /* Slate 600 */
-            font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
-            height: 40px; /* FIXED HEIGHT */
-            padding: 0 12px;
-            border-bottom: 1px solid #e2e8f0;
-            white-space: nowrap;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            background: #f8fafc; color: #64748b;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 10px;
+            height: 44px; padding: 0 16px;
+            border-bottom: 1px solid #e2e8f0; text-align: left;
         }
-        
-        /* Cell Uniformity */
+        .pivot-table thead th.text-center { text-align: center; }
         .pivot-table td { 
-            height: 36px; /* FIXED HEIGHT */
-            padding: 0 12px;
-            border-bottom: 1px solid #f1f5f9;
-            border-right: 1px solid #f1f5f9;
-            vertical-align: middle; /* Center Vertically */
-            color: #334155;
+            height: 40px; padding: 0 16px;
+            border-bottom: 1px solid #f1f5f9; color: #334155; font-weight: 500;
+            vertical-align: middle;
         }
+        .pivot-table tr:hover td { background-color: #f8fafc; }
         .pivot-table tr:last-child td { border-bottom: none; }
-        .pivot-table td:last-child { border-right: none; }
         
-        /* Specifics */
         .pivot-val { font-weight: 700; color: #0f172a; font-size: 12px; }
-        .pivot-pct { font-size: 10px; color: #64748b; font-weight: 500; }
-        .row-group-header { background-color: #fff; font-weight: 700; border-right: 2px solid #e2e8f0 !important; }
+        .pivot-pct { font-size: 10px; color: #64748b; font-weight: 600; margin-left: 4px; }
+        .row-group-header { background: #fff; font-weight: 700; border-right: 1px solid #f1f5f9; }
+
+        /* --- CARDS & WIDGETS --- */
+        .glass-panel {
+            background: white; border: 1px solid #e2e8f0;
+            border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        
+        .kpi-card { 
+            background: white; border-radius: 16px; 
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; overflow: hidden;
+        }
+        .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.15); border-color: #c7d2fe; }
         
         /* Modern Switch */
-        .toggle-checkbox:checked { right: 0; border-color: #2563eb; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #2563eb; }
-        
-        /* Cards */
-        .kpi-card { transition: transform 0.2s, box-shadow 0.2s; }
-        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .toggle-switch { appearance: none; width: 36px; height: 20px; background: #e2e8f0; border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s; }
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .toggle-switch:checked { background: #4f46e5; }
+        .toggle-switch:checked::after { left: 18px; }
 
+        /* Gradient Text */
+        .text-gradient { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased selection:bg-indigo-100 selection:text-indigo-700">
 
-    <!-- INITIAL LOADING SCREEN -->
+    <!-- INITIAL LOADING -->
     <div id="initialLoading">
-        <div class="island-spinner" style="width: 24px; height: 24px; border-color: #cbd5e1; border-top-color: #2563eb;"></div>
-        <p class="mt-3 text-xs font-semibold text-slate-500">Memuat Sistem...</p>
-        <button id="skipLoadingBtn" class="mt-4 px-3 py-1 bg-white border border-slate-300 rounded text-[10px] text-slate-600 hover:bg-slate-50 hidden-section transition" onclick="forceHideLoading()">
+        <div class="relative">
+            <div class="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center font-bold text-indigo-600 text-xs">LOG</div>
+        </div>
+        <p class="mt-4 text-sm font-bold text-slate-600 tracking-wide animate-pulse">MEMUAT DASHBOARD</p>
+        <button id="skipLoadingBtn" class="mt-6 px-4 py-2 bg-white border border-slate-200 rounded-full text-xs font-semibold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm hidden-section" onclick="forceHideLoading()">
             Mode Offline
         </button>
     </div>
 
-    <!-- DYNAMIC ISLAND (Notification Center) -->
-    <div id="dynamicIsland">
-        <!-- Content injected via JS -->
-    </div>
+    <!-- DYNAMIC ISLAND -->
+    <div id="dynamicIsland"></div>
 
     <!-- MAIN WRAPPER -->
-    <div class="w-full max-w-[98%] mx-auto py-3 pb-8">
+    <div class="w-full max-w-[98%] mx-auto py-4 pb-10">
         
-        <!-- HEADER & CONTROLS -->
-        <header class="bg-white/80 backdrop-blur-sm border border-slate-200 sticky top-2 z-40 px-4 py-2.5 mb-4 rounded-2xl shadow-sm flex flex-col xl:flex-row justify-between items-center gap-3">
-            <div class="flex items-center gap-3">
-                <div class="bg-slate-900 p-1.5 rounded-lg text-white shadow-lg shadow-slate-200"><i class="ph-bold ph-chart-polar text-lg"></i></div>
+        <!-- HEADER -->
+        <header class="glass-panel px-5 py-3 mb-5 flex flex-col xl:flex-row justify-between items-center gap-4 sticky top-4 z-40 bg-white/90 backdrop-blur-md">
+            <div class="flex items-center gap-4 w-full xl:w-auto">
+                <div class="bg-gradient-to-br from-indigo-600 to-violet-600 w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                    <i class="ph-bold ph-chart-polar text-xl"></i>
+                </div>
                 <div>
-                    <h1 class="text-sm font-bold text-slate-800 tracking-tight">MONITORING PAKET</h1>
-                    <div class="flex items-center gap-2 text-[10px] font-medium">
-                        <span id="connectionStatus" class="text-emerald-600 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online</span>
-                        <span class="text-slate-300">|</span>
-                        <span id="lastUpdated" class="text-slate-500">--:--</span>
+                    <h1 class="text-base font-extrabold text-slate-800 tracking-tight leading-tight">MONITORING PAKET</h1>
+                    <div class="flex items-center gap-3 text-[11px] font-medium text-slate-500">
+                        <span id="connectionStatus" class="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
+                        </span>
+                        <span class="flex items-center gap-1"><i class="ph-bold ph-clock"></i> <span id="lastUpdated">--:--</span></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Global Filters -->
-            <div class="flex items-center gap-2 flex-wrap justify-end">
-                <div class="flex items-center bg-white p-0.5 rounded-lg border border-slate-200 shadow-sm">
-                    <input type="date" id="filterStartDate" class="bg-transparent text-[11px] px-2 py-1 focus:outline-none text-slate-600 font-medium cursor-pointer">
-                    <span class="text-slate-300 text-[10px]">→</span>
-                    <input type="date" id="filterEndDate" class="bg-transparent text-[11px] px-2 py-1 focus:outline-none text-slate-600 font-medium cursor-pointer">
+            <!-- CONTROLS -->
+            <div class="flex items-center gap-3 flex-wrap justify-end w-full xl:w-auto">
+                <!-- Date Filter -->
+                <div class="flex items-center bg-slate-50 p-1 rounded-xl border border-slate-200">
+                    <input type="date" id="filterStartDate" class="bg-transparent text-xs font-semibold text-slate-600 px-2 py-1.5 focus:outline-none cursor-pointer">
+                    <span class="text-slate-300 text-[10px] px-1">→</span>
+                    <input type="date" id="filterEndDate" class="bg-transparent text-xs font-semibold text-slate-600 px-2 py-1.5 focus:outline-none cursor-pointer">
                 </div>
 
-                <!-- HUB Filter -->
+                <!-- Dropdowns -->
                 <div class="relative group">
-                    <select id="filterHub" class="appearance-none text-[11px] font-semibold border border-slate-200 rounded-lg px-3 py-1.5 bg-white focus:ring-2 focus:ring-slate-100 outline-none w-28 cursor-pointer shadow-sm text-slate-600 pr-6">
-                        <option value="">HUB: All</option>
+                    <select id="filterHub" class="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-4 py-2.5 pr-8 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:bg-white hover:shadow-sm">
+                        <option value="">HUB: Semua</option>
                     </select>
-                    <i class="ph-bold ph-caret-down absolute right-2 top-2 text-slate-400 pointer-events-none group-hover:text-slate-600"></i>
+                    <i class="ph-bold ph-caret-down absolute right-3 top-3 text-slate-400 pointer-events-none"></i>
                 </div>
 
-                <!-- Service Filter -->
                 <div class="relative group">
-                    <select id="filterService" class="appearance-none text-[11px] font-semibold border border-slate-200 rounded-lg px-3 py-1.5 bg-white focus:ring-2 focus:ring-slate-100 outline-none w-24 cursor-pointer shadow-sm text-slate-600 pr-6">
-                        <option value="">Svc: All</option>
+                    <select id="filterService" class="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-4 py-2.5 pr-8 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:bg-white hover:shadow-sm">
+                        <option value="">Svc: Semua</option>
                     </select>
-                    <i class="ph-bold ph-caret-down absolute right-2 top-2 text-slate-400 pointer-events-none group-hover:text-slate-600"></i>
+                    <i class="ph-bold ph-caret-down absolute right-3 top-3 text-slate-400 pointer-events-none"></i>
                 </div>
 
-                <!-- Posisi Filter -->
                 <div class="relative group">
-                    <select id="filterPosisi" class="appearance-none text-[11px] font-semibold border border-slate-200 rounded-lg px-3 py-1.5 bg-white focus:ring-2 focus:ring-slate-100 outline-none w-28 cursor-pointer shadow-sm text-slate-600 pr-6">
-                        <option value="">Posisi: All</option>
+                    <select id="filterPosisi" class="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-4 py-2.5 pr-8 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:bg-white hover:shadow-sm w-36">
+                        <option value="">Posisi: Semua</option>
                     </select>
-                    <i class="ph-bold ph-caret-down absolute right-2 top-2 text-slate-400 pointer-events-none group-hover:text-slate-600"></i>
+                    <i class="ph-bold ph-caret-down absolute right-3 top-3 text-slate-400 pointer-events-none"></i>
                 </div>
 
-                <div class="flex items-center bg-white border border-slate-200 rounded-lg px-3 py-1.5 shadow-sm">
-                    <label class="relative inline-flex items-center cursor-pointer mr-2">
-                        <input type="checkbox" id="statusToggle" class="sr-only peer">
-                        <div class="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-slate-800"></div>
-                    </label>
-                    <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wide" id="toggleLabel">Semua</span>
+                <!-- Toggle -->
+                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" id="toggleLabel">Semua</span>
+                    <input type="checkbox" id="statusToggle" class="toggle-switch">
                 </div>
 
-                <label class="group px-4 py-1.5 bg-slate-900 text-white rounded-lg text-[11px] font-bold cursor-pointer hover:bg-slate-800 flex items-center gap-1.5 shadow-md shadow-slate-200 transition-all active:scale-95">
-                    <i class="ph-bold ph-upload-simple"></i> Upload
+                <!-- Upload Btn -->
+                <label class="group flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer hover:bg-indigo-600 transition-all shadow-lg shadow-slate-300 hover:shadow-indigo-200 active:scale-95">
+                    <i class="ph-bold ph-upload-simple text-lg"></i>
+                    <span>Upload</span>
                     <input type='file' class="hidden" id="csvFileInput" accept=".csv" />
                 </label>
             </div>
         </header>
 
-        <!-- 1. KPI CARDS -->
-        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-4">
+        <!-- 1. KPI CARDS (Updated with Gradients & Icons) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4 mb-5">
             <script>
-                const card = (id, label, color, icon) => document.write(`
-                    <div class="kpi-card bg-white rounded-xl border border-slate-100 p-3 relative overflow-hidden shadow-sm">
-                        <div class="flex justify-between items-start z-10 relative">
-                            <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">${label}</p>
-                                <h3 class="text-xl font-bold text-slate-800 leading-none" id="${id}">0</h3>
-                                <p class="text-[9px] font-semibold text-${color}-600 mt-1 bg-${color}-50 px-1.5 py-0.5 rounded-md inline-block" id="${id}Pct">0%</p>
+                const kpiCard = (id, label, gradFrom, gradTo, icon, delay) => document.write(`
+                    <div class="kpi-card p-4 flex flex-col justify-between h-28 animate-fade-in" style="animation-delay: ${delay}ms">
+                        <div class="flex justify-between items-start">
+                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-${gradFrom}-500 to-${gradTo}-600 flex items-center justify-center text-white shadow-md shadow-${gradFrom}-200">
+                                <i class="ph-bold ${icon} text-sm"></i>
                             </div>
-                            <div class="text-${color}-500 bg-${color}-50 p-1.5 rounded-lg"><i class="ph-fill ${icon} text-lg"></i></div>
+                            <!-- Mini Sparkline Placeholder -->
+                            <div class="text-[9px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100" id="${id}Pct">0%</div>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-extrabold text-slate-800 tracking-tight mt-2 leading-none" id="${id}">0</h3>
+                            <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mt-1">${label}</p>
                         </div>
                     </div>
                 `);
             </script>
             <script>
-                card('kpiTotal', 'Total AWB', 'slate', 'ph-package');
-                card('kpiFirstMile', 'First Mile', 'indigo', 'ph-package-open');
-                card('kpiTransport', 'Transport', 'cyan', 'ph-van');
-                card('kpiMidMile', 'Mid Mile', 'orange', 'ph-airplane-tilt');
-                card('kpiVendor', 'Vendor 3PL', 'purple', 'ph-truck');
-                card('kpiMitra', 'Mitra Usaha', 'emerald', 'ph-handshake');
-                card('kpiLastMile', 'Last Mile', 'blue', 'ph-house-line');
+                // Urutan: Total, First, Trans, Mid, 3PL, Mitra, Last
+                kpiCard('kpiTotal', 'Total AWB', 'slate', 'gray', 'ph-package', 0);
+                kpiCard('kpiFirstMile', 'First Mile', 'indigo', 'violet', 'ph-package-open', 100);
+                kpiCard('kpiTransport', 'Transport', 'cyan', 'blue', 'ph-van', 200);
+                kpiCard('kpiMidMile', 'Mid Mile', 'orange', 'amber', 'ph-airplane-tilt', 300);
+                kpiCard('kpiVendor', 'Vendor 3PL', 'purple', 'fuchsia', 'ph-truck', 400);
+                kpiCard('kpiMitra', 'Mitra Usaha', 'emerald', 'teal', 'ph-handshake', 500);
+                kpiCard('kpiLastMile', 'Last Mile', 'blue', 'sky', 'ph-house-line', 600);
             </script>
         </div>
 
-        <!-- 2. CHARTS SECTION (SCREEN 1) -->
-        <div class="grid grid-cols-12 gap-4 mb-4">
-            <!-- Tahunan - Increased Height to 50vh -->
-            <div class="col-span-12 lg:col-span-6 bg-white p-4 rounded-xl border border-slate-100 shadow-sm h-[50vh] flex flex-col">
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1"><i class="ph-bold ph-chart-bar"></i> Tahunan (HUB)</h4>
+        <!-- 2. CHARTS SECTION -->
+        <div class="grid grid-cols-12 gap-5 mb-5">
+            <div class="col-span-12 lg:col-span-6 glass-panel p-5 h-[50vh] flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-violet-500"></span> Tren Tahunan (HUB)
+                    </h4>
                 </div>
-                <div class="flex-1 relative w-full"><canvas id="yearlyChart"></canvas></div>
+                <div class="flex-1 w-full"><canvas id="yearlyChart"></canvas></div>
             </div>
-            <!-- Bulanan - Increased Height to 50vh -->
-            <div class="col-span-12 lg:col-span-6 bg-white p-4 rounded-xl border border-slate-100 shadow-sm h-[50vh] flex flex-col">
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1"><i class="ph-bold ph-chart-line-up"></i> Bulanan (HUB)</h4>
+            <div class="col-span-12 lg:col-span-6 glass-panel p-5 h-[50vh] flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Tren Bulanan (HUB)
+                    </h4>
                 </div>
-                <div class="flex-1 relative w-full"><canvas id="monthlyChart"></canvas></div>
-            </div>
-        </div>
-
-        <!-- 3. CHARTS + TABLES (SCREEN 2) -->
-        <!-- Daily Chart - 30vh -->
-        <div class="grid grid-cols-12 gap-4 mb-4">
-            <div class="col-span-12 bg-white p-4 rounded-xl border border-slate-100 shadow-sm h-[30vh] flex flex-col">
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1"><i class="ph-bold ph-trend-up"></i> Harian (Bulan Ini)</h4>
-                    <span id="currentMonthLabel" class="text-[9px] px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full font-bold border border-orange-100"></span>
-                </div>
-                <div class="flex-1 relative w-full"><canvas id="dailyChart"></canvas></div>
+                <div class="flex-1 w-full"><canvas id="monthlyChart"></canvas></div>
             </div>
         </div>
 
-        <!-- 3 Tables - 58vh to fit screen with daily -->
-        <div class="grid grid-cols-12 gap-4 h-[58vh] min-h-[400px] mb-4">
-            <!-- LEFT: Monitoring KPI -->
-            <div class="col-span-12 lg:col-span-3 flex flex-col gap-2">
-                <div class="bg-white px-3 py-2 rounded-t-xl border border-slate-200 border-b-0 flex items-center gap-2 shadow-sm">
-                    <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
-                    <h3 class="text-xs font-bold text-slate-700">Monitoring KPI</h3>
+        <!-- 3. CHARTS + TABLES -->
+        <!-- Daily Chart -->
+        <div class="grid grid-cols-12 gap-5 mb-5">
+            <div class="col-span-12 glass-panel p-5 h-[30vh] flex flex-col">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-orange-500"></span> Tren Harian (Bulan Ini)
+                    </h4>
+                    <span id="currentMonthLabel" class="text-[10px] font-bold px-3 py-1 bg-orange-50 text-orange-600 rounded-full border border-orange-100"></span>
                 </div>
-                <div class="flex-1 overflow-auto table-container shadow-sm">
+                <div class="flex-1 w-full"><canvas id="dailyChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- 3 Tables Side-by-Side -->
+        <div class="grid grid-cols-12 gap-5 h-[58vh] min-h-[450px] mb-5">
+            <!-- Monitoring KPI -->
+            <div class="col-span-12 lg:col-span-3 flex flex-col">
+                <div class="bg-indigo-600 text-white px-4 py-2.5 rounded-t-xl flex items-center gap-2 shadow-sm">
+                    <i class="ph-bold ph-monitor"></i> <h3 class="text-xs font-bold">Monitoring KPI</h3>
+                </div>
+                <div class="flex-1 overflow-auto modern-table-container rounded-t-none">
                     <table class="pivot-table" id="tableKPI"></table>
                 </div>
             </div>
 
-            <!-- CENTER: Rekapan HUB -->
-            <div class="col-span-12 lg:col-span-6 flex flex-col gap-2">
-                <div class="bg-white px-3 py-2 rounded-t-xl border border-slate-200 border-b-0 flex justify-between items-center shadow-sm">
-                    <div class="flex items-center gap-2">
-                        <div class="w-2 h-2 rounded-full bg-orange-500"></div>
-                        <h3 class="text-xs font-bold text-slate-700">Rekapan HUB</h3>
+            <!-- Rekapan HUB -->
+            <div class="col-span-12 lg:col-span-6 flex flex-col">
+                <div class="bg-white border border-slate-200 border-b-0 px-4 py-2 rounded-t-xl flex justify-between items-center shadow-sm">
+                    <h3 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                        <i class="ph-bold ph-buildings text-orange-500"></i> Rekapan HUB
+                    </h3>
+                    <div class="relative">
+                        <i class="ph-bold ph-magnifying-glass absolute left-2 top-1.5 text-slate-400 text-sm"></i>
+                        <input type="text" id="searchInput" placeholder="Cari HUB..." class="pl-7 pr-3 py-1 text-[10px] bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 w-32 font-medium">
                     </div>
-                    <input type="text" id="searchInput" placeholder="Cari HUB..." class="text-[10px] bg-slate-50 border border-slate-200 rounded-md px-2 py-1 w-32 focus:ring-1 focus:ring-orange-500 outline-none transition-all">
                 </div>
-                <div class="flex-1 overflow-auto table-container shadow-sm">
+                <div class="flex-1 overflow-auto modern-table-container rounded-t-none">
                     <table class="pivot-table" id="tableHub"></table>
                 </div>
             </div>
 
-            <!-- RIGHT: Service -->
-            <div class="col-span-12 lg:col-span-3 flex flex-col gap-2">
-                <div class="bg-white px-3 py-2 rounded-t-xl border border-slate-200 border-b-0 flex items-center gap-2 shadow-sm">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    <h3 class="text-xs font-bold text-slate-700">Service</h3>
+            <!-- Service -->
+            <div class="col-span-12 lg:col-span-3 flex flex-col">
+                <div class="bg-white border border-slate-200 border-b-0 px-4 py-2.5 rounded-t-xl flex items-center gap-2 shadow-sm">
+                    <i class="ph-bold ph-tag text-emerald-500"></i> <h3 class="text-xs font-bold text-slate-700">Rekapan Service</h3>
                 </div>
-                <div class="flex-1 overflow-auto table-container shadow-sm">
+                <div class="flex-1 overflow-auto modern-table-container rounded-t-none">
                     <table class="pivot-table" id="tableService"></table>
                 </div>
             </div>
         </div>
 
-        <!-- 4. STAGING (SCREEN 3) - 90vh -->
-        <div class="grid grid-cols-12 gap-4 h-[90vh] flex flex-col">
-            <div class="col-span-12 h-full flex flex-col gap-2">
-                <div class="bg-white px-3 py-2 rounded-t-xl border border-slate-200 border-b-0 flex items-center gap-2 shadow-sm">
-                    <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                    <h3 class="text-xs font-bold text-slate-700">Rekapan Staging</h3>
+        <!-- 4. STAGING TABLE -->
+        <div class="grid grid-cols-12 gap-5 h-[90vh] flex flex-col">
+            <div class="col-span-12 h-full flex flex-col">
+                <div class="bg-white border border-slate-200 border-b-0 px-4 py-2.5 rounded-t-xl flex items-center gap-2 shadow-sm">
+                    <i class="ph-bold ph-warehouse text-blue-500"></i> <h3 class="text-xs font-bold text-slate-700">Rekapan Staging</h3>
                 </div>
-                <div class="flex-1 overflow-auto table-container shadow-sm">
+                <div class="flex-1 overflow-auto modern-table-container rounded-t-none">
                     <table class="pivot-table" id="tableStaging"></table>
                 </div>
             </div>
@@ -304,7 +327,7 @@
 
     </div>
 
-    <!-- SCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
@@ -334,40 +357,34 @@
             return num ? num.toLocaleString('id-ID') : '0';
         }
 
-        // --- DYNAMIC ISLAND SYSTEM ---
+        // --- DYNAMIC ISLAND ---
         const island = document.getElementById('dynamicIsland');
-        
         function showIsland(type, msg, onConfirm = null) {
-            island.className = 'active'; // Reset to base active state
-            
+            island.className = 'active'; 
             if (type === 'loading') {
                 island.innerHTML = `<div class="island-content"><div class="island-spinner"></div><span>${msg}</span></div>`;
-            } 
-            else if (type === 'success') {
+            } else if (type === 'success') {
                 island.innerHTML = `<div class="island-content"><i class="ph-fill ph-check-circle text-emerald-400 text-lg"></i><span>${msg}</span></div>`;
-                setTimeout(() => { island.className = ''; island.style.opacity = '0'; }, 3000); // Auto hide
-            }
-            else if (type === 'error') {
+                setTimeout(() => { island.className = ''; island.style.opacity = '0'; }, 3000);
+            } else if (type === 'error') {
                 island.innerHTML = `<div class="island-content"><i class="ph-fill ph-warning-circle text-red-400 text-lg"></i><span>${msg}</span></div>`;
                 setTimeout(() => { island.className = ''; island.style.opacity = '0'; }, 4000);
-            }
-            else if (type === 'confirm') {
-                island.className = 'expanded'; // Expand mode
+            } else if (type === 'confirm') {
+                island.className = 'expanded';
                 island.innerHTML = `
                     <div class="text-center mb-4">
-                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-2 text-blue-400"><i class="ph-fill ph-question text-xl"></i></div>
-                        <h4 class="text-sm font-bold text-white mb-1">Konfirmasi</h4>
-                        <p class="text-xs text-slate-400">${msg}</p>
+                        <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-400 border border-slate-700"><i class="ph-fill ph-question text-2xl"></i></div>
+                        <h4 class="text-sm font-bold text-white">Konfirmasi Upload</h4>
+                        <p class="text-xs text-slate-400 mt-1">${msg}</p>
                     </div>
-                    <div class="flex gap-2 w-full">
-                        <button id="islCancel" class="flex-1 py-2 rounded-full bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">Batal</button>
-                        <button id="islOk" class="flex-1 py-2 rounded-full bg-white text-xs font-bold text-slate-900 hover:bg-slate-200 transition">Ya, Proses</button>
+                    <div class="flex gap-3 w-full">
+                        <button id="islCancel" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">Batal</button>
+                        <button id="islOk" class="flex-1 py-2.5 rounded-xl bg-white text-xs font-bold text-slate-900 hover:bg-slate-100 transition">Ya, Proses</button>
                     </div>
                 `;
                 document.getElementById('islCancel').onclick = () => { island.className = ''; island.style.opacity = '0'; document.getElementById('csvFileInput').value=''; };
                 document.getElementById('islOk').onclick = () => { onConfirm(); };
             }
-            
             island.style.opacity = '1';
         }
 
@@ -386,8 +403,9 @@
         });
 
         window.forceHideLoading = () => {
-            document.getElementById('initialLoading').style.opacity = '0';
-            setTimeout(() => document.getElementById('initialLoading').style.display = 'none', 500);
+            const ov = document.getElementById('initialLoading');
+            ov.style.opacity = '0';
+            setTimeout(() => ov.style.display = 'none', 500);
         }
 
         function initRealtimeListener() {
@@ -397,7 +415,7 @@
                 
                 const now = new Date();
                 const lastUpd = document.getElementById('lastUpdated');
-                if (lastUpd) lastUpd.innerText = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+                if(lastUpd) lastUpd.innerText = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
                 
                 populateDropdowns(allData);
                 renderDashboard();
@@ -405,7 +423,6 @@
             });
         }
 
-        // --- RENDERER ---
         function renderDashboard() {
             const filteredData = getFilteredData();
             calculateKPIs(filteredData);
@@ -419,7 +436,6 @@
         }
 
         function getFilteredData() {
-            // Null check for filter elements
             const startDateEl = document.getElementById('filterStartDate');
             if (!startDateEl) return allData;
 
@@ -493,7 +509,7 @@
             return null;
         }
 
-        // --- CHARTS ---
+        // --- CHARTS (Updated with Gradients & Better Config) ---
         function updateCharts(data) {
             const yearly = {}; const monthly = {}; const daily = {};
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
@@ -532,14 +548,23 @@
             const sortMonth = (a,b) => new Date(`1 ${a}`) - new Date(`1 ${b}`);
             const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
 
-            renderChart('yearlyChart', 'bar', Object.keys(yearly).sort(), Object.values(yearly), '#8b5cf6');
-            renderChart('monthlyChart', 'line', Object.keys(monthly).sort(sortMonth), Object.keys(monthly).sort(sortMonth).map(k=>monthly[k]), '#3b82f6');
-            renderChart('dailyChart', 'bar', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), '#f97316');
+            renderChart('yearlyChart', 'bar', Object.keys(yearly).sort(), Object.values(yearly), ['#8b5cf6', '#6d28d9']);
+            renderChart('monthlyChart', 'line', Object.keys(monthly).sort(sortMonth), Object.keys(monthly).sort(sortMonth).map(k=>monthly[k]), ['#3b82f6', '#1d4ed8']);
+            renderChart('dailyChart', 'bar', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), ['#f97316', '#c2410c']);
         }
 
-        function renderChart(id, type, labels, data, color) {
+        function renderChart(id, type, labels, data, colors) {
             const ctx = document.getElementById(id).getContext('2d');
             if (chartInstances[id]) chartInstances[id].destroy();
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            if(type === 'bar') {
+                gradient.addColorStop(0, colors[0]);
+                gradient.addColorStop(1, colors[1]);
+            } else {
+                gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+                gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+            }
 
             chartInstances[id] = new Chart(ctx, {
                 type: type,
@@ -547,12 +572,17 @@
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: type === 'line' ? 'rgba(59, 130, 246, 0.1)' : color,
-                        borderColor: color,
-                        borderWidth: 2,
-                        borderRadius: 3,
-                        tension: 0.3,
-                        pointRadius: 3
+                        backgroundColor: gradient,
+                        borderColor: colors[0],
+                        borderWidth: 0,
+                        borderRadius: 6,
+                        tension: 0.4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: colors[0],
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        hoverBorderWidth: 0,
+                        fill: type === 'line'
                     }]
                 },
                 options: {
@@ -560,18 +590,23 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { enabled: false },
+                        tooltip: { 
+                            enabled: false 
+                        },
                         datalabels: {
                             anchor: 'end', align: 'top', color: '#64748b',
-                            font: { size: 9, weight: 'bold', family: 'Plus Jakarta Sans' },
+                            font: { size: 10, weight: 'bold', family: 'Plus Jakarta Sans' },
                             offset: -2, formatter: (val) => formatNumber(val)
                         }
                     },
                     scales: {
                         y: { display: false },
-                        x: { grid: { display: false }, ticks: { font: { size: 9, family: 'Plus Jakarta Sans' } } }
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: { size: 10, family: 'Plus Jakarta Sans', weight: '500' }, color: '#94a3b8' } 
+                        }
                     },
-                    layout: { padding: { top: 15 } }
+                    layout: { padding: { top: 25 } }
                 }
             });
         }
@@ -603,12 +638,12 @@
                 return `<div class="flex flex-col items-center"><div class="pivot-val">${v>0?formatNumber(v):'-'}</div><div class="pivot-pct">${pct>0?pct.toFixed(0)+'%':''}</div></div>`;
             }
 
-            let html = `<thead><tr><th class="text-left">HUB</th><th class="text-center text-indigo-700 bg-indigo-50/50">Total</th><th class="text-center">MM Nas</th><th class="text-center">MM Reg</th><th class="text-center">Trans</th><th class="text-center">HUB</th></tr></thead><tbody>`;
+            let html = `<thead><tr><th class="text-left">HUB</th><th class="text-center text-indigo-600">Total</th><th class="text-center">MM Nas</th><th class="text-center">MM Reg</th><th class="text-center">Trans</th><th class="text-center">HUB</th></tr></thead><tbody>`;
             keys.forEach(h => {
                 const d = hubs[h];
-                html += `<tr class="hover:bg-slate-50"><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/30">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t)}</td></tr>`;
+                html += `<tr><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/50">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t)}</td></tr>`;
             });
-            html += `<tr class="bg-slate-100 font-bold sticky bottom-0 border-t-2 border-slate-200"><td class="px-3">TOTAL</td><td class="text-center text-indigo-800">${formatNumber(totals.total)}</td><td class="text-center">${cell(totals.nas,totals.total)}</td><td class="text-center">${cell(totals.reg,totals.total)}</td><td class="text-center">${cell(totals.trans,totals.total)}</td><td class="text-center">${cell(totals.hub,totals.total)}</td></tr></tbody>`;
+            html += `<tr class="bg-slate-50 font-bold border-t-2 border-slate-200 sticky bottom-0 z-10"><td class="px-3">TOTAL</td><td class="text-center text-indigo-700">${formatNumber(totals.total)}</td><td class="text-center">${cell(totals.nas,totals.total)}</td><td class="text-center">${cell(totals.reg,totals.total)}</td><td class="text-center">${cell(totals.trans,totals.total)}</td><td class="text-center">${cell(totals.hub,totals.total)}</td></tr></tbody>`;
             table.innerHTML = html;
         }
 
@@ -627,7 +662,7 @@
             const sortedHubs = Object.keys(hubs).sort();
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            let html = `<thead><tr><th class="text-left w-24">HUB</th><th class="text-center bg-indigo-50/50">${title}</th>`;
+            let html = `<thead><tr><th class="text-left w-24">HUB</th><th class="text-center bg-indigo-50/50 text-indigo-700">${title}</th>`;
             sortedPos.forEach(p => html += `<th class="text-center min-w-[50px]">${p}</th>`);
             html += `</tr></thead><tbody>`;
 
@@ -638,21 +673,21 @@
                 let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                 let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
 
-                html += `<tr class="hover:bg-slate-50"><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold bg-indigo-50/30 text-indigo-700">${formatNumber(d.t)}</td>`;
+                html += `<tr><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold bg-indigo-50/50 text-indigo-700">${formatNumber(d.t)}</td>`;
                 sortedPos.forEach(p => {
                     const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
-                    let content = `<span class="text-slate-200">-</span>`;
+                    let content = `<span class="text-slate-300">-</span>`;
                     if(c>0) {
                         let warn = "";
-                        if(p.toLowerCase()==='mid mile' && pct>5) warn = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[9px] mr-1"></i>`;
-                        else if(c===maxOther) warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[9px] mr-1"></i>`;
+                        if(p.toLowerCase()==='mid mile' && pct>5) warn = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px] mr-1"></i>`;
+                        else if(c===maxOther) warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px] mr-1"></i>`;
                         content = `<div>${formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
                     }
                     html += `<td class="text-center" style="background-color:${bg}">${content}</td>`;
                 });
                 html += `</tr>`;
             });
-            html += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-200 sticky bottom-0"><td class="px-3">ALL</td><td class="text-center text-indigo-800">${formatNumber(gt)}</td>`;
+            html += `<tr class="bg-slate-50 font-bold border-t-2 border-slate-200 sticky bottom-0"><td class="px-3">ALL</td><td class="text-center text-indigo-700">${formatNumber(gt)}</td>`;
             sortedPos.forEach(p => html += `<td class="text-center text-slate-700">${formatNumber(posTotals[p]||0)}</td>`);
             html += `</tr></tbody>`;
             table.innerHTML = html;
@@ -666,13 +701,13 @@
             data.forEach(r => { const s = r['service_code'] || "?"; svcMap[s] = (svcMap[s]||0)+1; });
             const keys = Object.keys(svcMap).sort((a,b) => svcMap[b] - svcMap[a]);
             let gt = 0;
-            let html = `<thead><tr><th class="text-left">Service</th><th class="text-center">Total</th><th class="text-center">%</th></tr></thead><tbody>`;
+            let html = `<thead><tr><th class="text-left">Service</th><th class="text-center text-indigo-700 bg-indigo-50/50">Total</th><th class="text-center">%</th></tr></thead><tbody>`;
             keys.forEach(s => {
                 const c = svcMap[s]; gt += c;
                 const pct = data.length>0?(c/data.length)*100:0;
-                html += `<tr class="hover:bg-slate-50"><td class="font-bold px-3">${s}</td><td class="text-center font-bold bg-indigo-50/30">${formatNumber(c)}</td><td class="text-center text-[10px] text-slate-500">${pct.toFixed(1)}%</td></tr>`;
+                html += `<tr><td class="font-bold px-3 text-slate-700">${s}</td><td class="text-center font-bold bg-indigo-50/20 text-indigo-700">${formatNumber(c)}</td><td class="text-center text-[10px] text-slate-500 font-semibold">${pct.toFixed(1)}%</td></tr>`;
             });
-            html += `<tr class="bg-slate-100 font-bold sticky bottom-0 border-t-2 border-slate-200"><td class="px-3">TOTAL</td><td class="text-center">${formatNumber(gt)}</td><td>100%</td></tr></tbody>`;
+            html += `<tr class="bg-slate-50 font-bold sticky bottom-0 border-t-2 border-slate-200"><td class="px-3">TOTAL</td><td class="text-center text-indigo-700">${formatNumber(gt)}</td><td class="text-center text-slate-600">100%</td></tr></tbody>`;
             table.innerHTML = html;
         }
 
@@ -693,7 +728,7 @@
             const sortedPos = Object.keys(posTotals).sort((a,b)=>posTotals[b]-posTotals[a]);
             const sortedHubs = Object.keys(grouping).sort();
             
-            let html = `<thead><tr><th class="text-left w-24">HUB</th><th class="text-left w-32">Staging</th><th class="text-center w-16 bg-indigo-50/50">Total</th>`;
+            let html = `<thead><tr><th class="text-left w-24">HUB</th><th class="text-left w-32">Staging</th><th class="text-center w-16 bg-indigo-50/50 text-indigo-700">Total</th>`;
             sortedPos.forEach(p => html += `<th class="text-center min-w-[50px]">${p}</th>`);
             html += `</tr></thead><tbody>`;
 
@@ -705,13 +740,13 @@
                     let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                     let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
 
-                    html += `<tr class="hover:bg-slate-50">`;
-                    if(i===0) html += `<td class="row-group-header border-b px-3" rowspan="${stagings.length}">${h}</td>`;
+                    html += `<tr>`;
+                    if(i===0) html += `<td class="row-group-header border-b px-3 text-slate-700 font-bold" rowspan="${stagings.length}">${h}</td>`;
                     html += `<td class="text-slate-600 border-r px-3 font-medium">${ss}</td><td class="text-center font-bold bg-indigo-50/30 text-indigo-700 border-r">${formatNumber(d.t)}</td>`;
                     
                     sortedPos.forEach(p => {
                         const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
-                        let content = `<span class="text-slate-200">-</span>`;
+                        let content = `<span class="text-slate-300">-</span>`;
                         if(c>0) {
                             let warn = "";
                             if(p.toLowerCase()==='mid mile' && pct>5) warn = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[9px] mr-1"></i>`;
@@ -726,13 +761,12 @@
             table.innerHTML = html;
         }
 
-        // --- UTILS ---
         function getGradient(val, min, max) {
             if(!val) return 'transparent';
             if(min===max) return '#f0fdf4';
             const ratio = (val-min)/(max-min);
             const hue = 120 - (ratio*120);
-            return `hsla(${hue}, 85%, 94%, 1)`;
+            return `hsla(${hue}, 85%, 96%, 1)`;
         }
 
         function calculateKPIs(data) {
@@ -749,14 +783,28 @@
             
             const setVal = (id, v) => {
                 const el = document.getElementById(id); const pct = document.getElementById(id+'Pct');
-                if(el) el.innerText = formatNumber(v);
+                if(el) {
+                    // Animate number
+                    let start = 0; const end = v; const duration = 800;
+                    const startTime = performance.now();
+                    const animate = (currentTime) => {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        // Ease out quart
+                        const ease = 1 - Math.pow(1 - progress, 4);
+                        const currentVal = Math.floor(ease * end);
+                        el.innerText = formatNumber(currentVal);
+                        if (progress < 1) requestAnimationFrame(animate);
+                        else el.innerText = formatNumber(end);
+                    };
+                    requestAnimationFrame(animate);
+                }
                 if(pct) pct.innerText = counts.total>0 ? ((v/counts.total)*100).toFixed(1)+'%' : '0%';
             };
             setVal('kpiTotal', counts.total); setVal('kpiLastMile', counts.last); setVal('kpiVendor', counts.vend);
             setVal('kpiMidMile', counts.mid); setVal('kpiMitra', counts.mit); setVal('kpiTransport', counts.trans); setVal('kpiFirstMile', counts.first);
         }
 
-        // Events
         document.getElementById('statusToggle').addEventListener('change', e => {
             isGustiadiOnly = e.target.checked;
             document.getElementById('toggleLabel').innerText = isGustiadiOnly ? "In Area" : "Semua";
@@ -764,14 +812,12 @@
             renderDashboard();
         });
 
-        // Add filter listeners if elements exist
         const filterIds = ['filterStartDate', 'filterEndDate', 'filterHub', 'filterService', 'filterPosisi', 'searchInput'];
         filterIds.forEach(id => {
             const el = document.getElementById(id);
             if(el) el.addEventListener(id==='searchInput'?'keyup':'change', renderDashboard);
         });
 
-        // Upload
         document.getElementById('csvFileInput').addEventListener('change', e => {
             const f = e.target.files[0]; if(!f) return;
             Papa.parse(f, { header:true, skipEmptyLines:true, complete: res => {
