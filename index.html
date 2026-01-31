@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dasboard Parcel Inprogess</title>
+    <title>Dashboard Monitoring Paket - Pro View</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -40,7 +40,7 @@
     </script>
 
     <style>
-        body { background-color: #f8fafc; color: #0f172a; font-size: 12px; }
+        body { background-color: #f1f5f9; color: #0f172a; font-size: 12px; }
         .hidden-section { display: none !important; }
         
         /* Smooth Scrollbar */
@@ -62,8 +62,6 @@
         @keyframes road-run { 0% { transform: translateX(0); } 100% { transform: translateX(-40px); } }
         .animate-bounce-truck { animation: bounce-truck 0.6s ease-in-out infinite; }
         .animate-road { animation: road-run 0.8s linear infinite; }
-        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- DYNAMIC ISLAND --- */
         #dynamicIsland {
@@ -82,14 +80,15 @@
         .island-spinner { border: 2px solid rgba(255,255,255,0.2); border-top: 2px solid #60a5fa; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- SUMMARY MODAL --- */
-        #summaryModalOverlay {
+        /* --- MODAL OVERLAYS --- */
+        .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
             z-index: 200; display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
-        #summaryModalOverlay.open { opacity: 1; pointer-events: auto; }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        
         .summary-card {
             background: white; width: 95%; max-width: 700px; border-radius: 20px;
             box-shadow: 0 20px 50px -10px rgba(0,0,0,0.2);
@@ -97,7 +96,15 @@
             border: 1px solid #e2e8f0; max-height: 90vh; overflow-y: auto;
             display: flex; flex-direction: column;
         }
-        #summaryModalOverlay.open .summary-card { transform: scale(1); }
+        .modal-overlay.open .summary-card, .modal-overlay.open #deleteModalContent { transform: scale(1); }
+
+        /* Delete Modal Content */
+        #deleteModalContent {
+            background: white; width: 100%; max-width: 320px; border-radius: 20px;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.2);
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid #e2e8f0; padding: 24px;
+        }
 
         /* --- MODERN TABLE --- */
         .modern-table-container { 
@@ -110,47 +117,29 @@
         .table-scroll-area { overflow: auto; flex: 1; position: relative; scroll-behavior: smooth; }
         
         /* TABLE STYLING */
-        .pivot-table { 
-            width: 100%; 
-            border-collapse: separate; 
-            border-spacing: 0; 
-            font-size: 11px; 
-        }
+        .pivot-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; }
         
-        /* Header Sticky Top */
         .pivot-table thead th { 
             position: sticky; top: 0; z-index: 20;
-            background: #e2e8f0; 
-            color: #475569;
+            background: #e2e8f0; color: #475569;
             font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 10px;
-            height: 44px; padding: 0 8px;
-            border-bottom: 2px solid #cbd5e1;
+            height: 44px; padding: 0 8px; border-bottom: 2px solid #cbd5e1;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            text-align: center;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
         }
         .pivot-table thead th:first-child { text-align: left; padding-left: 12px; z-index: 21; }
         
-        /* Footer Sticky Bottom */
         .pivot-table tfoot td {
             position: sticky; bottom: 0; z-index: 20;
-            background-color: #eff6ff !important;
-            font-weight: 800 !important;
-            color: #1e3a8a !important;
-            border-top: 2px solid #bfdbfe;
-            height: 40px;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
-            font-size: 11px;
-            text-align: center;
+            background-color: #eff6ff !important; font-weight: 800 !important; color: #1e3a8a !important;
+            border-top: 2px solid #bfdbfe; height: 40px; box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            font-size: 11px; text-align: center;
         }
         .pivot-table tfoot td:first-child { text-align: left; padding-left: 12px; z-index: 21; }
 
-        /* Cells */
         .pivot-table td { 
-            height: 46px; padding: 4px 8px;
-            border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;
-            color: #334155; font-weight: 500;
-            vertical-align: middle;
+            height: 46px; padding: 4px 8px; border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;
+            color: #334155; font-weight: 500; vertical-align: middle;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .pivot-table tr:hover td { background-color: #f8fafc; }
@@ -167,10 +156,8 @@
         }
         
         .kpi-card { 
-            background: white; border-radius: 14px; 
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white; border-radius: 14px; border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative; overflow: hidden;
         }
         .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(79, 70, 229, 0.1); border-color: #c7d2fe; }
@@ -205,7 +192,7 @@
     <div id="dynamicIsland"></div>
 
     <!-- SUMMARY MODAL -->
-    <div id="summaryModalOverlay">
+    <div id="summaryModalOverlay" class="modal-overlay">
         <div class="summary-card">
             <!-- Header -->
             <div class="bg-slate-50 px-6 py-4 rounded-t-2xl border-b border-slate-100 flex justify-between items-center sticky top-0 z-10">
@@ -217,14 +204,12 @@
                 </div>
                 <button onclick="closeSummary()" class="text-slate-400 hover:text-red-500 transition bg-white p-1 rounded-full shadow-sm border border-slate-200"><i class="ph-bold ph-x text-lg"></i></button>
             </div>
-            
             <!-- Body -->
             <div class="p-6 overflow-y-auto">
                 <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                     <i class="ph-fill ph-map-pin text-orange-500"></i> Top 3 Origin (Penyumbang Terbanyak)
                 </h4>
                 <div class="grid grid-cols-3 gap-3 mb-6" id="topOriginsContainer"></div>
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -240,9 +225,32 @@
                     </div>
                 </div>
             </div>
-            
+            <!-- Footer -->
             <div class="bg-slate-50 px-6 py-3 rounded-b-2xl border-t border-slate-100 text-center sticky bottom-0">
                 <p class="text-[10px] text-slate-400 font-medium">Total Data Dianalisa: <span class="font-bold text-slate-700" id="totalAnalyzed">0</span> Paket</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div id="deleteModalOverlay" class="modal-overlay hidden-section">
+        <div id="deleteModalContent">
+            <div class="flex flex-col items-center text-center">
+                <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4 border border-red-100 shadow-sm">
+                    <i class="ph-fill ph-trash text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 mb-2">Hapus Data Bulanan</h3>
+                <p class="text-xs text-slate-500 mb-6 leading-relaxed">Tindakan ini akan menghapus semua data pada periode bulan yang dipilih secara permanen.</p>
+                
+                <div class="w-full mb-6 text-left">
+                     <label class="text-[10px] font-bold text-slate-400 uppercase mb-1.5 block ml-1">Pilih Bulan & Tahun</label>
+                     <input type="month" id="deleteMonthInput" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl px-4 py-3 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none cursor-pointer hover:bg-white transition-colors">
+                </div>
+                
+                <div class="flex gap-3 w-full">
+                    <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition">Batal</button>
+                    <button onclick="executeDelete()" class="flex-1 py-3 rounded-xl bg-red-600 text-xs font-bold text-white hover:bg-red-700 transition shadow-lg shadow-red-200 active:scale-95">Hapus Data</button>
+                </div>
             </div>
         </div>
     </div>
@@ -269,9 +277,14 @@
 
             <!-- CONTROLS -->
             <div class="flex items-center gap-2 flex-wrap justify-end w-full xl:w-auto">
+                <button onclick="openDeleteModal()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-[10px] font-bold cursor-pointer hover:bg-red-100 transition-all border border-red-200">
+                    <i class="ph-bold ph-trash text-sm"></i>
+                    <span>Hapus Data</span>
+                </button>
+
                 <button onclick="copyReport()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-[10px] font-bold cursor-pointer hover:bg-emerald-700 transition-all shadow-md active:scale-95 border border-emerald-500">
                     <i class="ph-bold ph-whatsapp-logo text-lg"></i>
-                    <span>Salin Laporan WA</span>
+                    <span>Salin Laporan</span>
                 </button>
 
                 <div class="flex items-center bg-slate-50 p-0.5 rounded-lg border border-slate-200">
@@ -309,7 +322,7 @@
             </div>
         </header>
 
-        <!-- 1. KPI CARDS (Restored Premium Design) -->
+        <!-- 1. KPI CARDS -->
         <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-4">
             <script>
                 const kpiCard = (id, label, gradFrom, gradTo, icon, delay) => document.write(`
@@ -381,7 +394,7 @@
             </div>
         </div>
 
-        <!-- 3 Tables Side-by-Side (COMPACT HEIGHT - [35vh]) -->
+        <!-- 3 Tables Side-by-Side (COMPACT HEIGHT) -->
         <div class="grid grid-cols-12 gap-4 h-[35vh] min-h-[350px] mb-4 items-start">
             <!-- Monitoring KPI (4 Columns) -->
             <div class="col-span-12 lg:col-span-4 flex flex-col h-full">
@@ -421,12 +434,10 @@
             </div>
         </div>
 
-        <!-- Hidden Raw Table for Data -->
         <div class="hidden-section">
             <table id="tableRawBody"></table>
             <div id="rawCount"></div>
         </div>
-
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
@@ -509,7 +520,7 @@
             const hubMap = getHubTrans(currData);
             const sortedHubs = Object.entries(hubMap).sort((a,b) => b[1].special - a[1].special).slice(0, 10);
             
-            let hubTable = `2. BREAKDOWN HUB\n\`\`\`\n${pad('HUB', 10)}| ${pad('Total', 6)}| In Area\n`;
+            let hubTable = `2. BREAKDOWN HUB (Top 10 In Area)\n\`\`\`\n${pad('HUB', 10)}| ${pad('Total', 6)}| In Area\n`;
             hubTable += "-".repeat(30) + "\n";
             sortedHubs.forEach(([h, d]) => {
                 hubTable += `${pad(h, 10)}| ${pad(String(d.total), 6)}| ${d.special}\n`;
@@ -517,19 +528,16 @@
             hubTable += `\`\`\``;
 
             // 3. BREAKDOWN SERVICE (Matrix)
-            // Filter: Hub X = Gustiadi AND (Mid Mile OR Transport)
             const svcData = currData.filter(r => {
                 const pos = (r.Posisi||'').toLowerCase();
                 const hubX = (r['HUB X']||'').toLowerCase();
                 return (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi';
             });
             
-            // Get Top 3 Services across all hubs for columns
             const allSvcs = {};
             svcData.forEach(r => { const s = r.service_code||'?'; allSvcs[s] = (allSvcs[s]||0)+1; });
             const topSvcs = Object.keys(allSvcs).sort((a,b)=>allSvcs[b]-allSvcs[a]).slice(0,3);
             
-            // Group by Hub -> Service
             const svcHubMap = {};
             svcData.forEach(r => {
                 const h = r.delivery_hub || 'Unknown';
@@ -538,14 +546,13 @@
                 svcHubMap[h][s] = (svcHubMap[h][s]||0)+1;
             });
             
-            let svcTable = `3. BREAKDOWN SERVICE\n\`\`\`\n${pad('HUB', 10)}| ${topSvcs.map(s=>pad(s,5)).join('| ')}\n`;
+            let svcTable = `3. BREAKDOWN SERVICE (In Area)\n\`\`\`\n${pad('HUB', 10)}| ${topSvcs.map(s=>pad(s,5)).join('| ')}\n`;
             svcTable += "-".repeat(12 + topSvcs.length*7) + "\n";
-            // Sort hubs by total volume in this filtered dataset
             const sortedSvcHubs = Object.keys(svcHubMap).sort((a,b) => {
                  const sumA = Object.values(svcHubMap[a]).reduce((x,y)=>x+y,0);
                  const sumB = Object.values(svcHubMap[b]).reduce((x,y)=>x+y,0);
                  return sumB - sumA;
-            }).slice(0,10); // Limit to top 10 hubs
+            }).slice(0,10); 
 
             sortedSvcHubs.forEach(h => {
                 let row = `${pad(h, 10)}|`;
@@ -586,18 +593,15 @@
                 if(!feedMap[h]) feedMap[h] = {};
                 feedMap[h][f] = (feedMap[h][f]||0)+1;
             });
-            
-            // Sort Hubs by total feedback count
             const sortedFeedHubs = Object.keys(feedMap).sort((a,b) => {
                  const sumA = Object.values(feedMap[a]).reduce((x,y)=>x+y,0);
                  const sumB = Object.values(feedMap[b]).reduce((x,y)=>x+y,0);
                  return sumB - sumA;
             });
 
-            let feedText = `5. FEEDBACK\n\`\`\`\nHUB       | Feedback\n`;
+            let feedText = `5. FEEDBACK (In Area)\n\`\`\`\nHUB       | Feedback (Count)\n`;
             feedText += "-".repeat(40) + "\n";
             sortedFeedHubs.forEach(h => {
-                // Get top feedback for this hub
                 const topF = Object.entries(feedMap[h]).sort((a,b)=>b[1]-a[1])[0];
                 if(topF) {
                     feedText += `${pad(h, 10)}| ${topF[0]} (${topF[1]})\n`;
@@ -637,10 +641,81 @@
                 if(successful) showIsland('success', 'Laporan WA disalin!');
                 else showIsland('error', 'Gagal menyalin.');
             } catch (err) {
-                console.error('Copy failed', err);
+                console.error('Fallback copy failed', err);
                 showIsland('error', 'Gagal menyalin.');
             }
             document.body.removeChild(textArea);
+        }
+
+        // --- DELETE DATA MODAL ---
+        window.openDeleteModal = () => {
+            const modal = document.getElementById('deleteModalOverlay');
+            if(modal) {
+                modal.classList.remove('hidden-section');
+                setTimeout(() => modal.classList.add('open'), 10);
+            }
+        }
+
+        window.closeDeleteModal = () => {
+            const modal = document.getElementById('deleteModalOverlay');
+            if(modal) {
+                modal.classList.remove('open');
+                setTimeout(() => modal.classList.add('hidden-section'), 300);
+            }
+        }
+
+        window.executeDelete = async () => {
+            const monthInput = document.getElementById('deleteMonthInput').value; // YYYY-MM
+            if (!monthInput) {
+                showIsland('error', 'Pilih bulan terlebih dahulu!');
+                return;
+            }
+
+            const [year, month] = monthInput.split('-').map(Number); // 2026, 1
+
+            // Filter data to delete
+            const targets = allData.filter(row => {
+                const d = parseDateStr(row.Tanggal);
+                return d && d.getFullYear() === year && (d.getMonth() + 1) === month;
+            });
+
+            if (targets.length === 0) {
+                showIsland('error', 'Tidak ada data di bulan tersebut.');
+                return;
+            }
+
+            if (!confirm(`Yakin ingin menghapus ${targets.length} data untuk bulan ${month}/${year}?`)) return;
+
+            showIsland('loading', `Menghapus ${targets.length} data...`);
+
+            // Batch delete
+            const batchSize = 450;
+            const batches = [];
+            let currentBatch = writeBatch(db);
+            let count = 0;
+
+            for (const row of targets) {
+                const ref = doc(db, COLLECTION_NAME, row.awb.trim());
+                currentBatch.delete(ref);
+                count++;
+
+                if (count % batchSize === 0) {
+                    batches.push(currentBatch.commit());
+                    currentBatch = writeBatch(db);
+                }
+            }
+            if (count % batchSize !== 0) {
+                batches.push(currentBatch.commit());
+            }
+
+            try {
+                await Promise.all(batches);
+                showIsland('success', 'Data berhasil dihapus!');
+                closeDeleteModal();
+            } catch (e) {
+                console.error(e);
+                showIsland('error', 'Gagal menghapus data.');
+            }
         }
 
         // --- MODAL LOGIC ---
@@ -1219,7 +1294,7 @@
                 });
             });
             let tfootContent = `${colGroup}<tr><td colspan="2" class="px-3">GRAND TOTAL</td><td class="text-center text-indigo-800">${formatNumber(grandTotal)}</td>`;
-            sortedPos.forEach(pos => tfootContent += `<td class="text-center border-r border-slate-200 text-slate-700">${formatNumber(posTotals[pos]||0)}</td>`);
+            sortedPos.forEach(pos => tfootContent += `<td class="text-center border-r border-slate-200 text-slate-700">${formatNumber(posTotals[p]||0)}</td>`);
             tfootContent += `</tr>`;
 
             renderStructuredTable('containerStaging', theadContent, tbodyContent, tfootContent);
