@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Monitoring Paket - Pro UI</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; color: #1e293b; }
+        .hidden-section { display: none !important; }
+        
+        /* Custom Scrollbar */
+        .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+        .table-container::-webkit-scrollbar-track { background: transparent; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.98); z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease;
+        }
+
+        /* Custom Modal */
+        #customModalOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.5); z-index: 110;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .modal-content { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* Pivot Table Styling */
+        .pivot-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 0.875rem; }
+        .pivot-table th, .pivot-table td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
+        .pivot-table th:last-child, .pivot-table td:last-child { border-right: none; }
+        .pivot-table thead th { 
+            position: sticky; top: 0; z-index: 10; 
+            background-color: #f8fafc; color: #64748b; 
+            font-weight: 600; padding: 12px 16px; 
+            text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .pivot-table tbody td { padding: 10px 16px; vertical-align: middle; transition: background-color 0.15s; }
+        .pivot-val { font-weight: 700; color: #0f172a; font-size: 0.95rem; }
+        .pivot-pct { font-size: 0.7rem; color: #64748b; margin-top: 2px; font-weight: 600; letter-spacing: 0.02em; }
+        .row-group-header { background-color: #fff; font-weight: 700; color: #334155; vertical-align: top !important; }
+        
+        /* Modern Switch */
+        .toggle-checkbox:checked { right: 0; border-color: #4f46e5; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #4f46e5; }
+        
+        /* Card Hover Effect */
+        .kpi-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- 1. LOADING OVERLAY -->
+    <div id="loadingOverlay">
+        <div class="relative">
+            <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <i class="ph-fill ph-database text-indigo-600 text-xl"></i>
+            </div>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 mt-6" id="loadingTitle">Menghubungkan Database...</h3>
+        <p class="text-slate-500 text-sm mt-1 max-w-xs text-center" id="loadingText">Sedang melakukan otentikasi ke Firebase.</p>
+        
+        <div class="w-64 bg-slate-200 rounded-full h-1.5 mt-6 overflow-hidden">
+            <div id="progressBar" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 10%"></div>
+        </div>
+        
+        <!-- Tombol Paksa Masuk (Jika auth error/lama) -->
+        <button id="skipLoadingBtn" class="mt-6 px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition shadow-sm hidden-section" onclick="forceHideLoading()">
+            Batalkan Koneksi & Masuk (Mode Offline)
+        </button>
+    </div>
+
+    <!-- 2. CUSTOM MODAL -->
+    <div id="customModalOverlay" class="hidden-section">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-content border border-slate-100 relative">
+            <div class="flex flex-col items-center text-center mb-6">
+                <div id="modalIconBg" class="p-4 rounded-full bg-indigo-50 text-indigo-600 mb-4">
+                    <i id="modalIcon" class="ph-fill ph-info text-3xl"></i>
+                </div>
+                <h3 id="modalTitle" class="text-xl font-bold text-slate-900">Judul Modal</h3>
+                <p id="modalMessage" class="text-slate-500 mt-2 text-sm leading-relaxed">Pesan modal disini.</p>
+            </div>
+            
+            <div class="flex justify-center gap-3 w-full" id="modalActions"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 supports-[backdrop-filter]:bg-white/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-4">
+                    <div class="bg-gradient-to-br from-indigo-600 to-purple-600 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-200">
+                        <i class="ph-bold ph-chart-polar text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-900 tracking-tight">Dashboard Paket</h1>
+                        <div class="flex items-center gap-2">
+                            <span id="connectionStatus" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span> Menghubungkan...
+                            </span>
+                            <span class="text-slate-300">|</span>
+                            <span id="lastUpdated" class="text-xs text-indigo-600 font-medium">--:--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <!-- Global Toggle -->
+                    <div class="hidden md:flex items-center bg-white border border-slate-200 rounded-full p-1 pr-4 shadow-sm">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="statusToggle" class="sr-only peer">
+                            <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600 transition-colors"></div>
+                        </label>
+                        <div class="ml-3 flex flex-col items-start leading-none">
+                            <span class="text-[10px] text-slate-400 font-semibold uppercase">Filter HUB X</span>
+                            <span class="text-xs font-bold text-slate-700 transition-colors" id="toggleLabel">Semua Data</span>
+                        </div>
+                    </div>
+                    
+                    <div class="hidden lg:block text-right">
+                        <p class="text-xs text-slate-400 font-medium mb-0.5">Hari Ini</p>
+                        <p class="text-sm font-bold text-slate-800" id="currentDate"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- 0. FILTER SECTION -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="ph-fill ph-faders text-indigo-600"></i>
+                    <h3 class="text-sm font-bold text-slate-800">Filter Data Global</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                    <!-- Date Range -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal Awal</label>
+                        <input type="date" id="filterStartDate" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal Akhir</label>
+                        <input type="date" id="filterEndDate" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white transition-colors">
+                    </div>
+
+                    <!-- Dropdowns -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">HUB</label>
+                        <div class="relative">
+                            <select id="filterHub" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white appearance-none cursor-pointer">
+                                <option value="">Semua HUB</option>
+                            </select>
+                            <i class="ph-bold ph-caret-down absolute right-3 top-2.5 text-slate-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Service</label>
+                        <div class="relative">
+                            <select id="filterService" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white appearance-none cursor-pointer">
+                                <option value="">Semua Service</option>
+                            </select>
+                            <i class="ph-bold ph-caret-down absolute right-3 top-2.5 text-slate-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Posisi</label>
+                        <div class="relative">
+                            <select id="filterPosisi" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white appearance-none cursor-pointer">
+                                <option value="">Semua Posisi</option>
+                            </select>
+                            <i class="ph-bold ph-caret-down absolute right-3 top-2.5 text-slate-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end pt-2 border-t border-slate-100">
+                    <button id="btnResetFilters" class="text-xs font-semibold text-slate-500 hover:text-red-500 flex items-center gap-1 transition-colors">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. KPI Summary Cards (7 Categories) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- Total AWB -->
+            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-slate-800"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total AWB Inprogress</p>
+                        <h3 class="text-2xl font-bold text-slate-900" id="kpiTotal">0</h3>
+                        <p class="text-[10px] text-slate-400 mt-1 font-medium">100% Data</p>
+                    </div>
+                    <div class="p-2.5 bg-slate-100 text-slate-600 rounded-xl">
+                        <i class="ph-fill ph-package text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last Mile -->
+            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Last Mile</p>
+                        <h3 class="text-2xl font-bold text-blue-600" id="kpiLastMile">0</h3>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded" id="kpiLastMilePct">0%</span>
+                            <span class="text-[10px] text-slate-400">dari total</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                        <i class="ph-fill ph-house-line text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vendor 3PL -->
+            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Vendor 3PL</p>
+                        <h3 class="text-2xl font-bold text-purple-600" id="kpiVendor">0</h3>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded" id="kpiVendorPct">0%</span>
+                            <span class="text-[10px] text-slate-400">dari total</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 bg-purple-50 text-purple-600 rounded-xl">
+                        <i class="ph-fill ph-truck text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mid Mile -->
+            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-orange-500"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Mid Mile</p>
+                        <h3 class="text-2xl font-bold text-orange-600" id="kpiMidMile">0</h3>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="text-[10px] font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded" id="kpiMidMilePct">0%</span>
+                            <span class="text-[10px] text-slate-400">dari total</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 bg-orange-50 text-orange-600 rounded-xl">
+                        <i class="ph-fill ph-airplane-tilt text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mitra Pengusaha -->
+            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Mitra Pengusaha</p>
+                        <h3 class="text-2xl font-bold text-emerald-600" id="kpiMitra">0</h3>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded" id="kpiMitraPct">0%</span>
+                            <span class="text-[10px] text-slate-400">dari total</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
+                        <i class="ph-fill ph-handshake text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transport -->
+            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-cyan-500"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Transport</p>
+                        <h3 class="text-2xl font-bold text-cyan-600" id="kpiTransport">0</h3>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="text-[10px] font-bold text-cyan-600 bg-cyan-50 px-1.5 py-0.5 rounded" id="kpiTransportPct">0%</span>
+                            <span class="text-[10px] text-slate-400">dari total</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 bg-cyan-50 text-cyan-600 rounded-xl">
+                        <i class="ph-fill ph-van text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- First Mile -->
+            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">First Mile</p>
+                        <h3 class="text-2xl font-bold text-indigo-600" id="kpiFirstMile">0</h3>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded" id="kpiFirstMilePct">0%</span>
+                            <span class="text-[10px] text-slate-400">dari total</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <i class="ph-fill ph-package-open text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 2. Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Monthly Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                            <i class="ph-fill ph-calendar-blank"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Tren Bulanan</h3>
+                            <p class="text-xs text-slate-500">Inprogress di HUB (Tahun Ini)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="h-72 relative">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Yearly Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-purple-100 text-purple-600 rounded-lg">
+                            <i class="ph-fill ph-chart-bar"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Tren Tahunan</h3>
+                            <p class="text-xs text-slate-500">Historis Inprogress di HUB</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="h-72 relative">
+                    <canvas id="yearlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Action & Filter Bar -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-2 sticky top-20 z-30 flex flex-col md:flex-row items-center justify-between gap-3">
+            <!-- Tab Navigation -->
+            <div class="flex p-1 bg-slate-100 rounded-xl w-full md:w-auto overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('kpi')" id="tab-kpi" class="flex-1 md:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-all shadow-sm bg-white text-indigo-600 ring-1 ring-slate-200/50">
+                    Monitoring KPI
+                </button>
+                <button onclick="switchTab('hub')" id="tab-hub" class="flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
+                    Rekapan HUB
+                </button>
+                <button onclick="switchTab('staging')" id="tab-staging" class="flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
+                    Rekapan Staging
+                </button>
+                <button onclick="switchTab('service')" id="tab-service" class="flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
+                    Service
+                </button>
+                <button onclick="switchTab('raw')" id="tab-raw" class="flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
+                    Data Asli
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3 w-full md:w-auto px-2">
+                <!-- Search -->
+                <div class="relative w-full md:w-64">
+                    <i class="ph-bold ph-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
+                    <input type="text" id="searchInput" placeholder="Cari data..." class="w-full text-sm pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all bg-slate-50 focus:bg-white">
+                </div>
+
+                <!-- Upload Button -->
+                <label class="group flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl cursor-pointer hover:bg-indigo-600 transition-all duration-200 shadow-md shadow-slate-200 hover:shadow-indigo-200 active:scale-95 whitespace-nowrap">
+                    <i class="ph-bold ph-upload-simple text-lg"></i>
+                    <span class="hidden sm:inline font-semibold text-sm">Upload CSV</span>
+                    <input type='file' class="hidden" id="csvFileInput" accept=".csv" />
+                </label>
+            </div>
+        </div>
+
+        <!-- 4. Detailed Tables Section -->
+        <div id="mainTableContainer" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[600px] h-[75vh]">
+            <div class="flex-1 overflow-auto table-container relative bg-white">
+                <div id="view-kpi" class="view-section h-full p-0">
+                    <table class="pivot-table" id="tableKPI"></table>
+                </div>
+                <div id="view-hub" class="view-section hidden-section h-full p-0">
+                    <table class="pivot-table" id="tableHub"></table>
+                </div>
+                <div id="view-staging" class="view-section hidden-section h-full p-0">
+                    <table class="pivot-table" id="tableStaging"></table>
+                </div>
+                <div id="view-service" class="view-section hidden-section h-full p-0">
+                    <table class="pivot-table" id="tableService"></table>
+                </div>
+                <div id="view-raw" class="view-section hidden-section h-full p-0">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                         <thead class="bg-slate-50 text-slate-500 border-b border-slate-200 sticky top-0 z-10 font-semibold uppercase text-xs tracking-wider">
+                            <tr>
+                                <th class="px-6 py-4">Tanggal</th>
+                                <th class="px-6 py-4">AWB</th>
+                                <th class="px-6 py-4">Delivery HUB</th>
+                                <th class="px-6 py-4">Delivery Staging</th>
+                                <th class="px-6 py-4">Service</th>
+                                <th class="px-6 py-4">Posisi</th>
+                                <th class="px-6 py-4">HUB X</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableRawBody" class="divide-y divide-slate-100 text-slate-600"></tbody>
+                    </table>
+                    <div class="p-4 text-xs text-slate-400 text-center border-t border-slate-100 bg-slate-50" id="rawCount"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXOfZbVDqtfGB0abQkTeILo-XC6a9xxKI",
+            authDomain: "hub-dashboard-92428.firebaseapp.com",
+            projectId: "hub-dashboard-92428",
+            storageBucket: "hub-dashboard-92428.firebasestorage.app",
+            messagingSenderId: "827243064075",
+            appId: "1:827243064075:web:7a4ce8b927d3ec7e33d00e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const COLLECTION_NAME = "parcel_data";
+
+        let allData = [];
+        let currentTab = 'kpi';
+        let isGustiadiOnly = false;
+        let charts = { monthly: null, yearly: null };
+
+        // --- CHART HELPERS ---
+        function parseDateStr(dateStr) {
+            if (!dateStr) return null;
+            if (dateStr.includes('-')) {
+                return new Date(dateStr);
+            }
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            return null;
+        }
+
+        // --- FILTER LOGIC (NEW) ---
+        function populateDropdowns(data) {
+            const hubs = new Set();
+            const services = new Set();
+            const posisis = new Set();
+
+            data.forEach(row => {
+                if(row.delivery_hub) hubs.add(row.delivery_hub);
+                if(row.service_code) services.add(row.service_code);
+                if(row.Posisi) posisis.add(row.Posisi);
+            });
+
+            const fill = (id, set) => {
+                const select = document.getElementById(id);
+                const currentVal = select.value;
+                select.innerHTML = select.options[0].outerHTML; 
+                Array.from(set).sort().forEach(val => {
+                    const opt = document.createElement('option');
+                    opt.value = val;
+                    opt.innerText = val;
+                    select.appendChild(opt);
+                });
+                select.value = currentVal;
+            };
+
+            fill('filterHub', hubs);
+            fill('filterService', services);
+            fill('filterPosisi', posisis);
+        }
+
+        function getFilteredData() {
+            const startDateVal = document.getElementById('filterStartDate').value;
+            const endDateVal = document.getElementById('filterEndDate').value;
+            const hubVal = document.getElementById('filterHub').value;
+            const serviceVal = document.getElementById('filterService').value;
+            const posisiVal = document.getElementById('filterPosisi').value;
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+            const startDate = startDateVal ? new Date(startDateVal) : null;
+            const endDate = endDateVal ? new Date(endDateVal) : null;
+            if(startDate) startDate.setHours(0,0,0,0);
+            if(endDate) endDate.setHours(23,59,59,999);
+
+            return allData.filter(row => {
+                const hubX = (row['HUB X'] || "").toLowerCase().trim();
+                if (isGustiadiOnly && hubX !== 'gustiadi') return false;
+
+                if (startDate || endDate) {
+                    const rowDate = parseDateStr(row['Tanggal']);
+                    if (rowDate) {
+                        if (startDate && rowDate < startDate) return false;
+                        if (endDate && rowDate > endDate) return false;
+                    }
+                }
+
+                if (hubVal && row.delivery_hub !== hubVal) return false;
+                if (serviceVal && row.service_code !== serviceVal) return false;
+                if (posisiVal && row.Posisi !== posisiVal) return false;
+
+                if (searchVal) {
+                    const str = JSON.stringify(row).toLowerCase();
+                    if (!str.includes(searchVal)) return false;
+                }
+
+                return true;
+            });
+        }
+
+        ['filterStartDate', 'filterEndDate', 'filterHub', 'filterService', 'filterPosisi', 'searchInput'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => renderDashboard());
+            if(id === 'searchInput') {
+                document.getElementById(id).addEventListener('keyup', () => renderDashboard());
+            }
+        });
+
+        document.getElementById('btnResetFilters').addEventListener('click', () => {
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            document.getElementById('filterHub').value = '';
+            document.getElementById('filterService').value = '';
+            document.getElementById('filterPosisi').value = '';
+            document.getElementById('searchInput').value = '';
+            renderDashboard();
+        });
+
+        function updateCharts(data) {
+            const monthlyData = {};
+            const yearlyData = {};
+            const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+
+            data.forEach(row => {
+                const pos = (row['Posisi'] || "").toLowerCase();
+                const selectedPos = document.getElementById('filterPosisi').value;
+                
+                let includeInChart = false;
+                if (selectedPos) {
+                    includeInChart = true; 
+                } else {
+                    if (pos === 'mid mile') includeInChart = true;
+                }
+
+                if (!includeInChart) return;
+
+                const date = parseDateStr(row['Tanggal']);
+                if (date) {
+                    const year = date.getFullYear();
+                    const month = date.getMonth(); 
+                    const monthKey = `${months[month]} ${year}`; 
+
+                    monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1;
+                    yearlyData[year] = (yearlyData[year] || 0) + 1;
+                }
+            });
+
+            const sortedMonths = Object.keys(monthlyData).sort((a, b) => {
+                const [mA, yA] = a.split(' ');
+                const [mB, yB] = b.split(' ');
+                return new Date(`${mA} 1, ${yA}`) - new Date(`${mB} 1, ${yB}`);
+            });
+            const sortedYears = Object.keys(yearlyData).sort();
+
+            renderChart('monthlyChart', 'line', sortedMonths, sortedMonths.map(k => monthlyData[k]), 'Volume Bulanan', '#4f46e5');
+            renderChart('yearlyChart', 'bar', sortedYears, sortedYears.map(k => yearlyData[k]), 'Volume Tahunan', '#9333ea');
+        }
+
+        function renderChart(canvasId, type, labels, data, label, color) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            if (charts[canvasId]) charts[canvasId].destroy();
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            if(type === 'line') {
+                gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
+                gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
+            }
+
+            charts[canvasId] = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: type === 'line' ? gradient : color,
+                        borderColor: color,
+                        borderWidth: 2,
+                        fill: type === 'line',
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12,
+                            cornerRadius: 8,
+                            titleFont: { family: 'Plus Jakarta Sans', size: 13 },
+                            bodyFont: { family: 'Plus Jakarta Sans', size: 13 },
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: '#f1f5f9', borderDash: [5, 5] },
+                            ticks: { font: { family: 'Plus Jakarta Sans' }, color: '#94a3b8' }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { font: { family: 'Plus Jakarta Sans' }, color: '#64748b' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- AUTH & INIT ---
+        signInAnonymously(auth)
+            .then(() => {
+                // Auth success
+            })
+            .catch((error) => {
+                console.error("Auth Error:", error);
+                let msg = "Gagal login database: " + error.message;
+                
+                // Pesan khusus untuk error domain
+                if (error.code === 'auth/unauthorized-domain' || error.message.includes('unauthorized-domain')) {
+                    msg = "Domain ini belum diizinkan di Firebase Console. Buka Console > Authentication > Settings > Authorized Domains dan tambahkan domain Vercel Anda.";
+                }
+                
+                showModal('error', 'Koneksi Ditolak', msg);
+                
+                // Tampilkan tombol lewati loading
+                const skipBtn = document.getElementById('skipLoadingBtn');
+                if(skipBtn) skipBtn.classList.remove('hidden-section');
+            });
+
+        onAuthStateChanged(auth, (user) => {
+            const statusEl = document.getElementById('connectionStatus');
+            const overlay = document.getElementById('loadingOverlay');
+            
+            if (user) {
+                statusEl.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Online Live`;
+                statusEl.className = "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 uppercase tracking-wider";
+                initRealtimeListener();
+            } else {
+                statusEl.innerHTML = `<span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span> Offline`;
+                // Timeout to hide overlay if stuck
+                setTimeout(() => {
+                    const ov = document.getElementById('loadingOverlay');
+                    const btn = document.getElementById('skipLoadingBtn');
+                    if (ov && !ov.classList.contains('hidden-section')) {
+                       btn.classList.remove('hidden-section');
+                    }
+                }, 8000);
+            }
+        });
+
+        // Global function for skip button
+        window.forceHideLoading = () => {
+            document.getElementById('loadingOverlay').classList.add('hidden-section');
+        };
+
+        function initRealtimeListener() {
+            onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
+                allData = [];
+                snapshot.forEach(doc => allData.push(doc.data()));
+                
+                const now = new Date();
+                document.getElementById('lastUpdated').innerText = `Update: ${now.toLocaleTimeString('id-ID')}`;
+                
+                // Populate dropdowns once data loaded
+                populateDropdowns(allData);
+                renderDashboard();
+                
+                document.getElementById('loadingOverlay').classList.add('hidden-section');
+            });
+        }
+
+        function renderDashboard() {
+            const filteredData = getFilteredData();
+            calculateKPIs(filteredData);
+            refreshCurrentView(filteredData);
+            updateCharts(filteredData);
+        }
+
+        function getGradientColor(value, min, max) {
+            if (!value) return 'transparent';
+            if (min === max) return '#f0fdf4'; 
+            const ratio = (value - min) / (max - min);
+            const hue = 120 - (ratio * 120);
+            return `hsla(${hue}, 85%, 94%, 1)`; 
+        }
+
+        // --- GENERATORS ---
+        function generateKPIRecap(data) {
+            const table = document.getElementById('tableKPI');
+            const hubs = {};
+            const grandTotals = { 
+                total: 0, 
+                mm_nasional: 0, mm_region: 0, mm_transport: 0, hub_only: 0
+            };
+
+            data.forEach(row => {
+                const hub = row['delivery_hub'] || "Unknown";
+                if (!hubs[hub]) hubs[hub] = { total: 0, mm_nasional: 0, mm_region: 0, mm_transport: 0, hub_only: 0 };
+
+                const pos = (row['Posisi'] || "").toLowerCase().trim();
+                const bantuan = (row['Bantuan'] || "").toLowerCase().trim();
+
+                hubs[hub].total++;
+                grandTotals.total++;
+
+                const groupFull = ['mid mile', 'mitra pengusaha', 'transport', 'vendor 3pl'];
+                const groupTransport = ['mid mile', 'transport'];
+
+                if (groupFull.includes(pos) && bantuan === 'all') { hubs[hub].mm_nasional++; grandTotals.mm_nasional++; }
+                if (groupFull.includes(pos) && bantuan === 'kal sulam') { hubs[hub].mm_region++; grandTotals.mm_region++; }
+                if (groupTransport.includes(pos) && bantuan === 'kal sulam') { hubs[hub].mm_transport++; grandTotals.mm_transport++; }
+                if (pos === 'mid mile' && bantuan === 'kal sulam') { hubs[hub].hub_only++; grandTotals.hub_only++; }
+            });
+
+            const sortedHubs = Object.keys(hubs).sort();
+            
+            let html = `<thead><tr>
+                <th class="text-left w-48 bg-slate-50/80">Delivery HUB</th>
+                <th class="text-center text-indigo-700 bg-indigo-50/50 w-24">Total AWB</th>
+                <th class="text-center w-32">Mid Mile Nasional<br><span class="text-[10px] font-normal text-slate-400">All</span></th>
+                <th class="text-center w-32">Mid Mile Region<br><span class="text-[10px] font-normal text-slate-400">Kal Sulam</span></th>
+                <th class="text-center w-32">MM & Transport<br><span class="text-[10px] font-normal text-slate-400">Kal Sulam</span></th>
+                <th class="text-center w-32">HUB<br><span class="text-[10px] font-normal text-slate-400">Mid Mile Only</span></th>
+            </tr></thead><tbody class="bg-white">`;
+
+            const renderCell = (val, total, isWarningCheck = false) => {
+                const pct = total > 0 ? (val / total) * 100 : 0;
+                let valCls = "pivot-val";
+                let pctCls = "pivot-pct";
+                let icon = "";
+                
+                if (isWarningCheck && pct > 5.0) {
+                    valCls = "pivot-val text-red-600";
+                    pctCls = "text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 mt-1 inline-flex items-center gap-1";
+                    icon = `<i class="ph-fill ph-warning animate-pulse"></i>`;
+                }
+                
+                if(val === 0) return `<span class="text-slate-200 text-lg">-</span>`;
+
+                return `<div class="flex flex-col items-center"><div class="${valCls}">${val}</div><div class="${pctCls}">${icon}${pct.toFixed(1)}%</div></div>`;
+            };
+
+            sortedHubs.forEach(hub => {
+                const d = hubs[hub];
+                html += `<tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">
+                    <td class="font-bold text-slate-700 px-4 py-3 border-r bg-white sticky left-0 z-10">${hub}</td>
+                    <td class="text-center font-bold text-indigo-600 bg-indigo-50/30 border-r text-lg">${d.total}</td>
+                    <td class="text-center border-r px-4 py-3">${renderCell(d.mm_nasional, d.total)}</td>
+                    <td class="text-center border-r px-4 py-3">${renderCell(d.mm_region, d.total)}</td>
+                    <td class="text-center border-r px-4 py-3">${renderCell(d.mm_transport, d.total)}</td>
+                    <td class="text-center border-r px-4 py-3">${renderCell(d.hub_only, d.total, true)}</td>
+                </tr>`;
+            });
+
+            html += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-200 sticky bottom-0 z-10 shadow-inner">
+                <td class="px-4 py-3 text-slate-800 bg-slate-100 sticky left-0">GRAND TOTAL</td>
+                <td class="text-center text-indigo-800 bg-indigo-100 text-lg">${grandTotals.total}</td>
+                <td class="text-center border-r border-slate-200">${renderCell(grandTotals.mm_nasional, grandTotals.total)}</td>
+                <td class="text-center border-r border-slate-200">${renderCell(grandTotals.mm_region, grandTotals.total)}</td>
+                <td class="text-center border-r border-slate-200">${renderCell(grandTotals.mm_transport, grandTotals.total)}</td>
+                <td class="text-center border-r border-slate-200">${renderCell(grandTotals.hub_only, grandTotals.total)}</td>
+            </tr></tbody>`;
+            table.innerHTML = html;
+        }
+
+        function generateHubRecap(data) {
+            const table = document.getElementById('tableHub');
+            const hubs = {};
+            const posColumnTotals = {}; 
+
+            data.forEach(row => {
+                const hub = row['delivery_hub'] || "Unknown";
+                const pos = row['Posisi'] || "Unknown";
+                posColumnTotals[pos] = (posColumnTotals[pos] || 0) + 1;
+                if (!hubs[hub]) hubs[hub] = { total: 0, counts: {} };
+                hubs[hub].total++;
+                hubs[hub].counts[pos] = (hubs[hub].counts[pos] || 0) + 1;
+            });
+
+            const sortedPos = Object.keys(posColumnTotals).sort((a, b) => posColumnTotals[b] - posColumnTotals[a]);
+            const sortedHubs = Object.keys(hubs).sort();
+            const headerTitle = isGustiadiOnly ? `<span class="text-indigo-600">Total (In Area)</span>` : `<span class="text-slate-700">Total (Semua)</span>`;
+
+            let html = `<thead><tr><th class="text-left w-48 bg-slate-50/80">Delivery HUB</th><th class="text-center w-24 bg-indigo-50/50">${headerTitle}</th>`;
+            sortedPos.forEach(p => html += `<th class="text-center min-w-[100px]">${p}</th>`);
+            html += `</tr></thead><tbody class="bg-white">`;
+
+            let grandTotal = 0;
+            sortedHubs.forEach(hub => {
+                const total = hubs[hub].total;
+                grandTotal += total;
+                
+                let rowVals = sortedPos.map(p => hubs[hub].counts[p] || 0);
+                let min = Math.min(...rowVals.filter(v=>v>0)) || 0;
+                let max = Math.max(...rowVals);
+                let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>hubs[hub].counts[p]||0));
+
+                html += `<tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">
+                    <td class="font-bold border-r text-slate-700 bg-white sticky left-0 z-10">${hub}</td>
+                    <td class="text-center font-bold bg-indigo-50/30 border-r text-indigo-700">${total}</td>`;
+                
+                sortedPos.forEach(pos => {
+                    const count = hubs[hub].counts[pos] || 0;
+                    const pct = total > 0 ? (count / total) * 100 : 0;
+                    const bg = getGradientColor(count, min, max);
+                    let content = `<span class="text-slate-200">-</span>`;
+                    
+                    if(count > 0) {
+                        let badge = "";
+                        let badgeClass = "pivot-pct text-slate-500";
+                        if(pos.toLowerCase() === 'mid mile' && pct > 5.0) {
+                            badge = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px]"></i>`;
+                            badgeClass = "text-[10px] font-bold text-red-600 bg-red-50 rounded px-1.5 py-0.5 border border-red-100 shadow-sm";
+                        } else if (count === maxOther) {
+                            badge = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px]"></i>`;
+                            badgeClass = "text-[10px] font-bold text-orange-700 bg-orange-50 rounded px-1.5 py-0.5 border border-orange-100 shadow-sm";
+                        }
+                        content = `<div class="pivot-val">${count}</div><div class="${badgeClass} flex justify-center items-center gap-1 mt-1">${badge}${pct.toFixed(1)}%</div>`;
+                    }
+                    html += `<td class="text-center border-r" style="background-color:${bg}">${content}</td>`;
+                });
+                html += `</tr>`;
+            });
+            
+            html += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-200 sticky bottom-0 z-10 shadow-inner">
+                <td class="p-3 text-slate-800 bg-slate-100 sticky left-0">GRAND TOTAL</td>
+                <td class="text-center text-indigo-800 bg-indigo-100">${grandTotal}</td>`;
+            sortedPos.forEach(pos => html += `<td class="text-center border-r border-slate-200 text-slate-700">${posColumnTotals[pos] || 0}</td>`);
+            html += `</tr></tbody>`;
+            table.innerHTML = html;
+        }
+
+        function generateStagingRecap(data) {
+            const table = document.getElementById('tableStaging');
+            const grouping = {}; const posColumnTotals = {};
+
+            data.forEach(row => {
+                const hub = row['delivery_hub'] || "Unknown";
+                const ss = row['delivery_staging'] || "Unknown";
+                const pos = row['Posisi'] || "Unknown";
+                posColumnTotals[pos] = (posColumnTotals[pos] || 0) + 1;
+                if (!grouping[hub]) grouping[hub] = {};
+                if (!grouping[hub][ss]) grouping[hub][ss] = { total: 0, counts: {} };
+                grouping[hub][ss].total++;
+                grouping[hub][ss].counts[pos] = (grouping[hub][ss].counts[pos] || 0) + 1;
+            });
+
+            const sortedPos = Object.keys(posColumnTotals).sort((a, b) => posColumnTotals[b] - posColumnTotals[a]);
+            const sortedHubs = Object.keys(grouping).sort();
+            const headerTitle = isGustiadiOnly ? `<span class="text-indigo-600">Total (In Area)</span>` : `<span class="text-slate-700">Total (Semua)</span>`;
+
+            let html = `<thead><tr>
+                <th class="text-left w-32 bg-slate-50/80">HUB</th>
+                <th class="text-left w-48 bg-slate-50/80">Staging</th>
+                <th class="text-center w-24 bg-indigo-50/50">${headerTitle}</th>`;
+            sortedPos.forEach(p => html += `<th class="text-center min-w-[100px]">${p}</th>`);
+            html += `</tr></thead><tbody class="bg-white">`;
+
+            let grandTotal = 0;
+            sortedHubs.forEach(hub => {
+                const stagings = Object.keys(grouping[hub]).sort();
+                stagings.forEach((ss, idx) => {
+                    const d = grouping[hub][ss];
+                    grandTotal += d.total;
+                    
+                    let rowVals = sortedPos.map(p => d.counts[p] || 0);
+                    let min = Math.min(...rowVals.filter(v=>v>0)) || 0;
+                    let max = Math.max(...rowVals);
+                    let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.counts[p]||0));
+
+                    html += `<tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">`;
+                    if(idx===0) html += `<td class="row-group-header border-r border-b font-bold text-slate-700 bg-white sticky left-0 z-10" rowspan="${stagings.length}">${hub}</td>`;
+                    html += `<td class="border-r font-medium text-slate-600 px-3">${ss}</td><td class="text-center font-bold bg-indigo-50/30 border-r text-indigo-700">${d.total}</td>`;
+
+                    sortedPos.forEach(pos => {
+                        const count = d.counts[pos] || 0;
+                        const pct = d.total > 0 ? (count / d.total) * 100 : 0;
+                        const bg = getGradientColor(count, min, max);
+                        let content = `<span class="text-slate-200">-</span>`;
+                        if(count > 0) {
+                            let badge = "";
+                            let badgeClass = "pivot-pct text-slate-500";
+                            if(pos.toLowerCase() === 'mid mile' && pct > 5.0) {
+                                badge = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px]"></i>`;
+                                badgeClass = "text-[10px] font-bold text-red-600 bg-red-50 rounded px-1.5 py-0.5 border border-red-100 shadow-sm";
+                            } else if (count === maxOther) {
+                                badge = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px]"></i>`;
+                                badgeClass = "text-[10px] font-bold text-orange-700 bg-orange-50 rounded px-1.5 py-0.5 border border-orange-100 shadow-sm";
+                            }
+                            content = `<div class="pivot-val">${count}</div><div class="${badgeClass} flex justify-center items-center gap-1 mt-1">${badge}${pct.toFixed(1)}%</div>`;
+                        }
+                        html += `<td class="text-center border-r" style="background-color:${bg}">${content}</td>`;
+                    });
+                    html += `</tr>`;
+                });
+            });
+            html += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-200 sticky bottom-0 z-10 shadow-inner">
+                <td colspan="2" class="p-3 text-slate-800 bg-slate-100 sticky left-0">GRAND TOTAL</td>
+                <td class="text-center text-indigo-800 bg-indigo-100">${grandTotal}</td>`;
+            sortedPos.forEach(pos => html += `<td class="text-center border-r border-slate-200 text-slate-700">${posColumnTotals[pos] || 0}</td>`);
+            html += `</tr></tbody>`;
+            table.innerHTML = html;
+        }
+
+        function generateServiceRecap(data) {
+            const table = document.getElementById('tableService');
+            const services = {}; const posColumnTotals = {};
+            data.forEach(row => {
+                const svc = row['service_code'] || "Unknown";
+                const pos = row['Posisi'] || "Unknown";
+                posColumnTotals[pos] = (posColumnTotals[pos] || 0) + 1;
+                if (!services[svc]) services[svc] = { total: 0, counts: {} };
+                services[svc].total++;
+                services[svc].counts[pos] = (services[svc].counts[pos] || 0) + 1;
+            });
+            const sortedPos = Object.keys(posColumnTotals).sort((a, b) => posColumnTotals[b] - posColumnTotals[a]);
+            const sortedSvc = Object.keys(services).sort();
+            let html = `<thead><tr><th class="text-left w-48 bg-slate-50/80">Service</th><th class="text-center w-24 bg-indigo-50/50">Total</th>`;
+            sortedPos.forEach(p => html += `<th class="text-center min-w-[100px]">${p}</th>`);
+            html += `</tr></thead><tbody class="bg-white">`;
+            let grandTotal = 0;
+            sortedSvc.forEach(svc => {
+                const total = services[svc].total; grandTotal += total;
+                html += `<tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">
+                    <td class="font-bold border-r px-4 py-2 bg-white sticky left-0 z-10 text-slate-700">${svc}</td>
+                    <td class="text-center font-bold bg-indigo-50/30 border-r text-indigo-700">${total}</td>`;
+                sortedPos.forEach(pos => {
+                    const count = services[svc].counts[pos] || 0;
+                    const pct = total > 0 ? (count / total) * 100 : 0;
+                    html += `<td class="text-center border-r"><div class="pivot-val">${count>0?count:'-'}</div><div class="pivot-pct text-slate-400">${count>0?pct.toFixed(1)+'%':''}</div></td>`;
+                });
+                html += `</tr>`;
+            });
+            html += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-200 sticky bottom-0 z-10 shadow-inner">
+                <td class="p-3 text-slate-800 bg-slate-100 sticky left-0">GRAND TOTAL</td>
+                <td class="text-center text-indigo-800 bg-indigo-100">${grandTotal}</td>`;
+            sortedPos.forEach(pos => html += `<td class="text-center border-r border-slate-200 text-slate-700">${posColumnTotals[pos] || 0}</td>`);
+            html += `</tr></tbody>`;
+            table.innerHTML = html;
+        }
+
+        // --- CORE FUNCTIONS ---
+        function calculateKPIs(data) {
+            // Data is already filtered by getFilteredData()
+            const total = data.length;
+            
+            let counts = {
+                lastMile: 0,
+                vendor: 0,
+                midMile: 0,
+                mitra: 0,
+                transport: 0,
+                firstMile: 0
+            };
+
+            data.forEach(r => {
+                const pos = (r['Posisi'] || "").toLowerCase().trim();
+                if (pos === 'last mile') counts.lastMile++;
+                else if (pos === 'vendor 3pl') counts.vendor++;
+                else if (pos === 'mid mile') counts.midMile++;
+                else if (pos === 'mitra pengusaha') counts.mitra++;
+                else if (pos === 'transport') counts.transport++;
+                else if (pos === 'first mile') counts.firstMile++;
+            });
+
+            const updateCard = (idCount, idPct, val) => {
+                const elCount = document.getElementById(idCount);
+                const elPct = document.getElementById(idPct);
+                if (elCount) animateValue(idCount, val);
+                if (elPct) {
+                    const pct = total > 0 ? (val / total) * 100 : 0;
+                    elPct.innerText = pct.toFixed(1) + '%';
+                }
+            };
+
+            animateValue('kpiTotal', total);
+            updateCard('kpiLastMile', 'kpiLastMilePct', counts.lastMile);
+            updateCard('kpiVendor', 'kpiVendorPct', counts.vendor);
+            updateCard('kpiMidMile', 'kpiMidMilePct', counts.midMile);
+            updateCard('kpiMitra', 'kpiMitraPct', counts.mitra);
+            updateCard('kpiTransport', 'kpiTransportPct', counts.transport);
+            updateCard('kpiFirstMile', 'kpiFirstMilePct', counts.firstMile);
+        }
+
+        function animateValue(id, end) {
+            const obj = document.getElementById(id);
+            if(!obj) return;
+            obj.innerText = end.toLocaleString('id-ID');
+        }
+
+        window.switchTab = (tabName) => {
+            currentTab = tabName;
+            ['kpi', 'hub', 'staging', 'service', 'raw'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tabName) {
+                    btn.className = "flex-1 md:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-all shadow-sm bg-white text-indigo-600 ring-1 ring-slate-200/50";
+                } else {
+                    btn.className = "flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50";
+                }
+                document.getElementById(`view-${t}`).classList.add('hidden-section');
+            });
+            document.getElementById(`view-${tabName}`).classList.remove('hidden-section');
+            renderDashboard();
+        };
+
+        document.getElementById('statusToggle').addEventListener('change', function(e) {
+            isGustiadiOnly = e.target.checked;
+            const label = document.getElementById('toggleLabel');
+            if (isGustiadiOnly) {
+                label.innerText = "Khusus In Area"; label.classList.add("text-indigo-600"); label.classList.remove("text-slate-700");
+            } else {
+                label.innerText = "Semua Data"; label.classList.remove("text-indigo-600"); label.classList.add("text-slate-700");
+            }
+            renderDashboard();
+        });
+
+        function refreshCurrentView(data) {
+            // Use 'data' directly, don't read searchInput here as it's already handled in getFilteredData
+            if(currentTab === 'kpi') generateKPIRecap(data);
+            else if(currentTab === 'hub') generateHubRecap(data);
+            else if(currentTab === 'staging') generateStagingRecap(data);
+            else if(currentTab === 'service') generateServiceRecap(data);
+            else {
+                const tbody = document.getElementById('tableRawBody');
+                // Display first 100 for performance
+                const display = data.slice(0, 100);
+                let html = '';
+                display.forEach(row => {
+                    html += `<tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0"><td class="px-6 py-3 font-medium">${row.Tanggal}</td><td class="px-6 py-3 font-mono text-xs text-slate-500">${row.awb}</td><td class="px-6 py-3 font-bold text-indigo-600">${row.delivery_hub}</td><td class="px-6 py-3">${row.delivery_staging}</td><td class="px-6 py-3"><span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-bold">${row.service_code}</span></td><td class="px-6 py-3">${row.Posisi}</td><td class="px-6 py-3 font-bold">${row['HUB X']}</td></tr>`;
+                });
+                tbody.innerHTML = html;
+                document.getElementById('rawCount').innerText = `Menampilkan ${display.length} dari ${data.length}`;
+            }
+        }
+
+        // --- UPLOAD HANDLER ---
+        document.getElementById('csvFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            Papa.parse(file, {
+                header: true, skipEmptyLines: true,
+                complete: function(results) {
+                     showModal('confirm', 'Konfirmasi Upload', `Siap memproses ${results.data.length} baris data. Lanjutkan?`, () => saveData(results.data));
+                }
+            });
+        });
+
+        async function saveData(csvData) {
+            const overlay = document.getElementById('loadingOverlay');
+            const progress = document.getElementById('progressBar');
+            overlay.classList.remove('hidden-section');
+            document.getElementById('loadingTitle').innerText = "Menyimpan ke Cloud...";
+            
+            const validData = csvData.filter(r => r.awb);
+            const batchSize = 400;
+            const totalBatches = Math.ceil(validData.length / batchSize);
+
+            try {
+                for (let i = 0; i < totalBatches; i++) {
+                    const batch = writeBatch(db);
+                    validData.slice(i * batchSize, (i + 1) * batchSize).forEach(row => {
+                        const cleanRow = JSON.parse(JSON.stringify(row));
+                        batch.set(doc(db, COLLECTION_NAME, row.awb.trim()), cleanRow, {merge:true});
+                    });
+                    await batch.commit();
+                    progress.style.width = `${((i+1)/totalBatches)*100}%`;
+                }
+                overlay.classList.add('hidden-section');
+                showModal('success', 'Upload Berhasil', 'Data telah berhasil diperbarui di database.');
+            } catch (err) {
+                overlay.classList.add('hidden-section');
+                showModal('error', 'Gagal', err.message);
+            }
+        }
+
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+    </script>
+</body>
+</html>
