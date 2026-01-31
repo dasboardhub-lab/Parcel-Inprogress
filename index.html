@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard SLA Inprogress</title>
+    <title>Dashboard Monitoring Paket - Pro View</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -202,7 +202,7 @@
     <!-- DYNAMIC ISLAND -->
     <div id="dynamicIsland"></div>
 
-    <!-- SUMMARY MODAL (UPDATED WITH ORIGIN & FEEDBACK) -->
+    <!-- SUMMARY MODAL -->
     <div id="summaryModalOverlay">
         <div class="summary-card">
             <!-- Header -->
@@ -210,8 +210,8 @@
                 <div class="flex items-center gap-3">
                     <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 border border-indigo-200"><i class="ph-bold ph-chart-pie-slice text-xl"></i></div>
                     <div>
-                        <h3 class="text-sm font-bold text-slate-800" id="summaryTitle">Analisis HUB & Trans</h3>
-                        <p class="text-[10px] text-slate-500 font-medium flex items-center gap-1"><i class="ph-fill ph-info"></i> In Area Gustiadi (Mid Mile + Transport)</p>
+                        <h3 class="text-sm font-bold text-slate-800" id="summaryTitle">Analisis HUB</h3>
+                        <!-- Text dihapus -->
                     </div>
                 </div>
                 <button onclick="closeSummary()" class="text-slate-400 hover:text-red-500 transition bg-white p-1 rounded-full shadow-sm border border-slate-200"><i class="ph-bold ph-x text-lg"></i></button>
@@ -219,41 +219,27 @@
             
             <!-- Body -->
             <div class="p-6 overflow-y-auto">
-                <!-- 1. Top 3 Origin -->
                 <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                     <i class="ph-fill ph-map-pin text-orange-500"></i> Top 3 Origin (Penyumbang Terbanyak)
                 </h4>
-                <div class="grid grid-cols-3 gap-3 mb-6" id="topOriginsContainer">
-                    <!-- JS Injected -->
-                    <div class="bg-slate-50 rounded-xl p-3 text-center border border-slate-100"><span class="text-xs text-slate-400">-</span></div>
-                    <div class="bg-slate-50 rounded-xl p-3 text-center border border-slate-100"><span class="text-xs text-slate-400">-</span></div>
-                    <div class="bg-slate-50 rounded-xl p-3 text-center border border-slate-100"><span class="text-xs text-slate-400">-</span></div>
-                </div>
+                <div class="grid grid-cols-3 gap-3 mb-6" id="topOriginsContainer"></div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- 2. Feedback Breakdown -->
                     <div>
                         <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            <i class="ph-fill ph-chat-text text-indigo-500"></i> Feedback (Status)
+                            <i class="ph-fill ph-chat-text text-indigo-500"></i> Top Feedback
                         </h4>
-                        <div class="space-y-3" id="feedbackBreakdown">
-                            <!-- JS injected -->
-                        </div>
+                        <div class="space-y-3" id="feedbackBreakdown"></div>
                     </div>
-
-                    <!-- 3. Service Breakdown -->
                     <div>
                         <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                             <i class="ph-fill ph-tag text-emerald-500"></i> Service Type
                         </h4>
-                        <div class="space-y-3" id="serviceBreakdown">
-                            <!-- JS injected -->
-                        </div>
+                        <div class="space-y-3" id="serviceBreakdown"></div>
                     </div>
                 </div>
             </div>
             
-            <!-- Footer -->
             <div class="bg-slate-50 px-6 py-3 rounded-b-2xl border-t border-slate-100 text-center sticky bottom-0">
                 <p class="text-[10px] text-slate-400 font-medium">Total Data Dianalisa: <span class="font-bold text-slate-700" id="totalAnalyzed">0</span> Paket</p>
             </div>
@@ -282,6 +268,11 @@
 
             <!-- CONTROLS -->
             <div class="flex items-center gap-2 flex-wrap justify-end w-full xl:w-auto">
+                <button onclick="copyReport()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-[10px] font-bold cursor-pointer hover:bg-emerald-700 transition-all shadow-md active:scale-95">
+                    <i class="ph-bold ph-whatsapp-logo text-sm"></i>
+                    <span>Salin Laporan WA</span>
+                </button>
+
                 <div class="flex items-center bg-slate-50 p-0.5 rounded-lg border border-slate-200">
                     <input type="date" id="filterStartDate" class="bg-transparent text-[10px] font-semibold text-slate-600 px-2 py-1 focus:outline-none cursor-pointer">
                     <span class="text-slate-300 text-[10px] px-1">→</span>
@@ -317,25 +308,42 @@
             </div>
         </header>
 
-        <!-- 1. KPI CARDS -->
+        <!-- 1. KPI CARDS (Updated Layout with 2 Percentages) -->
         <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-4">
             <script>
+                // Template Updated to show both percentages clearly
                 const kpiCard = (id, label, gradFrom, gradTo, icon, delay) => document.write(`
-                    <div class="kpi-card p-3 flex flex-col justify-between h-20 animate-fade-in" style="animation-delay: ${delay}ms">
-                        <div class="flex justify-between items-start">
-                            <div class="w-6 h-6 rounded-md bg-gradient-to-br from-${gradFrom}-500 to-${gradTo}-600 flex items-center justify-center text-white shadow-sm">
-                                <i class="ph-bold ${icon} text-xs"></i>
+                    <div class="kpi-card p-4 flex flex-col justify-between h-36 animate-fade-in-up hover:bg-${gradFrom}-50/10" style="animation-delay: ${delay}ms">
+                        
+                        <!-- Header: Icon & Share % -->
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-${gradFrom}-500 to-${gradTo}-600 flex items-center justify-center text-white shadow-md shadow-${gradFrom}-200">
+                                <i class="ph-bold ${icon} text-lg"></i>
                             </div>
-                            <div class="text-[9px] font-bold text-slate-400 bg-slate-50 px-1 py-0.5 rounded border border-slate-100" id="${id}Pct">0%</div>
+                            <div class="flex flex-col items-end">
+                                <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Share</span>
+                                <div class="text-[10px] font-bold text-${gradFrom}-600 bg-${gradFrom}-50 px-2 py-0.5 rounded border border-${gradFrom}-100" id="${id}Share">0%</div>
+                            </div>
                         </div>
+
+                        <!-- Main Number -->
                         <div>
-                            <h3 class="text-lg font-extrabold text-slate-800 tracking-tight mt-1 leading-none" id="${id}">0</h3>
-                            <p class="text-[9px] font-semibold text-slate-500 uppercase tracking-wide mt-0.5">${label}</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">${label}</p>
+                            <h3 class="text-2xl font-black text-slate-800 tracking-tight leading-none" id="${id}">0</h3>
+                        </div>
+
+                        <!-- Footer: Comparison -->
+                        <div class="flex items-center gap-2 pt-2 border-t border-slate-100 mt-2">
+                            <span class="text-[9px] font-semibold text-slate-400">vs Lalu:</span>
+                            <div id="${id}Comp" class="flex items-center gap-1">
+                                <span class="text-[10px] font-bold text-slate-300">-</span>
+                            </div>
                         </div>
                     </div>
                 `);
             </script>
             <script>
+                // Urutan: Total -> First -> Trans -> Mid -> 3PL -> Mitra -> Last
                 kpiCard('kpiTotal', 'Total AWB', 'slate', 'gray', 'ph-stack', 0);
                 kpiCard('kpiFirstMile', 'First Mile', 'indigo', 'violet', 'ph-storefront', 100);
                 kpiCard('kpiTransport', 'Transport', 'cyan', 'blue', 'ph-airplane-in-flight', 200);
@@ -379,7 +387,7 @@
             </div>
         </div>
 
-        <!-- 3 Tables Side-by-Side -->
+        <!-- 3 Tables Side-by-Side (COMPACT HEIGHT - [35vh]) -->
         <div class="grid grid-cols-12 gap-4 h-[35vh] min-h-[350px] mb-4 items-start">
             <!-- Monitoring KPI (4 Columns) -->
             <div class="col-span-12 lg:col-span-4 flex flex-col h-full">
@@ -419,6 +427,7 @@
             </div>
         </div>
 
+        <!-- Hidden Raw Table for Data -->
         <div class="hidden-section">
             <table id="tableRawBody"></table>
             <div id="rawCount"></div>
@@ -456,7 +465,85 @@
             return num ? num.toLocaleString('id-ID') : '0';
         }
 
-        // --- MODAL LOGIC (UPDATED: Feedback & Origins) ---
+        // --- REPORT GENERATOR ---
+        window.copyReport = () => {
+            const dateStart = document.getElementById('filterStartDate').value || 'Awal';
+            const dateEnd = document.getElementById('filterEndDate').value || 'Akhir';
+            const range = `${dateStart} s/d ${dateEnd}`;
+            const total = document.getElementById('kpiTotal').innerText;
+            
+            // Get KPI data from DOM
+            const kpiData = ['kpiLastMile','kpiVendor','kpiMidMile','kpiMitra','kpiTransport','kpiFirstMile']
+                .map(id => {
+                    const label = id.replace('kpi','');
+                    const val = document.getElementById(id).innerText;
+                    return `- ${label}: *${val}*`;
+                }).join('\n');
+
+            // Find Top 3 Problem Hubs (Stuck Count)
+            const filteredData = getFilteredData();
+            const hubCounts = {};
+            filteredData.forEach(r => {
+                const h = r.delivery_hub || 'Unknown';
+                hubCounts[h] = (hubCounts[h]||0)+1;
+            });
+            const topHubs = Object.entries(hubCounts)
+                .sort((a,b)=>b[1]-a[1])
+                .slice(0,3)
+                .map(([h,c], i) => `${i+1}. ${h}: *${formatNumber(c)}*`)
+                .join('\n');
+
+            // Find Top Feedback
+            const feedbacks = {};
+            filteredData.forEach(r => {
+                 let fb = r['Feedback'] ? r['Feedback'].trim() : "";
+                 if(fb) feedbacks[fb] = (feedbacks[fb]||0)+1;
+            });
+            const topFeed = Object.entries(feedbacks)
+                .sort((a,b)=>b[1]-a[1])
+                .slice(0,3)
+                .map(([f,c]) => `- ${f}: ${c}`)
+                .join('\n') || "- Belum ada feedback";
+
+            const text = `*LAPORAN MONITORING PAKET INPROGRESS*\n` +
+                         `Periode: ${range}\n\n` +
+                         `*TOTAL: ${total}*\n` +
+                         `------------------\n` +
+                         `*BREAKDOWN POSISI:*\n` +
+                         `${kpiData}\n\n` +
+                         `*TOP 3 HUB STUCK:*\n` +
+                         `${topHubs}\n\n` +
+                         `*TOP FEEDBACK:*\n` +
+                         `${topFeed}\n\n` +
+                         `_Generated by Dashboard System_`;
+
+            fallbackCopyTextToClipboard(text);
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            textArea.style.opacity = "0";
+
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if(successful) showIsland('success', 'Laporan berhasil disalin!');
+                else showIsland('error', 'Gagal menyalin.');
+            } catch (err) {
+                console.error('Fallback copy failed', err);
+                showIsland('error', 'Gagal menyalin.');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // --- MODAL LOGIC ---
         window.openHubSummary = (hubName) => {
             if(!hubName) return;
             const modal = document.getElementById('summaryModalOverlay');
@@ -481,15 +568,10 @@
             const origins = {};
 
             stuckData.forEach(r => {
-                // Origin (pickup_hub)
                 const origin = r['pickup_hub'] || 'Unknown';
                 origins[origin] = (origins[origin] || 0) + 1;
-
-                // Service
                 const svc = r['service_code'] || 'Unknown';
                 services[svc] = (services[svc] || 0) + 1;
-
-                // Feedback
                 let fb = r['Feedback'] ? r['Feedback'].trim() : "Belum ada Feedback";
                 if(!fb) fb = "Belum ada Feedback";
                 feedbacks[fb] = (feedbacks[fb] || 0) + 1;
@@ -1008,6 +1090,7 @@
             return `hsla(${hue}, 85%, 96%, 1)`;
         }
 
+        // --- KPI CARD CALCULATION (UPDATED: SHARE & COMPARISON) ---
         function calculateKPIs(data) {
             const counts = { total: data.length, last:0, vend:0, mid:0, mit:0, trans:0, first:0 };
             data.forEach(r => {
@@ -1020,26 +1103,108 @@
                 else if(p==='first mile') counts.first++;
             });
             
-            const setVal = (id, v) => {
-                const el = document.getElementById(id); const pct = document.getElementById(id+'Pct');
-                if(el) {
-                    let start = 0; const end = v; const duration = 800;
-                    const startTime = performance.now();
-                    const animate = (currentTime) => {
-                        const elapsed = currentTime - startTime;
-                        const progress = Math.min(elapsed / duration, 1);
-                        const ease = 1 - Math.pow(1 - progress, 4);
-                        const currentVal = Math.floor(ease * end);
-                        el.innerText = formatNumber(currentVal);
-                        if (progress < 1) requestAnimationFrame(animate);
-                        else el.innerText = formatNumber(end);
-                    };
-                    requestAnimationFrame(animate);
+            // PREVIOUS PERIOD LOGIC
+            const startDateEl = document.getElementById('filterStartDate');
+            const endDateEl = document.getElementById('filterEndDate');
+            
+            let prevData = [];
+            let showComp = false;
+
+            if (data.length > 0) {
+                let start, end;
+                if (startDateEl.value && endDateEl.value) {
+                    start = new Date(startDateEl.value);
+                    end = new Date(endDateEl.value);
+                } else {
+                    let maxDate = new Date(0);
+                    data.forEach(r => {
+                        const d = parseDateStr(r['Tanggal']);
+                        if (d && d > maxDate) maxDate = d;
+                    });
+                    start = maxDate; 
+                    end = maxDate;
                 }
-                if(pct) pct.innerText = counts.total>0 ? ((v/counts.total)*100).toFixed(1)+'%' : '0%';
+
+                const duration = end - start; 
+                const prevEnd = new Date(start.getTime() - 86400000);
+                const prevStart = new Date(prevEnd.getTime() - duration);
+
+                const hubVal = document.getElementById('filterHub').value;
+                const svcVal = document.getElementById('filterService').value;
+                const posVal = document.getElementById('filterPosisi').value;
+
+                prevData = allData.filter(row => {
+                    const hubX = (row['HUB X'] || "").toLowerCase().trim();
+                    if (isGustiadiOnly && hubX !== 'gustiadi') return false;
+                    if (hubVal && row.delivery_hub !== hubVal) return false;
+                    if (svcVal && row.service_code !== svcVal) return false;
+                    if (posVal && row.Posisi !== posVal) return false;
+
+                    const d = parseDateStr(row['Tanggal']);
+                    if (!d) return false;
+                    return d >= prevStart && d <= prevEnd;
+                });
+                showComp = true;
+            }
+
+            const prevCounts = { total: prevData.length, last:0, vend:0, mid:0, mit:0, trans:0, first:0 };
+            prevData.forEach(r => {
+                const p = (r.Posisi||"").toLowerCase().trim();
+                if(p==='last mile') prevCounts.last++;
+                else if(p==='vendor 3pl') prevCounts.vend++;
+                else if(p==='mid mile') prevCounts.mid++;
+                else if(p==='mitra pengusaha') prevCounts.mit++;
+                else if(p==='transport') prevCounts.trans++;
+                else if(p==='first mile') prevCounts.first++;
+            });
+
+            const updateCard = (id, curr, prev) => {
+                const el = document.getElementById(id);
+                const shareEl = document.getElementById(id+'Share');
+                const compEl = document.getElementById(id+'Comp');
+                
+                if(el) el.innerText = formatNumber(curr);
+                
+                // 1. Share %
+                if(shareEl) {
+                    const share = counts.total > 0 ? (curr / counts.total) * 100 : 0;
+                    shareEl.innerText = share.toFixed(1) + '%';
+                }
+
+                // 2. Comparison %
+                if(compEl && showComp) {
+                    let diffPct = 0;
+                    let html = '';
+                    
+                    if (prev === 0) {
+                         // If prev 0 and curr > 0, it's 100% increase theoretically or infinite
+                         diffPct = curr > 0 ? 100 : 0; 
+                    } else {
+                         diffPct = ((curr - prev) / prev) * 100;
+                    }
+
+                    if (curr === prev) {
+                        html = `<span class="text-[9px] font-bold text-slate-400">0%</span>`;
+                    } else {
+                        const isIncrease = diffPct > 0;
+                        const color = isIncrease ? 'text-red-500' : 'text-emerald-500'; // Increase in stuck packages is bad (Red)
+                        const icon = isIncrease ? 'ph-trend-up' : 'ph-trend-down';
+                        const sign = isIncrease ? '+' : '';
+                        html = `<i class="ph-bold ${icon} ${color} text-[10px]"></i><span class="text-[9px] font-bold ${color} ml-1">${sign}${diffPct.toFixed(1)}%</span>`;
+                    }
+                    compEl.innerHTML = html;
+                } else if (compEl) {
+                    compEl.innerHTML = `<span class="text-[9px] font-bold text-slate-300">-</span>`;
+                }
             };
-            setVal('kpiTotal', counts.total); setVal('kpiLastMile', counts.last); setVal('kpiVendor', counts.vend);
-            setVal('kpiMidMile', counts.mid); setVal('kpiMitra', counts.mit); setVal('kpiTransport', counts.trans); setVal('kpiFirstMile', counts.first);
+
+            updateCard('kpiTotal', counts.total, prevCounts.total);
+            updateCard('kpiLastMile', counts.last, prevCounts.last);
+            updateCard('kpiVendor', counts.vend, prevCounts.vend);
+            updateCard('kpiMidMile', counts.mid, prevCounts.mid);
+            updateCard('kpiMitra', counts.mit, prevCounts.mit);
+            updateCard('kpiTransport', counts.trans, prevCounts.trans);
+            updateCard('kpiFirstMile', counts.first, prevCounts.first);
         }
 
         document.getElementById('statusToggle').addEventListener('change', e => {
