@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Monitoring Paket - Pro View</title>
+    <title>Dasboard Parcel Inprogess</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -40,7 +40,7 @@
     </script>
 
     <style>
-        body { background-color: #f1f5f9; color: #0f172a; font-size: 12px; }
+        body { background-color: #f8fafc; color: #0f172a; font-size: 12px; }
         .hidden-section { display: none !important; }
         
         /* Smooth Scrollbar */
@@ -62,6 +62,8 @@
         @keyframes road-run { 0% { transform: translateX(0); } 100% { transform: translateX(-40px); } }
         .animate-bounce-truck { animation: bounce-truck 0.6s ease-in-out infinite; }
         .animate-road { animation: road-run 0.8s linear infinite; }
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- DYNAMIC ISLAND --- */
         #dynamicIsland {
@@ -107,7 +109,7 @@
         
         .table-scroll-area { overflow: auto; flex: 1; position: relative; scroll-behavior: smooth; }
         
-        /* TABLE STYLING - UNIFIED */
+        /* TABLE STYLING */
         .pivot-table { 
             width: 100%; 
             border-collapse: separate; 
@@ -211,7 +213,6 @@
                     <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 border border-indigo-200"><i class="ph-bold ph-chart-pie-slice text-xl"></i></div>
                     <div>
                         <h3 class="text-sm font-bold text-slate-800" id="summaryTitle">Analisis HUB</h3>
-                        <!-- Text dihapus -->
                     </div>
                 </div>
                 <button onclick="closeSummary()" class="text-slate-400 hover:text-red-500 transition bg-white p-1 rounded-full shadow-sm border border-slate-200"><i class="ph-bold ph-x text-lg"></i></button>
@@ -256,7 +257,7 @@
                     <i class="ph-bold ph-chart-polar text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-sm font-extrabold text-slate-800 tracking-tight leading-tight">MONITORING PAKET</h1>
+                    <h1 class="text-sm font-extrabold text-slate-800 tracking-tight leading-tight">PARCEL INPROGRESS</h1>
                     <div class="flex items-center gap-3 text-[10px] font-medium text-slate-500">
                         <span id="connectionStatus" class="flex items-center gap-1 text-emerald-600 font-bold">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
@@ -268,8 +269,8 @@
 
             <!-- CONTROLS -->
             <div class="flex items-center gap-2 flex-wrap justify-end w-full xl:w-auto">
-                <button onclick="copyReport()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-[10px] font-bold cursor-pointer hover:bg-emerald-700 transition-all shadow-md active:scale-95">
-                    <i class="ph-bold ph-whatsapp-logo text-sm"></i>
+                <button onclick="copyReport()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-[10px] font-bold cursor-pointer hover:bg-emerald-700 transition-all shadow-md active:scale-95 border border-emerald-500">
+                    <i class="ph-bold ph-whatsapp-logo text-lg"></i>
                     <span>Salin Laporan WA</span>
                 </button>
 
@@ -308,14 +309,11 @@
             </div>
         </header>
 
-        <!-- 1. KPI CARDS (Updated Layout with 2 Percentages) -->
+        <!-- 1. KPI CARDS (Restored Premium Design) -->
         <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-4">
             <script>
-                // Template Updated to show both percentages clearly
                 const kpiCard = (id, label, gradFrom, gradTo, icon, delay) => document.write(`
                     <div class="kpi-card p-4 flex flex-col justify-between h-36 animate-fade-in-up hover:bg-${gradFrom}-50/10" style="animation-delay: ${delay}ms">
-                        
-                        <!-- Header: Icon & Share % -->
                         <div class="flex justify-between items-start mb-2">
                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-${gradFrom}-500 to-${gradTo}-600 flex items-center justify-center text-white shadow-md shadow-${gradFrom}-200">
                                 <i class="ph-bold ${icon} text-lg"></i>
@@ -325,14 +323,10 @@
                                 <div class="text-[10px] font-bold text-${gradFrom}-600 bg-${gradFrom}-50 px-2 py-0.5 rounded border border-${gradFrom}-100" id="${id}Share">0%</div>
                             </div>
                         </div>
-
-                        <!-- Main Number -->
                         <div>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">${label}</p>
                             <h3 class="text-2xl font-black text-slate-800 tracking-tight leading-none" id="${id}">0</h3>
                         </div>
-
-                        <!-- Footer: Comparison -->
                         <div class="flex items-center gap-2 pt-2 border-t border-slate-100 mt-2">
                             <span class="text-[9px] font-semibold text-slate-400">vs Lalu:</span>
                             <div id="${id}Comp" class="flex items-center gap-1">
@@ -472,49 +466,155 @@
             const range = `${dateStart} s/d ${dateEnd}`;
             const total = document.getElementById('kpiTotal').innerText;
             
-            // Get KPI data from DOM
-            const kpiData = ['kpiLastMile','kpiVendor','kpiMidMile','kpiMitra','kpiTransport','kpiFirstMile']
-                .map(id => {
-                    const label = id.replace('kpi','');
-                    const val = document.getElementById(id).innerText;
-                    return `- ${label}: *${val}*`;
-                }).join('\n');
+            const currData = getFilteredData();
+            const totalCurr = currData.length;
+            const prevData = getPrevPeriodData();
+            
+            // Helper Pad String
+            const pad = (str, len) => (str + " ".repeat(len)).slice(0, len);
+            
+            const getComp = (curr, prev) => {
+                if (prev === 0) return curr > 0 ? "100%" : "0%";
+                const diff = ((curr - prev) / prev) * 100;
+                const sign = diff > 0 ? "+" : "";
+                return `${sign}${diff.toFixed(1)}%`;
+            };
 
-            // Find Top 3 Problem Hubs (Stuck Count)
-            const filteredData = getFilteredData();
-            const hubCounts = {};
-            filteredData.forEach(r => {
+            // 1. BREAKDOWN POSISI
+            const posList = ['Last Mile', 'Vendor 3PL', 'Mid Mile', 'Mitra Pengusaha', 'Transport', 'First Mile'];
+            let posTable = `1. BREAKDOWN POSISI\n\`\`\`\n${pad('Posisi', 16)}| ${pad('Curr', 5)}| ${pad('Prev', 5)}| %\n`;
+            posTable += "-".repeat(40) + "\n";
+            posList.forEach(p => {
+                const c = currData.filter(r => (r.Posisi||'').toLowerCase() === p.toLowerCase()).length;
+                const pr = prevData.filter(r => (r.Posisi||'').toLowerCase() === p.toLowerCase()).length;
+                posTable += `${pad(p, 16)}| ${pad(String(c), 5)}| ${pad(String(pr), 5)}| ${getComp(c, pr)}\n`;
+            });
+            posTable += `\`\`\``;
+
+            // 2. BREAKDOWN HUB (Sorted by In Area)
+            const getHubTrans = (data) => {
+                const map = {};
+                data.forEach(r => {
+                    const h = r.delivery_hub || 'Unknown';
+                    const pos = (r.Posisi||'').toLowerCase();
+                    const hubX = (r['HUB X']||'').toLowerCase();
+                    if (!map[h]) map[h] = { total: 0, special: 0 };
+                    map[h].total++;
+                    if ((pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi') {
+                        map[h].special++;
+                    }
+                });
+                return map;
+            };
+            const hubMap = getHubTrans(currData);
+            const sortedHubs = Object.entries(hubMap).sort((a,b) => b[1].special - a[1].special).slice(0, 10);
+            
+            let hubTable = `2. BREAKDOWN HUB\n\`\`\`\n${pad('HUB', 10)}| ${pad('Total', 6)}| In Area\n`;
+            hubTable += "-".repeat(30) + "\n";
+            sortedHubs.forEach(([h, d]) => {
+                hubTable += `${pad(h, 10)}| ${pad(String(d.total), 6)}| ${d.special}\n`;
+            });
+            hubTable += `\`\`\``;
+
+            // 3. BREAKDOWN SERVICE (Matrix)
+            // Filter: Hub X = Gustiadi AND (Mid Mile OR Transport)
+            const svcData = currData.filter(r => {
+                const pos = (r.Posisi||'').toLowerCase();
+                const hubX = (r['HUB X']||'').toLowerCase();
+                return (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi';
+            });
+            
+            // Get Top 3 Services across all hubs for columns
+            const allSvcs = {};
+            svcData.forEach(r => { const s = r.service_code||'?'; allSvcs[s] = (allSvcs[s]||0)+1; });
+            const topSvcs = Object.keys(allSvcs).sort((a,b)=>allSvcs[b]-allSvcs[a]).slice(0,3);
+            
+            // Group by Hub -> Service
+            const svcHubMap = {};
+            svcData.forEach(r => {
                 const h = r.delivery_hub || 'Unknown';
-                hubCounts[h] = (hubCounts[h]||0)+1;
+                const s = r.service_code || '?';
+                if(!svcHubMap[h]) svcHubMap[h] = {};
+                svcHubMap[h][s] = (svcHubMap[h][s]||0)+1;
             });
-            const topHubs = Object.entries(hubCounts)
-                .sort((a,b)=>b[1]-a[1])
-                .slice(0,3)
-                .map(([h,c], i) => `${i+1}. ${h}: *${formatNumber(c)}*`)
-                .join('\n');
+            
+            let svcTable = `3. BREAKDOWN SERVICE\n\`\`\`\n${pad('HUB', 10)}| ${topSvcs.map(s=>pad(s,5)).join('| ')}\n`;
+            svcTable += "-".repeat(12 + topSvcs.length*7) + "\n";
+            // Sort hubs by total volume in this filtered dataset
+            const sortedSvcHubs = Object.keys(svcHubMap).sort((a,b) => {
+                 const sumA = Object.values(svcHubMap[a]).reduce((x,y)=>x+y,0);
+                 const sumB = Object.values(svcHubMap[b]).reduce((x,y)=>x+y,0);
+                 return sumB - sumA;
+            }).slice(0,10); // Limit to top 10 hubs
 
-            // Find Top Feedback
-            const feedbacks = {};
-            filteredData.forEach(r => {
-                 let fb = r['Feedback'] ? r['Feedback'].trim() : "";
-                 if(fb) feedbacks[fb] = (feedbacks[fb]||0)+1;
+            sortedSvcHubs.forEach(h => {
+                let row = `${pad(h, 10)}|`;
+                topSvcs.forEach(s => {
+                    const val = svcHubMap[h][s] || 0;
+                    row += ` ${pad(String(val), 4)}|`;
+                });
+                svcTable += row.slice(0,-1) + "\n";
             });
-            const topFeed = Object.entries(feedbacks)
-                .sort((a,b)=>b[1]-a[1])
-                .slice(0,3)
-                .map(([f,c]) => `- ${f}: ${c}`)
-                .join('\n') || "- Belum ada feedback";
+            svcTable += `\`\`\``;
 
-            const text = `*LAPORAN MONITORING PAKET INPROGRESS*\n` +
+            // 4. TOP 5 ORIGIN
+            const pickupMap = {};
+            currData.forEach(r => {
+                const p = r.pickup_hub || 'Unknown';
+                pickupMap[p] = (pickupMap[p]||0)+1;
+            });
+            const topPickups = Object.entries(pickupMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+            let pickTable = `4. TOP 5 HUB PICKUP\n\`\`\`\n${pad('Origin', 10)}| ${pad('Count', 6)}| %\n`;
+            pickTable += "-".repeat(25) + "\n";
+            topPickups.forEach(([p, c]) => {
+                const pct = totalCurr > 0 ? ((c/totalCurr)*100).toFixed(1) + '%' : '0%';
+                pickTable += `${pad(p, 10)}| ${pad(String(c), 6)}| ${pct}\n`;
+            });
+            pickTable += `\`\`\``;
+
+            // 5. FEEDBACK
+            const feedData = currData.filter(r => {
+                const pos = (r.Posisi||'').toLowerCase();
+                const hubX = (r['HUB X']||'').toLowerCase();
+                return (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi';
+            });
+            const feedMap = {};
+            feedData.forEach(r => {
+                const h = r.delivery_hub || 'Unknown';
+                let f = r.Feedback ? r.Feedback.trim() : '';
+                if(!f) return;
+                if(!feedMap[h]) feedMap[h] = {};
+                feedMap[h][f] = (feedMap[h][f]||0)+1;
+            });
+            
+            // Sort Hubs by total feedback count
+            const sortedFeedHubs = Object.keys(feedMap).sort((a,b) => {
+                 const sumA = Object.values(feedMap[a]).reduce((x,y)=>x+y,0);
+                 const sumB = Object.values(feedMap[b]).reduce((x,y)=>x+y,0);
+                 return sumB - sumA;
+            });
+
+            let feedText = `5. FEEDBACK\n\`\`\`\nHUB       | Feedback\n`;
+            feedText += "-".repeat(40) + "\n";
+            sortedFeedHubs.forEach(h => {
+                // Get top feedback for this hub
+                const topF = Object.entries(feedMap[h]).sort((a,b)=>b[1]-a[1])[0];
+                if(topF) {
+                    feedText += `${pad(h, 10)}| ${topF[0]} (${topF[1]})\n`;
+                }
+            });
+            feedText += `\`\`\``;
+
+            const text = `*LAPORAN MONITORING PARCEL INPROGRESS*\n` +
+                         `*HUB KAL SULAMP*\n` +
                          `Periode: ${range}\n\n` +
-                         `*TOTAL: ${total}*\n` +
+                         `*TOTAL: ${formatNumber(totalCurr)}*\n` +
                          `------------------\n` +
-                         `*BREAKDOWN POSISI:*\n` +
-                         `${kpiData}\n\n` +
-                         `*TOP 3 HUB STUCK:*\n` +
-                         `${topHubs}\n\n` +
-                         `*TOP FEEDBACK:*\n` +
-                         `${topFeed}\n\n` +
+                         `${posTable}\n` +
+                         `${hubTable}\n` +
+                         `${svcTable}\n` +
+                         `${pickTable}\n` +
+                         `${feedText}\n\n` +
                          `_Generated by Dashboard System_`;
 
             fallbackCopyTextToClipboard(text);
@@ -534,10 +634,10 @@
 
             try {
                 const successful = document.execCommand('copy');
-                if(successful) showIsland('success', 'Laporan berhasil disalin!');
+                if(successful) showIsland('success', 'Laporan WA disalin!');
                 else showIsland('error', 'Gagal menyalin.');
             } catch (err) {
-                console.error('Fallback copy failed', err);
+                console.error('Copy failed', err);
                 showIsland('error', 'Gagal menyalin.');
             }
             document.body.removeChild(textArea);
@@ -754,6 +854,49 @@
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
                 if (isGustiadiOnly && hubX !== 'gustiadi') return false;
                 return true;
+            });
+        }
+
+        // Helper to get Prev Period Data for Reports/KPIs
+        function getPrevPeriodData() {
+            const startDateEl = document.getElementById('filterStartDate');
+            const endDateEl = document.getElementById('filterEndDate');
+            
+            if (!allData.length) return [];
+            
+            let start, end;
+            if (startDateEl.value && endDateEl.value) {
+                start = new Date(startDateEl.value);
+                end = new Date(endDateEl.value);
+            } else {
+                let maxDate = new Date(0);
+                allData.forEach(r => {
+                    const d = parseDateStr(r['Tanggal']);
+                    if (d && d > maxDate) maxDate = d;
+                });
+                start = maxDate; 
+                end = maxDate;
+            }
+
+            const duration = end - start; 
+            const prevEnd = new Date(start.getTime() - 86400000);
+            const prevStart = new Date(prevEnd.getTime() - duration);
+
+            // Filters logic same as getFilteredData but with prev dates
+            const hubVal = document.getElementById('filterHub').value;
+            const svcVal = document.getElementById('filterService').value;
+            const posVal = document.getElementById('filterPosisi').value;
+
+            return allData.filter(row => {
+                const hubX = (row['HUB X'] || "").toLowerCase().trim();
+                if (isGustiadiOnly && hubX !== 'gustiadi') return false;
+                if (hubVal && row.delivery_hub !== hubVal) return false;
+                if (svcVal && row.service_code !== svcVal) return false;
+                if (posVal && row.Posisi !== posVal) return false;
+
+                const d = parseDateStr(row['Tanggal']);
+                if (!d) return false;
+                return d >= prevStart && d <= prevEnd;
             });
         }
 
@@ -1090,7 +1233,6 @@
             return `hsla(${hue}, 85%, 96%, 1)`;
         }
 
-        // --- KPI CARD CALCULATION (UPDATED: SHARE & COMPARISON) ---
         function calculateKPIs(data) {
             const counts = { total: data.length, last:0, vend:0, mid:0, mit:0, trans:0, first:0 };
             data.forEach(r => {
