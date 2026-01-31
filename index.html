@@ -3,465 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Monitoring Paket - Pro UI</title>
+    <title>Dashboard Monitoring Paket - Full View</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Chart.js -->
+    <!-- Chart.js & Datalabels Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     
     <!-- PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; color: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; font-size: 11px; }
         .hidden-section { display: none !important; }
         
-        /* Custom Scrollbar */
-        .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
-        .table-container::-webkit-scrollbar-track { background: transparent; }
-        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        /* Custom Scrollbar Thin */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         /* Loading Overlay */
         #loadingOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.98); z-index: 100;
+            background: rgba(255, 255, 255, 0.98); z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             backdrop-filter: blur(5px);
-            transition: opacity 0.3s ease;
         }
 
-        /* Custom Modal */
-        #customModalOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.5); z-index: 110;
-            display: flex; justify-content: center; align-items: center;
-            backdrop-filter: blur(4px);
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        .modal-content { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-
-        /* Pivot Table Styling */
-        .pivot-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 0.875rem; }
-        .pivot-table th, .pivot-table td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
+        /* Pivot Table Styling Compact */
+        .pivot-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 10px; }
+        .pivot-table th, .pivot-table td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 4px 8px; }
         .pivot-table th:last-child, .pivot-table td:last-child { border-right: none; }
         .pivot-table thead th { 
             position: sticky; top: 0; z-index: 10; 
-            background-color: #f8fafc; color: #64748b; 
-            font-weight: 600; padding: 12px 16px; 
-            text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            background-color: #f1f5f9; color: #475569; 
+            font-weight: 700; text-transform: uppercase; 
+            letter-spacing: 0.02em;
         }
-        .pivot-table tbody td { padding: 10px 16px; vertical-align: middle; transition: background-color 0.15s; }
-        .pivot-val { font-weight: 700; color: #0f172a; font-size: 0.95rem; }
-        .pivot-pct { font-size: 0.7rem; color: #64748b; margin-top: 2px; font-weight: 600; letter-spacing: 0.02em; }
-        .row-group-header { background-color: #fff; font-weight: 700; color: #334155; vertical-align: top !important; }
+        .pivot-val { font-weight: 700; color: #0f172a; font-size: 11px; }
+        .pivot-pct { font-size: 9px; color: #64748b; }
+        .row-group-header { background-color: #fff; font-weight: 700; vertical-align: top !important; }
         
-        /* Modern Switch */
-        .toggle-checkbox:checked { right: 0; border-color: #4f46e5; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #4f46e5; }
+        /* Modern Switch Compact */
+        .toggle-checkbox:checked { right: 0; border-color: #2563eb; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #2563eb; }
         
-        /* Card Hover Effect */
-        .kpi-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        /* Compact Card */
+        .kpi-card { transition: all 0.2s; }
+        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
 
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- 1. LOADING OVERLAY -->
+    <!-- LOADING OVERLAY -->
     <div id="loadingOverlay">
-        <div class="relative">
-            <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <i class="ph-fill ph-database text-indigo-600 text-xl"></i>
-            </div>
-        </div>
-        <h3 class="text-lg font-bold text-slate-800 mt-6" id="loadingTitle">Menghubungkan Database...</h3>
-        <p class="text-slate-500 text-sm mt-1 max-w-xs text-center" id="loadingText">Sedang melakukan otentikasi ke Firebase.</p>
-        
-        <div class="w-64 bg-slate-200 rounded-full h-1.5 mt-6 overflow-hidden">
-            <div id="progressBar" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 10%"></div>
-        </div>
-        
-        <!-- Tombol Paksa Masuk (Jika auth error/lama) -->
-        <button id="skipLoadingBtn" class="mt-6 px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition shadow-sm hidden-section" onclick="forceHideLoading()">
-            Batalkan Koneksi & Masuk (Mode Offline)
+        <div class="w-10 h-10 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin mb-3"></div>
+        <h3 class="text-sm font-bold text-slate-800">Memuat Dashboard...</h3>
+        <button id="skipLoadingBtn" class="mt-4 px-3 py-1 bg-white border border-slate-300 rounded text-xs text-slate-600 hover:bg-slate-50 hidden-section" onclick="forceHideLoading()">
+            Mode Offline
         </button>
     </div>
 
-    <!-- 2. CUSTOM MODAL -->
-    <div id="customModalOverlay" class="hidden-section">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 modal-content border border-slate-100 relative">
-            <div class="flex flex-col items-center text-center mb-6">
-                <div id="modalIconBg" class="p-4 rounded-full bg-indigo-50 text-indigo-600 mb-4">
-                    <i id="modalIcon" class="ph-fill ph-info text-3xl"></i>
-                </div>
-                <h3 id="modalTitle" class="text-xl font-bold text-slate-900">Judul Modal</h3>
-                <p id="modalMessage" class="text-slate-500 mt-2 text-sm leading-relaxed">Pesan modal disini.</p>
-            </div>
-            
-            <div class="flex justify-center gap-3 w-full" id="modalActions"></div>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 supports-[backdrop-filter]:bg-white/60">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-4">
-                    <div class="bg-gradient-to-br from-indigo-600 to-purple-600 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-200">
-                        <i class="ph-bold ph-chart-polar text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold text-slate-900 tracking-tight">Dashboard Paket</h1>
-                        <div class="flex items-center gap-2">
-                            <span id="connectionStatus" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-wider">
-                                <span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span> Menghubungkan...
-                            </span>
-                            <span class="text-slate-300">|</span>
-                            <span id="lastUpdated" class="text-xs text-indigo-600 font-medium">--:--</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-6">
-                    <!-- Global Toggle -->
-                    <div class="hidden md:flex items-center bg-white border border-slate-200 rounded-full p-1 pr-4 shadow-sm">
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="statusToggle" class="sr-only peer">
-                            <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600 transition-colors"></div>
-                        </label>
-                        <div class="ml-3 flex flex-col items-start leading-none">
-                            <span class="text-[10px] text-slate-400 font-semibold uppercase">Filter HUB X</span>
-                            <span class="text-xs font-bold text-slate-700 transition-colors" id="toggleLabel">Semua Data</span>
-                        </div>
-                    </div>
-                    
-                    <div class="hidden lg:block text-right">
-                        <p class="text-xs text-slate-400 font-medium mb-0.5">Hari Ini</p>
-                        <p class="text-sm font-bold text-slate-800" id="currentDate"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <!-- MAIN WRAPPER -->
+    <div class="w-full max-w-[99%] mx-auto py-2">
         
-        <!-- 0. FILTER SECTION -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-            <div class="flex flex-col gap-4">
-                <div class="flex items-center gap-2 mb-1">
-                    <i class="ph-fill ph-faders text-indigo-600"></i>
-                    <h3 class="text-sm font-bold text-slate-800">Filter Data Global</h3>
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                    <!-- Date Range -->
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal Awal</label>
-                        <input type="date" id="filterStartDate" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white transition-colors">
+        <!-- HEADER & CONTROLS -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 py-2 mb-3 rounded-lg shadow-sm flex flex-col lg:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-1.5 rounded text-white"><i class="ph-bold ph-chart-polar text-lg"></i></div>
+                <div>
+                    <h1 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Monitoring Paket Live</h1>
+                    <div class="flex items-center gap-2 text-[10px]">
+                        <span id="connectionStatus" class="text-emerald-600 font-bold">● Online</span>
+                        <span class="text-slate-300">|</span>
+                        <span id="lastUpdated" class="text-slate-500">--:--</span>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal Akhir</label>
-                        <input type="date" id="filterEndDate" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white transition-colors">
-                    </div>
-
-                    <!-- Dropdowns -->
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">HUB</label>
-                        <div class="relative">
-                            <select id="filterHub" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white appearance-none cursor-pointer">
-                                <option value="">Semua HUB</option>
-                            </select>
-                            <i class="ph-bold ph-caret-down absolute right-3 top-2.5 text-slate-400 pointer-events-none"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Service</label>
-                        <div class="relative">
-                            <select id="filterService" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white appearance-none cursor-pointer">
-                                <option value="">Semua Service</option>
-                            </select>
-                            <i class="ph-bold ph-caret-down absolute right-3 top-2.5 text-slate-400 pointer-events-none"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Posisi</label>
-                        <div class="relative">
-                            <select id="filterPosisi" class="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100 bg-slate-50 hover:bg-white appearance-none cursor-pointer">
-                                <option value="">Semua Posisi</option>
-                            </select>
-                            <i class="ph-bold ph-caret-down absolute right-3 top-2.5 text-slate-400 pointer-events-none"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-end pt-2 border-t border-slate-100">
-                    <button id="btnResetFilters" class="text-xs font-semibold text-slate-500 hover:text-red-500 flex items-center gap-1 transition-colors">
-                        <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset Filter
-                    </button>
                 </div>
             </div>
-        </div>
 
-        <!-- 1. KPI Summary Cards (7 Categories) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            
+            <!-- Global Filters -->
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+                <div class="flex items-center bg-slate-100 p-1 rounded border border-slate-200">
+                    <input type="date" id="filterStartDate" class="bg-transparent text-xs px-1 focus:outline-none text-slate-600">
+                    <span class="text-slate-400 text-[10px]">-</span>
+                    <input type="date" id="filterEndDate" class="bg-transparent text-xs px-1 focus:outline-none text-slate-600">
+                </div>
+
+                <select id="filterPosisi" class="text-xs border border-slate-200 rounded px-2 py-1 bg-white focus:ring-1 focus:ring-indigo-500 outline-none w-28">
+                    <option value="">Posisi: All</option>
+                </select>
+
+                <div class="flex items-center bg-white border border-slate-200 rounded px-2 py-1">
+                    <label class="relative inline-flex items-center cursor-pointer mr-2">
+                        <input type="checkbox" id="statusToggle" class="sr-only peer">
+                        <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                    <span class="text-[10px] font-bold text-slate-600 uppercase" id="toggleLabel">Semua</span>
+                </div>
+
+                <label class="px-3 py-1 bg-slate-800 text-white rounded text-xs font-bold cursor-pointer hover:bg-slate-700 flex items-center gap-1">
+                    <i class="ph-bold ph-upload-simple"></i> Upload
+                    <input type='file' class="hidden" id="csvFileInput" accept=".csv" />
+                </label>
+            </div>
+        </header>
+
+        <!-- 1. KPI CARDS (SINGLE ROW) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2 mb-3">
             <!-- Total AWB -->
-            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-1 bg-slate-800"></div>
+            <div class="kpi-card bg-white rounded-lg border border-slate-200 p-3 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-slate-500"></div>
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total AWB Inprogress</p>
-                        <h3 class="text-2xl font-bold text-slate-900" id="kpiTotal">0</h3>
-                        <p class="text-[10px] text-slate-400 mt-1 font-medium">100% Data</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase truncate">Total AWB</p>
+                        <h3 class="text-lg font-bold text-slate-800 leading-tight" id="kpiTotal">0</h3>
+                        <p class="text-[9px] text-slate-600 font-semibold mt-0.5" id="kpiTotalPct">0%</p>
                     </div>
-                    <div class="p-2.5 bg-slate-100 text-slate-600 rounded-xl">
-                        <i class="ph-fill ph-package text-2xl"></i>
-                    </div>
+                    <i class="ph-fill ph-package text-slate-500 text-lg opacity-80"></i>
                 </div>
             </div>
-
+            
             <!-- Last Mile -->
-            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+            <div class="kpi-card bg-white rounded-lg border border-slate-200 p-3 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Last Mile</p>
-                        <h3 class="text-2xl font-bold text-blue-600" id="kpiLastMile">0</h3>
-                        <div class="flex items-center gap-1 mt-1">
-                            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded" id="kpiLastMilePct">0%</span>
-                            <span class="text-[10px] text-slate-400">dari total</span>
-                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase truncate">Last Mile</p>
+                        <h3 class="text-lg font-bold text-slate-800 leading-tight" id="kpiLastMile">0</h3>
+                        <p class="text-[9px] text-blue-600 font-semibold mt-0.5" id="kpiLastMilePct">0%</p>
                     </div>
-                    <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
-                        <i class="ph-fill ph-house-line text-2xl"></i>
-                    </div>
+                    <i class="ph-fill ph-house-line text-blue-500 text-lg opacity-80"></i>
                 </div>
             </div>
 
             <!-- Vendor 3PL -->
-            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+            <div class="kpi-card bg-white rounded-lg border border-slate-200 p-3 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Vendor 3PL</p>
-                        <h3 class="text-2xl font-bold text-purple-600" id="kpiVendor">0</h3>
-                        <div class="flex items-center gap-1 mt-1">
-                            <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded" id="kpiVendorPct">0%</span>
-                            <span class="text-[10px] text-slate-400">dari total</span>
-                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase truncate">Vendor 3PL</p>
+                        <h3 class="text-lg font-bold text-slate-800 leading-tight" id="kpiVendor">0</h3>
+                        <p class="text-[9px] text-purple-600 font-semibold mt-0.5" id="kpiVendorPct">0%</p>
                     </div>
-                    <div class="p-2.5 bg-purple-50 text-purple-600 rounded-xl">
-                        <i class="ph-fill ph-truck text-2xl"></i>
-                    </div>
+                    <i class="ph-fill ph-truck text-purple-500 text-lg opacity-80"></i>
                 </div>
             </div>
 
             <!-- Mid Mile -->
-            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-1 bg-orange-500"></div>
+            <div class="kpi-card bg-white rounded-lg border border-slate-200 p-3 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Mid Mile</p>
-                        <h3 class="text-2xl font-bold text-orange-600" id="kpiMidMile">0</h3>
-                        <div class="flex items-center gap-1 mt-1">
-                            <span class="text-[10px] font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded" id="kpiMidMilePct">0%</span>
-                            <span class="text-[10px] text-slate-400">dari total</span>
-                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase truncate">Mid Mile</p>
+                        <h3 class="text-lg font-bold text-slate-800 leading-tight" id="kpiMidMile">0</h3>
+                        <p class="text-[9px] text-orange-600 font-semibold mt-0.5" id="kpiMidMilePct">0%</p>
                     </div>
-                    <div class="p-2.5 bg-orange-50 text-orange-600 rounded-xl">
-                        <i class="ph-fill ph-airplane-tilt text-2xl"></i>
-                    </div>
+                    <i class="ph-fill ph-airplane-tilt text-orange-500 text-lg opacity-80"></i>
                 </div>
             </div>
 
             <!-- Mitra Pengusaha -->
-            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+            <div class="kpi-card bg-white rounded-lg border border-slate-200 p-3 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Mitra Pengusaha</p>
-                        <h3 class="text-2xl font-bold text-emerald-600" id="kpiMitra">0</h3>
-                        <div class="flex items-center gap-1 mt-1">
-                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded" id="kpiMitraPct">0%</span>
-                            <span class="text-[10px] text-slate-400">dari total</span>
-                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase truncate">Mitra Usaha</p>
+                        <h3 class="text-lg font-bold text-slate-800 leading-tight" id="kpiMitra">0</h3>
+                        <p class="text-[9px] text-emerald-600 font-semibold mt-0.5" id="kpiMitraPct">0%</p>
                     </div>
-                    <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
-                        <i class="ph-fill ph-handshake text-2xl"></i>
-                    </div>
+                    <i class="ph-fill ph-handshake text-emerald-500 text-lg opacity-80"></i>
                 </div>
             </div>
 
             <!-- Transport -->
-            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-1 bg-cyan-500"></div>
+            <div class="kpi-card bg-white rounded-lg border border-slate-200 p-3 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Transport</p>
-                        <h3 class="text-2xl font-bold text-cyan-600" id="kpiTransport">0</h3>
-                        <div class="flex items-center gap-1 mt-1">
-                            <span class="text-[10px] font-bold text-cyan-600 bg-cyan-50 px-1.5 py-0.5 rounded" id="kpiTransportPct">0%</span>
-                            <span class="text-[10px] text-slate-400">dari total</span>
-                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase truncate">Transport</p>
+                        <h3 class="text-lg font-bold text-slate-800 leading-tight" id="kpiTransport">0</h3>
+                        <p class="text-[9px] text-cyan-600 font-semibold mt-0.5" id="kpiTransportPct">0%</p>
                     </div>
-                    <div class="p-2.5 bg-cyan-50 text-cyan-600 rounded-xl">
-                        <i class="ph-fill ph-van text-2xl"></i>
-                    </div>
+                    <i class="ph-fill ph-van text-cyan-500 text-lg opacity-80"></i>
                 </div>
             </div>
 
             <!-- First Mile -->
-            <div class="kpi-card bg-white rounded-2xl shadow-sm border border-slate-200 p-5 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div>
+            <div class="kpi-card bg-white rounded-lg border border-slate-200 p-3 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">First Mile</p>
-                        <h3 class="text-2xl font-bold text-indigo-600" id="kpiFirstMile">0</h3>
-                        <div class="flex items-center gap-1 mt-1">
-                            <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded" id="kpiFirstMilePct">0%</span>
-                            <span class="text-[10px] text-slate-400">dari total</span>
-                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase truncate">First Mile</p>
+                        <h3 class="text-lg font-bold text-slate-800 leading-tight" id="kpiFirstMile">0</h3>
+                        <p class="text-[9px] text-indigo-600 font-semibold mt-0.5" id="kpiFirstMilePct">0%</p>
                     </div>
-                    <div class="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
-                        <i class="ph-fill ph-package-open text-2xl"></i>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- 2. Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Monthly Chart -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <div class="flex justify-between items-center mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                            <i class="ph-fill ph-calendar-blank"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-base font-bold text-slate-800">Tren Bulanan</h3>
-                            <p class="text-xs text-slate-500">Inprogress di HUB (Tahun Ini)</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="h-72 relative">
-                    <canvas id="monthlyChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Yearly Chart -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <div class="flex justify-between items-center mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-purple-100 text-purple-600 rounded-lg">
-                            <i class="ph-fill ph-chart-bar"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-base font-bold text-slate-800">Tren Tahunan</h3>
-                            <p class="text-xs text-slate-500">Historis Inprogress di HUB</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="h-72 relative">
-                    <canvas id="yearlyChart"></canvas>
+                    <i class="ph-fill ph-package-open text-indigo-500 text-lg opacity-80"></i>
                 </div>
             </div>
         </div>
 
-        <!-- 3. Action & Filter Bar -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-2 sticky top-20 z-30 flex flex-col md:flex-row items-center justify-between gap-3">
-            <!-- Tab Navigation -->
-            <div class="flex p-1 bg-slate-100 rounded-xl w-full md:w-auto overflow-x-auto no-scrollbar">
-                <button onclick="switchTab('kpi')" id="tab-kpi" class="flex-1 md:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-all shadow-sm bg-white text-indigo-600 ring-1 ring-slate-200/50">
-                    Monitoring KPI
-                </button>
-                <button onclick="switchTab('hub')" id="tab-hub" class="flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
-                    Rekapan HUB
-                </button>
-                <button onclick="switchTab('staging')" id="tab-staging" class="flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
-                    Rekapan Staging
-                </button>
-                <button onclick="switchTab('service')" id="tab-service" class="flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
-                    Service
-                </button>
-                <button onclick="switchTab('raw')" id="tab-raw" class="flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
-                    Data Asli
-                </button>
+        <!-- 2. CHARTS SECTION (2 ROWS) -->
+        <div class="grid grid-cols-12 gap-3 mb-3">
+            <!-- Row 1: Tahunan & Bulanan -->
+            <div class="col-span-12 lg:col-span-6 bg-white p-3 rounded-lg border border-slate-200 flex flex-col h-48">
+                <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">Tren Tahunan (HUB)</h4>
+                <div class="flex-1 relative w-full"><canvas id="yearlyChart"></canvas></div>
             </div>
-
-            <div class="flex items-center gap-3 w-full md:w-auto px-2">
-                <!-- Search -->
-                <div class="relative w-full md:w-64">
-                    <i class="ph-bold ph-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
-                    <input type="text" id="searchInput" placeholder="Cari data..." class="w-full text-sm pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all bg-slate-50 focus:bg-white">
+            <div class="col-span-12 lg:col-span-6 bg-white p-3 rounded-lg border border-slate-200 flex flex-col h-48">
+                <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">Tren Bulanan (HUB)</h4>
+                <div class="flex-1 relative w-full"><canvas id="monthlyChart"></canvas></div>
+            </div>
+            
+            <!-- Row 2: Harian (Full Width) -->
+            <div class="col-span-12 bg-white p-3 rounded-lg border border-slate-200 flex flex-col h-48">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-[10px] font-bold text-slate-500 uppercase">Tren Harian (Bulan Berjalan)</h4>
+                    <span id="currentMonthLabel" class="text-[9px] px-2 py-0.5 bg-orange-100 text-orange-700 rounded font-bold"></span>
                 </div>
-
-                <!-- Upload Button -->
-                <label class="group flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl cursor-pointer hover:bg-indigo-600 transition-all duration-200 shadow-md shadow-slate-200 hover:shadow-indigo-200 active:scale-95 whitespace-nowrap">
-                    <i class="ph-bold ph-upload-simple text-lg"></i>
-                    <span class="hidden sm:inline font-semibold text-sm">Upload CSV</span>
-                    <input type='file' class="hidden" id="csvFileInput" accept=".csv" />
-                </label>
+                <div class="flex-1 relative w-full"><canvas id="dailyChart"></canvas></div>
             </div>
         </div>
 
-        <!-- 4. Detailed Tables Section -->
-        <div id="mainTableContainer" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[600px] h-[75vh]">
-            <div class="flex-1 overflow-auto table-container relative bg-white">
-                <div id="view-kpi" class="view-section h-full p-0">
+        <!-- 3. TABLES SECTION (3 SPLIT + BOTTOM) -->
+        <div class="grid grid-cols-12 gap-3 h-[calc(100vh-340px)] min-h-[400px]">
+            
+            <!-- LEFT: Monitoring KPI -->
+            <div class="col-span-12 lg:col-span-3 bg-white rounded-lg border border-slate-200 flex flex-col">
+                <div class="p-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
+                    <h3 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                        <i class="ph-bold ph-monitor text-indigo-600"></i> Monitoring KPI
+                    </h3>
+                </div>
+                <div class="flex-1 overflow-auto table-container">
                     <table class="pivot-table" id="tableKPI"></table>
                 </div>
-                <div id="view-hub" class="view-section hidden-section h-full p-0">
+            </div>
+
+            <!-- CENTER: Rekapan HUB -->
+            <div class="col-span-12 lg:col-span-6 bg-white rounded-lg border border-slate-200 flex flex-col">
+                <div class="p-2 border-b border-slate-100 bg-slate-50 rounded-t-lg flex justify-between">
+                    <h3 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                        <i class="ph-bold ph-buildings text-orange-600"></i> Rekapan HUB
+                    </h3>
+                    <input type="text" id="searchInput" placeholder="Cari HUB..." class="text-[10px] border rounded px-2 py-0.5 w-32 focus:ring-1 focus:ring-orange-200 outline-none">
+                </div>
+                <div class="flex-1 overflow-auto table-container">
                     <table class="pivot-table" id="tableHub"></table>
                 </div>
-                <div id="view-staging" class="view-section hidden-section h-full p-0">
-                    <table class="pivot-table" id="tableStaging"></table>
+            </div>
+
+            <!-- RIGHT: Service -->
+            <div class="col-span-12 lg:col-span-3 bg-white rounded-lg border border-slate-200 flex flex-col">
+                <div class="p-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
+                    <h3 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                        <i class="ph-bold ph-tag text-emerald-600"></i> Rekapan Service
+                    </h3>
                 </div>
-                <div id="view-service" class="view-section hidden-section h-full p-0">
+                <div class="flex-1 overflow-auto table-container">
                     <table class="pivot-table" id="tableService"></table>
                 </div>
-                <div id="view-raw" class="view-section hidden-section h-full p-0">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
-                         <thead class="bg-slate-50 text-slate-500 border-b border-slate-200 sticky top-0 z-10 font-semibold uppercase text-xs tracking-wider">
-                            <tr>
-                                <th class="px-6 py-4">Tanggal</th>
-                                <th class="px-6 py-4">AWB</th>
-                                <th class="px-6 py-4">Delivery HUB</th>
-                                <th class="px-6 py-4">Delivery Staging</th>
-                                <th class="px-6 py-4">Service</th>
-                                <th class="px-6 py-4">Posisi</th>
-                                <th class="px-6 py-4">HUB X</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableRawBody" class="divide-y divide-slate-100 text-slate-600"></tbody>
-                    </table>
-                    <div class="p-4 text-xs text-slate-400 text-center border-t border-slate-100 bg-slate-50" id="rawCount"></div>
+            </div>
+
+            <!-- BOTTOM: Staging & Raw (Toggleable/Scrollable below) -->
+            <div class="col-span-12 h-64 bg-white rounded-lg border border-slate-200 flex flex-col mt-1">
+                <div class="p-2 border-b border-slate-100 bg-slate-50 rounded-t-lg">
+                    <h3 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                        <i class="ph-bold ph-warehouse text-blue-600"></i> Rekapan Staging
+                    </h3>
+                </div>
+                <div class="flex-1 overflow-auto table-container">
+                    <table class="pivot-table" id="tableStaging"></table>
                 </div>
             </div>
         </div>
-    </main>
 
-    <!-- Firebase & Logic -->
+    </div>
+
+    <!-- SCRIPT LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
         import { getFirestore, collection, getDocs, doc, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+
+        // Register Chart DataLabels
+        Chart.register(ChartDataLabels);
 
         const firebaseConfig = {
             apiKey: "AIzaSyDXOfZbVDqtfGB0abQkTeILo-XC6a9xxKI",
@@ -478,60 +311,86 @@
         const COLLECTION_NAME = "parcel_data";
 
         let allData = [];
-        let currentTab = 'kpi';
         let isGustiadiOnly = false;
-        let charts = { monthly: null, yearly: null };
+        let chartInstances = {};
 
-        // --- CHART HELPERS ---
-        function parseDateStr(dateStr) {
-            if (!dateStr) return null;
-            if (dateStr.includes('-')) {
-                return new Date(dateStr);
-            }
-            const parts = dateStr.split('/');
-            if (parts.length === 3) {
-                return new Date(parts[2], parts[1] - 1, parts[0]);
-            }
-            return null;
+        // Helper Format Number #.###
+        function formatNumber(num) {
+            return num ? num.toLocaleString('id-ID') : '0';
         }
 
-        // --- FILTER LOGIC (NEW) ---
-        function populateDropdowns(data) {
-            const hubs = new Set();
-            const services = new Set();
-            const posisis = new Set();
+        // --- AUTH & INIT ---
+        signInAnonymously(auth).catch(e => console.error("Auth Error:", e));
 
-            data.forEach(row => {
-                if(row.delivery_hub) hubs.add(row.delivery_hub);
-                if(row.service_code) services.add(row.service_code);
-                if(row.Posisi) posisis.add(row.Posisi);
+        onAuthStateChanged(auth, (user) => {
+            const statusEl = document.getElementById('connectionStatus');
+            if (user) {
+                if(statusEl) {
+                    statusEl.innerHTML = `● Online`;
+                    statusEl.className = "text-emerald-600 font-bold";
+                }
+                initRealtimeListener();
+            } else {
+                if(statusEl) {
+                    statusEl.innerHTML = `● Offline`;
+                    statusEl.className = "text-slate-400 font-bold";
+                }
+                setTimeout(() => {
+                    const btn = document.getElementById('skipLoadingBtn');
+                    if(btn) btn.classList.remove('hidden-section');
+                }, 5000);
+            }
+        });
+
+        window.forceHideLoading = () => {
+            const overlay = document.getElementById('loadingOverlay');
+            if(overlay) overlay.classList.add('hidden-section');
+        }
+
+        function initRealtimeListener() {
+            onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
+                allData = [];
+                snapshot.forEach(doc => allData.push(doc.data()));
+                
+                const now = new Date();
+                const lastUpd = document.getElementById('lastUpdated');
+                if(lastUpd) lastUpd.innerText = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+                
+                populateDropdowns(allData);
+                renderDashboard();
+                
+                const overlay = document.getElementById('loadingOverlay');
+                if(overlay) overlay.classList.add('hidden-section');
             });
-
-            const fill = (id, set) => {
-                const select = document.getElementById(id);
-                const currentVal = select.value;
-                select.innerHTML = select.options[0].outerHTML; 
-                Array.from(set).sort().forEach(val => {
-                    const opt = document.createElement('option');
-                    opt.value = val;
-                    opt.innerText = val;
-                    select.appendChild(opt);
-                });
-                select.value = currentVal;
-            };
-
-            fill('filterHub', hubs);
-            fill('filterService', services);
-            fill('filterPosisi', posisis);
         }
 
+        // --- MAIN RENDERER ---
+        function renderDashboard() {
+            const filteredData = getFilteredData();
+            calculateKPIs(filteredData);
+            
+            // Render All Tables Simultaneously
+            generateKPIRecap(filteredData);
+            generateHubRecap(filteredData);
+            generateServiceRecap(filteredData);
+            generateStagingRecap(filteredData);
+            
+            updateCharts(filteredData);
+        }
+
+        // --- FILTERING ---
         function getFilteredData() {
-            const startDateVal = document.getElementById('filterStartDate').value;
-            const endDateVal = document.getElementById('filterEndDate').value;
-            const hubVal = document.getElementById('filterHub').value;
-            const serviceVal = document.getElementById('filterService').value;
-            const posisiVal = document.getElementById('filterPosisi').value;
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const startDateEl = document.getElementById('filterStartDate');
+            const endDateEl = document.getElementById('filterEndDate');
+            const posisiEl = document.getElementById('filterPosisi');
+            const searchEl = document.getElementById('searchInput');
+
+            if (!startDateEl || !endDateEl || !posisiEl || !searchEl) return allData;
+
+            const startDateVal = startDateEl.value;
+            const endDateVal = endDateEl.value;
+            const posisiVal = posisiEl.value;
+            const searchVal = searchEl.value.toLowerCase();
 
             const startDate = startDateVal ? new Date(startDateVal) : null;
             const endDate = endDateVal ? new Date(endDateVal) : null;
@@ -539,9 +398,11 @@
             if(endDate) endDate.setHours(23,59,59,999);
 
             return allData.filter(row => {
+                // Toggle Logic (HUB X)
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
                 if (isGustiadiOnly && hubX !== 'gustiadi') return false;
 
+                // Date Filter
                 if (startDate || endDate) {
                     const rowDate = parseDateStr(row['Tanggal']);
                     if (rowDate) {
@@ -550,102 +411,108 @@
                     }
                 }
 
-                if (hubVal && row.delivery_hub !== hubVal) return false;
-                if (serviceVal && row.service_code !== serviceVal) return false;
+                // Dropdown Filter
                 if (posisiVal && row.Posisi !== posisiVal) return false;
 
+                // Text Search (Applies to HUB Name mostly)
                 if (searchVal) {
-                    const str = JSON.stringify(row).toLowerCase();
-                    if (!str.includes(searchVal)) return false;
+                    const hubName = (row.delivery_hub || "").toLowerCase();
+                    const awb = (row.awb || "").toLowerCase();
+                    if (!hubName.includes(searchVal) && !awb.includes(searchVal)) return false;
                 }
 
                 return true;
             });
         }
 
-        ['filterStartDate', 'filterEndDate', 'filterHub', 'filterService', 'filterPosisi', 'searchInput'].forEach(id => {
-            document.getElementById(id).addEventListener('change', () => renderDashboard());
-            if(id === 'searchInput') {
-                document.getElementById(id).addEventListener('keyup', () => renderDashboard());
-            }
-        });
+        function populateDropdowns(data) {
+            const posisis = new Set();
+            data.forEach(r => { if(r.Posisi) posisis.add(r.Posisi); });
+            
+            const select = document.getElementById('filterPosisi');
+            if(!select || select.options.length > 1) return; // Don't repopulate if exists
+            
+            Array.from(posisis).sort().forEach(val => {
+                const opt = document.createElement('option');
+                opt.value = val; opt.innerText = `Posisi: ${val}`;
+                select.appendChild(opt);
+            });
+        }
 
-        document.getElementById('btnResetFilters').addEventListener('click', () => {
-            document.getElementById('filterStartDate').value = '';
-            document.getElementById('filterEndDate').value = '';
-            document.getElementById('filterHub').value = '';
-            document.getElementById('filterService').value = '';
-            document.getElementById('filterPosisi').value = '';
-            document.getElementById('searchInput').value = '';
-            renderDashboard();
-        });
+        function parseDateStr(dateStr) {
+            if (!dateStr) return null;
+            if (dateStr.includes('-')) return new Date(dateStr);
+            const parts = dateStr.split('/');
+            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
+            return null;
+        }
 
+        // --- CHARTS (Updated: 2 Rows, Daily Logic, Formatted Labels) ---
         function updateCharts(data) {
-            const monthlyData = {};
-            const yearlyData = {};
+            const yearly = {};
+            const monthly = {};
+            const daily = {};
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            
+            // Find Latest Date for "Bulan Berjalan"
+            let latestDate = new Date(0);
+            data.forEach(row => {
+                const d = parseDateStr(row['Tanggal']);
+                if (d && d > latestDate) latestDate = d;
+            });
+            const currentMonthIdx = latestDate.getMonth();
+            const currentYear = latestDate.getFullYear();
+            
+            // Update Label UI
+            const monthLabel = document.getElementById('currentMonthLabel');
+            if (monthLabel) monthLabel.innerText = `${months[currentMonthIdx]} ${currentYear}`;
 
             data.forEach(row => {
                 const pos = (row['Posisi'] || "").toLowerCase();
                 const selectedPos = document.getElementById('filterPosisi').value;
-                
-                let includeInChart = false;
-                if (selectedPos) {
-                    includeInChart = true; 
-                } else {
-                    if (pos === 'mid mile') includeInChart = true;
-                }
-
-                if (!includeInChart) return;
+                if (!selectedPos && pos !== 'mid mile') return;
 
                 const date = parseDateStr(row['Tanggal']);
                 if (date) {
-                    const year = date.getFullYear();
-                    const month = date.getMonth(); 
-                    const monthKey = `${months[month]} ${year}`; 
-
-                    monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1;
-                    yearlyData[year] = (yearlyData[year] || 0) + 1;
+                    const y = date.getFullYear();
+                    const mKey = `${months[date.getMonth()]} ${y}`;
+                    
+                    yearly[y] = (yearly[y] || 0) + 1;
+                    monthly[mKey] = (monthly[mKey] || 0) + 1;
+                    
+                    // Daily: Only for current month & year
+                    if (date.getMonth() === currentMonthIdx && date.getFullYear() === currentYear) {
+                        const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
+                        daily[dKey] = (daily[dKey] || 0) + 1;
+                    }
                 }
             });
 
-            const sortedMonths = Object.keys(monthlyData).sort((a, b) => {
-                const [mA, yA] = a.split(' ');
-                const [mB, yB] = b.split(' ');
-                return new Date(`${mA} 1, ${yA}`) - new Date(`${mB} 1, ${yB}`);
-            });
-            const sortedYears = Object.keys(yearlyData).sort();
+            // Sort & Prep Data
+            const sortMonth = (a,b) => new Date(`1 ${a}`) - new Date(`1 ${b}`);
+            const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
 
-            renderChart('monthlyChart', 'line', sortedMonths, sortedMonths.map(k => monthlyData[k]), 'Volume Bulanan', '#4f46e5');
-            renderChart('yearlyChart', 'bar', sortedYears, sortedYears.map(k => yearlyData[k]), 'Volume Tahunan', '#9333ea');
+            renderChart('yearlyChart', 'bar', Object.keys(yearly).sort(), Object.values(yearly), '#8b5cf6');
+            renderChart('monthlyChart', 'line', Object.keys(monthly).sort(sortMonth), Object.keys(monthly).sort(sortMonth).map(k=>monthly[k]), '#3b82f6');
+            renderChart('dailyChart', 'bar', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), '#f97316');
         }
 
-        function renderChart(canvasId, type, labels, data, label, color) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            
-            if (charts[canvasId]) charts[canvasId].destroy();
+        function renderChart(id, type, labels, data, color) {
+            const ctx = document.getElementById(id).getContext('2d');
+            if (chartInstances[id]) chartInstances[id].destroy();
 
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            if(type === 'line') {
-                gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
-                gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
-            }
-
-            charts[canvasId] = new Chart(ctx, {
+            chartInstances[id] = new Chart(ctx, {
                 type: type,
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: label,
                         data: data,
-                        backgroundColor: type === 'line' ? gradient : color,
+                        backgroundColor: type === 'line' ? 'rgba(59, 130, 246, 0.1)' : color,
                         borderColor: color,
                         borderWidth: 2,
-                        fill: type === 'line',
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        borderRadius: 6
+                        borderRadius: 4,
+                        tension: 0.3,
+                        pointRadius: 3
                     }]
                 },
                 options: {
@@ -653,498 +520,253 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            padding: 12,
-                            cornerRadius: 8,
-                            titleFont: { family: 'Plus Jakarta Sans', size: 13 },
-                            bodyFont: { family: 'Plus Jakarta Sans', size: 13 },
-                            displayColors: false
+                        tooltip: { enabled: false }, // Disable tooltip, use datalabels
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            color: '#475569',
+                            font: { size: 9, weight: 'bold', family: 'Inter' },
+                            offset: -2,
+                            formatter: (value) => formatNumber(value) // Format Number
                         }
                     },
                     scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            grid: { color: '#f1f5f9', borderDash: [5, 5] },
-                            ticks: { font: { family: 'Plus Jakarta Sans' }, color: '#94a3b8' }
-                        },
+                        y: { display: false, grid: { display: false } },
                         x: { 
                             grid: { display: false },
-                            ticks: { font: { family: 'Plus Jakarta Sans' }, color: '#64748b' }
+                            ticks: { font: { size: 9, family: 'Inter' } }
                         }
-                    }
+                    },
+                    layout: { padding: { top: 20 } } // Space for labels
                 }
             });
         }
 
-        // --- AUTH & INIT ---
-        signInAnonymously(auth)
-            .then(() => {
-                // Auth success
-            })
-            .catch((error) => {
-                console.error("Auth Error:", error);
-                let msg = "Gagal login database: " + error.message;
-                
-                // Pesan khusus untuk error domain
-                if (error.code === 'auth/unauthorized-domain' || error.message.includes('unauthorized-domain')) {
-                    msg = "Domain ini belum diizinkan di Firebase Console. Buka Console > Authentication > Settings > Authorized Domains dan tambahkan domain Vercel Anda.";
-                }
-                
-                showModal('error', 'Koneksi Ditolak', msg);
-                
-                // Tampilkan tombol lewati loading
-                const skipBtn = document.getElementById('skipLoadingBtn');
-                if(skipBtn) skipBtn.classList.remove('hidden-section');
-            });
-
-        onAuthStateChanged(auth, (user) => {
-            const statusEl = document.getElementById('connectionStatus');
-            const overlay = document.getElementById('loadingOverlay');
-            
-            if (user) {
-                statusEl.innerHTML = `<span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Online Live`;
-                statusEl.className = "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 uppercase tracking-wider";
-                initRealtimeListener();
-            } else {
-                statusEl.innerHTML = `<span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span> Offline`;
-                // Timeout to hide overlay if stuck
-                setTimeout(() => {
-                    const ov = document.getElementById('loadingOverlay');
-                    const btn = document.getElementById('skipLoadingBtn');
-                    if (ov && !ov.classList.contains('hidden-section')) {
-                       btn.classList.remove('hidden-section');
-                    }
-                }, 8000);
-            }
-        });
-
-        // Global function for skip button
-        window.forceHideLoading = () => {
-            document.getElementById('loadingOverlay').classList.add('hidden-section');
-        };
-
-        function initRealtimeListener() {
-            onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
-                allData = [];
-                snapshot.forEach(doc => allData.push(doc.data()));
-                
-                const now = new Date();
-                document.getElementById('lastUpdated').innerText = `Update: ${now.toLocaleTimeString('id-ID')}`;
-                
-                // Populate dropdowns once data loaded
-                populateDropdowns(allData);
-                renderDashboard();
-                
-                document.getElementById('loadingOverlay').classList.add('hidden-section');
-            });
-        }
-
-        function renderDashboard() {
-            const filteredData = getFilteredData();
-            calculateKPIs(filteredData);
-            refreshCurrentView(filteredData);
-            updateCharts(filteredData);
-        }
-
-        function getGradientColor(value, min, max) {
-            if (!value) return 'transparent';
-            if (min === max) return '#f0fdf4'; 
-            const ratio = (value - min) / (max - min);
-            const hue = 120 - (ratio * 120);
-            return `hsla(${hue}, 85%, 94%, 1)`; 
-        }
-
-        // --- GENERATORS ---
+        // --- TABLE GENERATORS (Formatted Numbers) ---
+        // 1. KPI TABLE
         function generateKPIRecap(data) {
             const table = document.getElementById('tableKPI');
+            if(!table) return;
             const hubs = {};
-            const grandTotals = { 
-                total: 0, 
-                mm_nasional: 0, mm_region: 0, mm_transport: 0, hub_only: 0
-            };
+            const totals = { total: 0, nas: 0, reg: 0, trans: 0, hub: 0 };
 
-            data.forEach(row => {
-                const hub = row['delivery_hub'] || "Unknown";
-                if (!hubs[hub]) hubs[hub] = { total: 0, mm_nasional: 0, mm_region: 0, mm_transport: 0, hub_only: 0 };
-
-                const pos = (row['Posisi'] || "").toLowerCase().trim();
-                const bantuan = (row['Bantuan'] || "").toLowerCase().trim();
-
-                hubs[hub].total++;
-                grandTotals.total++;
-
-                const groupFull = ['mid mile', 'mitra pengusaha', 'transport', 'vendor 3pl'];
-                const groupTransport = ['mid mile', 'transport'];
-
-                if (groupFull.includes(pos) && bantuan === 'all') { hubs[hub].mm_nasional++; grandTotals.mm_nasional++; }
-                if (groupFull.includes(pos) && bantuan === 'kal sulam') { hubs[hub].mm_region++; grandTotals.mm_region++; }
-                if (groupTransport.includes(pos) && bantuan === 'kal sulam') { hubs[hub].mm_transport++; grandTotals.mm_transport++; }
-                if (pos === 'mid mile' && bantuan === 'kal sulam') { hubs[hub].hub_only++; grandTotals.hub_only++; }
+            data.forEach(r => {
+                const h = r['delivery_hub'] || "?";
+                if (!hubs[h]) hubs[h] = { t:0, nas:0, reg:0, trans:0, hub:0 };
+                
+                const pos = (r['Posisi']||"").toLowerCase().trim();
+                const ban = (r['Bantuan']||"").toLowerCase().trim();
+                
+                hubs[h].t++; totals.total++;
+                
+                const isFull = ['mid mile','mitra pengusaha','transport','vendor 3pl'].includes(pos);
+                if(isFull && ban === 'all') { hubs[h].nas++; totals.nas++; }
+                if(isFull && ban === 'kal sulam') { hubs[h].reg++; totals.reg++; }
+                if(['mid mile','transport'].includes(pos) && ban === 'kal sulam') { hubs[h].trans++; totals.trans++; }
+                if(pos === 'mid mile' && ban === 'kal sulam') { hubs[h].hub++; totals.hub++; }
             });
 
-            const sortedHubs = Object.keys(hubs).sort();
+            const keys = Object.keys(hubs).sort();
+            const cell = (v, t) => {
+                if(v===0) return `<span class="text-slate-200">-</span>`;
+                const pct = t>0?(v/t)*100:0;
+                return `<div>${formatNumber(v)}<br><span class="pivot-pct">${pct.toFixed(0)}%</span></div>`;
+            }
+
+            let html = `<thead><tr><th class="text-left">HUB</th><th>Total</th><th>MM Nas<br><span class="text-[9px] font-normal">All</span></th><th>MM Reg<br><span class="text-[9px] font-normal">KS</span></th><th>Trans<br><span class="text-[9px] font-normal">KS</span></th><th>HUB<br><span class="text-[9px] font-normal">Only</span></th></tr></thead><tbody>`;
             
-            let html = `<thead><tr>
-                <th class="text-left w-48 bg-slate-50/80">Delivery HUB</th>
-                <th class="text-center text-indigo-700 bg-indigo-50/50 w-24">Total AWB</th>
-                <th class="text-center w-32">Mid Mile Nasional<br><span class="text-[10px] font-normal text-slate-400">All</span></th>
-                <th class="text-center w-32">Mid Mile Region<br><span class="text-[10px] font-normal text-slate-400">Kal Sulam</span></th>
-                <th class="text-center w-32">MM & Transport<br><span class="text-[10px] font-normal text-slate-400">Kal Sulam</span></th>
-                <th class="text-center w-32">HUB<br><span class="text-[10px] font-normal text-slate-400">Mid Mile Only</span></th>
-            </tr></thead><tbody class="bg-white">`;
-
-            const renderCell = (val, total, isWarningCheck = false) => {
-                const pct = total > 0 ? (val / total) * 100 : 0;
-                let valCls = "pivot-val";
-                let pctCls = "pivot-pct";
-                let icon = "";
-                
-                if (isWarningCheck && pct > 5.0) {
-                    valCls = "pivot-val text-red-600";
-                    pctCls = "text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 mt-1 inline-flex items-center gap-1";
-                    icon = `<i class="ph-fill ph-warning animate-pulse"></i>`;
-                }
-                
-                if(val === 0) return `<span class="text-slate-200 text-lg">-</span>`;
-
-                return `<div class="flex flex-col items-center"><div class="${valCls}">${val}</div><div class="${pctCls}">${icon}${pct.toFixed(1)}%</div></div>`;
-            };
-
-            sortedHubs.forEach(hub => {
-                const d = hubs[hub];
-                html += `<tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">
-                    <td class="font-bold text-slate-700 px-4 py-3 border-r bg-white sticky left-0 z-10">${hub}</td>
-                    <td class="text-center font-bold text-indigo-600 bg-indigo-50/30 border-r text-lg">${d.total}</td>
-                    <td class="text-center border-r px-4 py-3">${renderCell(d.mm_nasional, d.total)}</td>
-                    <td class="text-center border-r px-4 py-3">${renderCell(d.mm_region, d.total)}</td>
-                    <td class="text-center border-r px-4 py-3">${renderCell(d.mm_transport, d.total)}</td>
-                    <td class="text-center border-r px-4 py-3">${renderCell(d.hub_only, d.total, true)}</td>
-                </tr>`;
+            keys.forEach(h => {
+                const d = hubs[h];
+                html += `<tr class="hover:bg-slate-50"><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/30">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t)}</td></tr>`;
             });
-
-            html += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-200 sticky bottom-0 z-10 shadow-inner">
-                <td class="px-4 py-3 text-slate-800 bg-slate-100 sticky left-0">GRAND TOTAL</td>
-                <td class="text-center text-indigo-800 bg-indigo-100 text-lg">${grandTotals.total}</td>
-                <td class="text-center border-r border-slate-200">${renderCell(grandTotals.mm_nasional, grandTotals.total)}</td>
-                <td class="text-center border-r border-slate-200">${renderCell(grandTotals.mm_region, grandTotals.total)}</td>
-                <td class="text-center border-r border-slate-200">${renderCell(grandTotals.mm_transport, grandTotals.total)}</td>
-                <td class="text-center border-r border-slate-200">${renderCell(grandTotals.hub_only, grandTotals.total)}</td>
-            </tr></tbody>`;
+            html += `<tr class="bg-slate-100 font-bold"><td class="px-2">TOTAL</td><td class="text-center text-indigo-800">${formatNumber(totals.total)}</td><td class="text-center">${cell(totals.nas,totals.total)}</td><td class="text-center">${cell(totals.reg,totals.total)}</td><td class="text-center">${cell(totals.trans,totals.total)}</td><td class="text-center">${cell(totals.hub,totals.total)}</td></tr></tbody>`;
             table.innerHTML = html;
         }
 
+        // 2. HUB RECAP
         function generateHubRecap(data) {
             const table = document.getElementById('tableHub');
-            const hubs = {};
-            const posColumnTotals = {}; 
-
-            data.forEach(row => {
-                const hub = row['delivery_hub'] || "Unknown";
-                const pos = row['Posisi'] || "Unknown";
-                posColumnTotals[pos] = (posColumnTotals[pos] || 0) + 1;
-                if (!hubs[hub]) hubs[hub] = { total: 0, counts: {} };
-                hubs[hub].total++;
-                hubs[hub].counts[pos] = (hubs[hub].counts[pos] || 0) + 1;
+            if(!table) return;
+            const hubs = {}; const posTotals = {};
+            
+            data.forEach(r => {
+                const h = r['delivery_hub'] || "?";
+                const p = r['Posisi'] || "?";
+                posTotals[p] = (posTotals[p]||0)+1;
+                if(!hubs[h]) hubs[h] = { t:0, c:{} };
+                hubs[h].t++;
+                hubs[h].c[p] = (hubs[h].c[p]||0)+1;
             });
 
-            const sortedPos = Object.keys(posColumnTotals).sort((a, b) => posColumnTotals[b] - posColumnTotals[a]);
+            const sortedPos = Object.keys(posTotals).sort((a,b) => posTotals[b]-posTotals[a]);
             const sortedHubs = Object.keys(hubs).sort();
-            const headerTitle = isGustiadiOnly ? `<span class="text-indigo-600">Total (In Area)</span>` : `<span class="text-slate-700">Total (Semua)</span>`;
+            const title = isGustiadiOnly ? 'Tot (Area)' : 'Total';
 
-            let html = `<thead><tr><th class="text-left w-48 bg-slate-50/80">Delivery HUB</th><th class="text-center w-24 bg-indigo-50/50">${headerTitle}</th>`;
-            sortedPos.forEach(p => html += `<th class="text-center min-w-[100px]">${p}</th>`);
-            html += `</tr></thead><tbody class="bg-white">`;
+            let html = `<thead><tr><th class="text-left w-24">HUB</th><th class="text-center bg-indigo-50/50">${title}</th>`;
+            sortedPos.forEach(p => html += `<th class="text-center min-w-[50px]">${p}</th>`);
+            html += `</tr></thead><tbody>`;
 
-            let grandTotal = 0;
-            sortedHubs.forEach(hub => {
-                const total = hubs[hub].total;
-                grandTotal += total;
-                
-                let rowVals = sortedPos.map(p => hubs[hub].counts[p] || 0);
-                let min = Math.min(...rowVals.filter(v=>v>0)) || 0;
-                let max = Math.max(...rowVals);
-                let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>hubs[hub].counts[p]||0));
+            let gt = 0;
+            sortedHubs.forEach(h => {
+                const d = hubs[h]; gt += d.t;
+                let rowVals = sortedPos.map(p => d.c[p]||0);
+                let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
+                let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
 
-                html += `<tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">
-                    <td class="font-bold border-r text-slate-700 bg-white sticky left-0 z-10">${hub}</td>
-                    <td class="text-center font-bold bg-indigo-50/30 border-r text-indigo-700">${total}</td>`;
-                
-                sortedPos.forEach(pos => {
-                    const count = hubs[hub].counts[pos] || 0;
-                    const pct = total > 0 ? (count / total) * 100 : 0;
-                    const bg = getGradientColor(count, min, max);
+                html += `<tr class="hover:bg-slate-50"><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold bg-indigo-50/30 text-indigo-700">${formatNumber(d.t)}</td>`;
+                sortedPos.forEach(p => {
+                    const c = d.c[p]||0;
+                    const pct = d.t>0?(c/d.t)*100:0;
+                    const bg = getGradient(c, min, max);
                     let content = `<span class="text-slate-200">-</span>`;
-                    
-                    if(count > 0) {
-                        let badge = "";
-                        let badgeClass = "pivot-pct text-slate-500";
-                        if(pos.toLowerCase() === 'mid mile' && pct > 5.0) {
-                            badge = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px]"></i>`;
-                            badgeClass = "text-[10px] font-bold text-red-600 bg-red-50 rounded px-1.5 py-0.5 border border-red-100 shadow-sm";
-                        } else if (count === maxOther) {
-                            badge = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px]"></i>`;
-                            badgeClass = "text-[10px] font-bold text-orange-700 bg-orange-50 rounded px-1.5 py-0.5 border border-orange-100 shadow-sm";
-                        }
-                        content = `<div class="pivot-val">${count}</div><div class="${badgeClass} flex justify-center items-center gap-1 mt-1">${badge}${pct.toFixed(1)}%</div>`;
+                    if(c>0) {
+                        let warn = "";
+                        if(p.toLowerCase()==='mid mile' && pct>5) warn = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[9px] mr-1"></i>`;
+                        else if(c===maxOther) warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[9px] mr-1"></i>`;
+                        content = `<div>${formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
                     }
-                    html += `<td class="text-center border-r" style="background-color:${bg}">${content}</td>`;
+                    html += `<td class="text-center" style="background-color:${bg}">${content}</td>`;
                 });
                 html += `</tr>`;
             });
-            
-            html += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-200 sticky bottom-0 z-10 shadow-inner">
-                <td class="p-3 text-slate-800 bg-slate-100 sticky left-0">GRAND TOTAL</td>
-                <td class="text-center text-indigo-800 bg-indigo-100">${grandTotal}</td>`;
-            sortedPos.forEach(pos => html += `<td class="text-center border-r border-slate-200 text-slate-700">${posColumnTotals[pos] || 0}</td>`);
+            // GT Row
+            html += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-200 sticky bottom-0 z-10"><td class="px-2">ALL</td><td class="text-center text-indigo-800">${formatNumber(gt)}</td>`;
+            sortedPos.forEach(p => html += `<td class="text-center text-slate-700">${formatNumber(posTotals[p]||0)}</td>`);
             html += `</tr></tbody>`;
             table.innerHTML = html;
         }
 
+        // 3. SERVICE RECAP (Sorted by Value)
+        function generateServiceRecap(data) {
+            const table = document.getElementById('tableService');
+            if(!table) return;
+            const svcMap = {};
+            data.forEach(r => {
+                const s = r['service_code'] || "?";
+                svcMap[s] = (svcMap[s]||0)+1;
+            });
+            // Sort Descending by Value
+            const keys = Object.keys(svcMap).sort((a,b) => svcMap[b] - svcMap[a]);
+            let gt = 0;
+            let html = `<thead><tr><th class="text-left">Service</th><th class="text-center">Total</th><th class="text-center">%</th></tr></thead><tbody>`;
+            keys.forEach(s => {
+                const c = svcMap[s]; gt += c;
+                const pct = data.length>0?(c/data.length)*100:0;
+                html += `<tr class="hover:bg-slate-50"><td class="font-bold px-2">${s}</td><td class="text-center font-bold bg-indigo-50/30">${formatNumber(c)}</td><td class="text-center text-xs text-slate-500">${pct.toFixed(1)}%</td></tr>`;
+            });
+            html += `<tr class="bg-slate-100 font-bold"><td class="px-2">TOTAL</td><td class="text-center">${formatNumber(gt)}</td><td>100%</td></tr></tbody>`;
+            table.innerHTML = html;
+        }
+
+        // 4. STAGING RECAP
         function generateStagingRecap(data) {
             const table = document.getElementById('tableStaging');
-            const grouping = {}; const posColumnTotals = {};
-
-            data.forEach(row => {
-                const hub = row['delivery_hub'] || "Unknown";
-                const ss = row['delivery_staging'] || "Unknown";
-                const pos = row['Posisi'] || "Unknown";
-                posColumnTotals[pos] = (posColumnTotals[pos] || 0) + 1;
-                if (!grouping[hub]) grouping[hub] = {};
-                if (!grouping[hub][ss]) grouping[hub][ss] = { total: 0, counts: {} };
-                grouping[hub][ss].total++;
-                grouping[hub][ss].counts[pos] = (grouping[hub][ss].counts[pos] || 0) + 1;
+            if(!table) return;
+            const grouping = {}; const posTotals = {};
+            
+            data.forEach(r => {
+                const h = r['delivery_hub']; const s = r['delivery_staging']; const p = r['Posisi'];
+                posTotals[p] = (posTotals[p]||0)+1;
+                if(!grouping[h]) grouping[h]={};
+                if(!grouping[h][s]) grouping[h][s]={t:0,c:{}};
+                grouping[h][s].t++;
+                grouping[h][s].c[p] = (grouping[h][s].c[p]||0)+1;
             });
 
-            const sortedPos = Object.keys(posColumnTotals).sort((a, b) => posColumnTotals[b] - posColumnTotals[a]);
+            const sortedPos = Object.keys(posTotals).sort((a,b)=>posTotals[b]-posTotals[a]);
             const sortedHubs = Object.keys(grouping).sort();
-            const headerTitle = isGustiadiOnly ? `<span class="text-indigo-600">Total (In Area)</span>` : `<span class="text-slate-700">Total (Semua)</span>`;
+            
+            let html = `<thead><tr><th class="text-left w-24">HUB</th><th class="text-left w-32">Staging</th><th class="text-center w-16 bg-indigo-50/50">Total</th>`;
+            sortedPos.forEach(p => html += `<th class="text-center min-w-[50px]">${p}</th>`);
+            html += `</tr></thead><tbody>`;
 
-            let html = `<thead><tr>
-                <th class="text-left w-32 bg-slate-50/80">HUB</th>
-                <th class="text-left w-48 bg-slate-50/80">Staging</th>
-                <th class="text-center w-24 bg-indigo-50/50">${headerTitle}</th>`;
-            sortedPos.forEach(p => html += `<th class="text-center min-w-[100px]">${p}</th>`);
-            html += `</tr></thead><tbody class="bg-white">`;
-
-            let grandTotal = 0;
-            sortedHubs.forEach(hub => {
-                const stagings = Object.keys(grouping[hub]).sort();
-                stagings.forEach((ss, idx) => {
-                    const d = grouping[hub][ss];
-                    grandTotal += d.total;
+            sortedHubs.forEach(h => {
+                const stagings = Object.keys(grouping[h]).sort();
+                stagings.forEach((ss, i) => {
+                    const d = grouping[h][ss];
+                    let rowVals = sortedPos.map(p => d.c[p]||0);
+                    let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                     
-                    let rowVals = sortedPos.map(p => d.counts[p] || 0);
-                    let min = Math.min(...rowVals.filter(v=>v>0)) || 0;
-                    let max = Math.max(...rowVals);
-                    let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.counts[p]||0));
-
-                    html += `<tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">`;
-                    if(idx===0) html += `<td class="row-group-header border-r border-b font-bold text-slate-700 bg-white sticky left-0 z-10" rowspan="${stagings.length}">${hub}</td>`;
-                    html += `<td class="border-r font-medium text-slate-600 px-3">${ss}</td><td class="text-center font-bold bg-indigo-50/30 border-r text-indigo-700">${d.total}</td>`;
-
-                    sortedPos.forEach(pos => {
-                        const count = d.counts[pos] || 0;
-                        const pct = d.total > 0 ? (count / d.total) * 100 : 0;
-                        const bg = getGradientColor(count, min, max);
-                        let content = `<span class="text-slate-200">-</span>`;
-                        if(count > 0) {
-                            let badge = "";
-                            let badgeClass = "pivot-pct text-slate-500";
-                            if(pos.toLowerCase() === 'mid mile' && pct > 5.0) {
-                                badge = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px]"></i>`;
-                                badgeClass = "text-[10px] font-bold text-red-600 bg-red-50 rounded px-1.5 py-0.5 border border-red-100 shadow-sm";
-                            } else if (count === maxOther) {
-                                badge = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px]"></i>`;
-                                badgeClass = "text-[10px] font-bold text-orange-700 bg-orange-50 rounded px-1.5 py-0.5 border border-orange-100 shadow-sm";
-                            }
-                            content = `<div class="pivot-val">${count}</div><div class="${badgeClass} flex justify-center items-center gap-1 mt-1">${badge}${pct.toFixed(1)}%</div>`;
-                        }
-                        html += `<td class="text-center border-r" style="background-color:${bg}">${content}</td>`;
+                    html += `<tr class="hover:bg-slate-50">`;
+                    if(i===0) html += `<td class="row-group-header border-b" rowspan="${stagings.length}">${h}</td>`;
+                    html += `<td class="text-slate-600 border-r">${ss}</td><td class="text-center font-bold bg-indigo-50/30 text-indigo-700 border-r">${formatNumber(d.t)}</td>`;
+                    
+                    sortedPos.forEach(p => {
+                        const c = d.c[p]||0; const bg = getGradient(c, min, max);
+                        html += `<td class="text-center border-r" style="background-color:${bg}">${c>0?formatNumber(c):'<span class="text-slate-200">-</span>'}</td>`;
                     });
                     html += `</tr>`;
                 });
             });
-            html += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-200 sticky bottom-0 z-10 shadow-inner">
-                <td colspan="2" class="p-3 text-slate-800 bg-slate-100 sticky left-0">GRAND TOTAL</td>
-                <td class="text-center text-indigo-800 bg-indigo-100">${grandTotal}</td>`;
-            sortedPos.forEach(pos => html += `<td class="text-center border-r border-slate-200 text-slate-700">${posColumnTotals[pos] || 0}</td>`);
-            html += `</tr></tbody>`;
             table.innerHTML = html;
         }
 
-        function generateServiceRecap(data) {
-            const table = document.getElementById('tableService');
-            const services = {}; const posColumnTotals = {};
-            data.forEach(row => {
-                const svc = row['service_code'] || "Unknown";
-                const pos = row['Posisi'] || "Unknown";
-                posColumnTotals[pos] = (posColumnTotals[pos] || 0) + 1;
-                if (!services[svc]) services[svc] = { total: 0, counts: {} };
-                services[svc].total++;
-                services[svc].counts[pos] = (services[svc].counts[pos] || 0) + 1;
-            });
-            const sortedPos = Object.keys(posColumnTotals).sort((a, b) => posColumnTotals[b] - posColumnTotals[a]);
-            const sortedSvc = Object.keys(services).sort();
-            let html = `<thead><tr><th class="text-left w-48 bg-slate-50/80">Service</th><th class="text-center w-24 bg-indigo-50/50">Total</th>`;
-            sortedPos.forEach(p => html += `<th class="text-center min-w-[100px]">${p}</th>`);
-            html += `</tr></thead><tbody class="bg-white">`;
-            let grandTotal = 0;
-            sortedSvc.forEach(svc => {
-                const total = services[svc].total; grandTotal += total;
-                html += `<tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0">
-                    <td class="font-bold border-r px-4 py-2 bg-white sticky left-0 z-10 text-slate-700">${svc}</td>
-                    <td class="text-center font-bold bg-indigo-50/30 border-r text-indigo-700">${total}</td>`;
-                sortedPos.forEach(pos => {
-                    const count = services[svc].counts[pos] || 0;
-                    const pct = total > 0 ? (count / total) * 100 : 0;
-                    html += `<td class="text-center border-r"><div class="pivot-val">${count>0?count:'-'}</div><div class="pivot-pct text-slate-400">${count>0?pct.toFixed(1)+'%':''}</div></td>`;
-                });
-                html += `</tr>`;
-            });
-            html += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-200 sticky bottom-0 z-10 shadow-inner">
-                <td class="p-3 text-slate-800 bg-slate-100 sticky left-0">GRAND TOTAL</td>
-                <td class="text-center text-indigo-800 bg-indigo-100">${grandTotal}</td>`;
-            sortedPos.forEach(pos => html += `<td class="text-center border-r border-slate-200 text-slate-700">${posColumnTotals[pos] || 0}</td>`);
-            html += `</tr></tbody>`;
-            table.innerHTML = html;
+        // --- UTILS ---
+        function getGradient(val, min, max) {
+            if(!val) return 'transparent';
+            if(min===max) return '#f0fdf4';
+            const ratio = (val-min)/(max-min);
+            const hue = 120 - (ratio*120);
+            return `hsla(${hue}, 85%, 94%, 1)`;
         }
 
-        // --- CORE FUNCTIONS ---
         function calculateKPIs(data) {
-            // Data is already filtered by getFilteredData()
-            const total = data.length;
-            
-            let counts = {
-                lastMile: 0,
-                vendor: 0,
-                midMile: 0,
-                mitra: 0,
-                transport: 0,
-                firstMile: 0
-            };
-
+            const counts = { total: data.length, last:0, vend:0, mid:0, mit:0, trans:0, first:0 };
             data.forEach(r => {
-                const pos = (r['Posisi'] || "").toLowerCase().trim();
-                if (pos === 'last mile') counts.lastMile++;
-                else if (pos === 'vendor 3pl') counts.vendor++;
-                else if (pos === 'mid mile') counts.midMile++;
-                else if (pos === 'mitra pengusaha') counts.mitra++;
-                else if (pos === 'transport') counts.transport++;
-                else if (pos === 'first mile') counts.firstMile++;
+                const p = (r.Posisi||"").toLowerCase().trim();
+                if(p==='last mile') counts.last++;
+                else if(p==='vendor 3pl') counts.vend++;
+                else if(p==='mid mile') counts.mid++;
+                else if(p==='mitra pengusaha') counts.mit++;
+                else if(p==='transport') counts.trans++;
+                else if(p==='first mile') counts.first++;
             });
-
-            const updateCard = (idCount, idPct, val) => {
-                const elCount = document.getElementById(idCount);
-                const elPct = document.getElementById(idPct);
-                if (elCount) animateValue(idCount, val);
-                if (elPct) {
-                    const pct = total > 0 ? (val / total) * 100 : 0;
-                    elPct.innerText = pct.toFixed(1) + '%';
-                }
-            };
-
-            animateValue('kpiTotal', total);
-            updateCard('kpiLastMile', 'kpiLastMilePct', counts.lastMile);
-            updateCard('kpiVendor', 'kpiVendorPct', counts.vendor);
-            updateCard('kpiMidMile', 'kpiMidMilePct', counts.midMile);
-            updateCard('kpiMitra', 'kpiMitraPct', counts.mitra);
-            updateCard('kpiTransport', 'kpiTransportPct', counts.transport);
-            updateCard('kpiFirstMile', 'kpiFirstMilePct', counts.firstMile);
-        }
-
-        function animateValue(id, end) {
-            const obj = document.getElementById(id);
-            if(!obj) return;
-            obj.innerText = end.toLocaleString('id-ID');
-        }
-
-        window.switchTab = (tabName) => {
-            currentTab = tabName;
-            ['kpi', 'hub', 'staging', 'service', 'raw'].forEach(t => {
-                const btn = document.getElementById(`tab-${t}`);
-                if (t === tabName) {
-                    btn.className = "flex-1 md:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-all shadow-sm bg-white text-indigo-600 ring-1 ring-slate-200/50";
-                } else {
-                    btn.className = "flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50";
-                }
-                document.getElementById(`view-${t}`).classList.add('hidden-section');
-            });
-            document.getElementById(`view-${tabName}`).classList.remove('hidden-section');
-            renderDashboard();
-        };
-
-        document.getElementById('statusToggle').addEventListener('change', function(e) {
-            isGustiadiOnly = e.target.checked;
-            const label = document.getElementById('toggleLabel');
-            if (isGustiadiOnly) {
-                label.innerText = "Khusus In Area"; label.classList.add("text-indigo-600"); label.classList.remove("text-slate-700");
-            } else {
-                label.innerText = "Semua Data"; label.classList.remove("text-indigo-600"); label.classList.add("text-slate-700");
-            }
-            renderDashboard();
-        });
-
-        function refreshCurrentView(data) {
-            // Use 'data' directly, don't read searchInput here as it's already handled in getFilteredData
-            if(currentTab === 'kpi') generateKPIRecap(data);
-            else if(currentTab === 'hub') generateHubRecap(data);
-            else if(currentTab === 'staging') generateStagingRecap(data);
-            else if(currentTab === 'service') generateServiceRecap(data);
-            else {
-                const tbody = document.getElementById('tableRawBody');
-                // Display first 100 for performance
-                const display = data.slice(0, 100);
-                let html = '';
-                display.forEach(row => {
-                    html += `<tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0"><td class="px-6 py-3 font-medium">${row.Tanggal}</td><td class="px-6 py-3 font-mono text-xs text-slate-500">${row.awb}</td><td class="px-6 py-3 font-bold text-indigo-600">${row.delivery_hub}</td><td class="px-6 py-3">${row.delivery_staging}</td><td class="px-6 py-3"><span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-bold">${row.service_code}</span></td><td class="px-6 py-3">${row.Posisi}</td><td class="px-6 py-3 font-bold">${row['HUB X']}</td></tr>`;
-                });
-                tbody.innerHTML = html;
-                document.getElementById('rawCount').innerText = `Menampilkan ${display.length} dari ${data.length}`;
-            }
-        }
-
-        // --- UPLOAD HANDLER ---
-        document.getElementById('csvFileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            Papa.parse(file, {
-                header: true, skipEmptyLines: true,
-                complete: function(results) {
-                     showModal('confirm', 'Konfirmasi Upload', `Siap memproses ${results.data.length} baris data. Lanjutkan?`, () => saveData(results.data));
-                }
-            });
-        });
-
-        async function saveData(csvData) {
-            const overlay = document.getElementById('loadingOverlay');
-            const progress = document.getElementById('progressBar');
-            overlay.classList.remove('hidden-section');
-            document.getElementById('loadingTitle').innerText = "Menyimpan ke Cloud...";
             
-            const validData = csvData.filter(r => r.awb);
-            const batchSize = 400;
-            const totalBatches = Math.ceil(validData.length / batchSize);
-
-            try {
-                for (let i = 0; i < totalBatches; i++) {
-                    const batch = writeBatch(db);
-                    validData.slice(i * batchSize, (i + 1) * batchSize).forEach(row => {
-                        const cleanRow = JSON.parse(JSON.stringify(row));
-                        batch.set(doc(db, COLLECTION_NAME, row.awb.trim()), cleanRow, {merge:true});
-                    });
-                    await batch.commit();
-                    progress.style.width = `${((i+1)/totalBatches)*100}%`;
-                }
-                overlay.classList.add('hidden-section');
-                showModal('success', 'Upload Berhasil', 'Data telah berhasil diperbarui di database.');
-            } catch (err) {
-                overlay.classList.add('hidden-section');
-                showModal('error', 'Gagal', err.message);
-            }
+            const setVal = (id, v) => {
+                const el = document.getElementById(id); const pct = document.getElementById(id+'Pct');
+                if(el) el.innerText = formatNumber(v);
+                if(pct) pct.innerText = counts.total>0 ? ((v/counts.total)*100).toFixed(1)+'%' : '0%';
+            };
+            setVal('kpiTotal', counts.total); setVal('kpiLastMile', counts.last); setVal('kpiVendor', counts.vend);
+            setVal('kpiMidMile', counts.mid); setVal('kpiMitra', counts.mit); setVal('kpiTransport', counts.trans); setVal('kpiFirstMile', counts.first);
         }
 
-        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+        // Events
+        document.getElementById('statusToggle').addEventListener('change', e => {
+            isGustiadiOnly = e.target.checked;
+            document.getElementById('toggleLabel').innerText = isGustiadiOnly ? "In Area" : "Semua";
+            document.getElementById('toggleLabel').className = isGustiadiOnly ? "text-[10px] font-bold text-indigo-600 uppercase" : "text-[10px] font-bold text-slate-600 uppercase";
+            renderDashboard();
+        });
+
+        ['filterStartDate', 'filterEndDate', 'filterPosisi', 'searchInput'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener(id==='searchInput'?'keyup':'change', renderDashboard);
+        });
+
+        // Upload
+        document.getElementById('csvFileInput').addEventListener('change', e => {
+            const f = e.target.files[0]; if(!f) return;
+            Papa.parse(f, { header:true, skipEmptyLines:true, complete: res => saveData(res.data) });
+        });
+
+        async function saveData(data) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            const valid = data.filter(r=>r.awb);
+            const batchSize = 450; 
+            for(let i=0; i<Math.ceil(valid.length/batchSize); i++) {
+                const batch = writeBatch(db);
+                valid.slice(i*batchSize, (i+1)*batchSize).forEach(row => {
+                    batch.set(doc(db, COLLECTION_NAME, row.awb.trim()), JSON.parse(JSON.stringify(row)), {merge:true});
+                });
+                await batch.commit();
+            }
+            document.getElementById('loadingOverlay').style.display = 'none';
+            alert("Upload Berhasil!");
+        }
+
+        const dateEl = document.getElementById('currentDate');
+        if(dateEl) dateEl.innerText = new Date().toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'short', year:'numeric'});
     </script>
 </body>
 </html>
