@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Monitoring Paket - Premium View</title>
+    <title>Dashboard Monitoring Paket - Pro View</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -110,7 +110,7 @@
         .pivot-table tr:last-child td { border-bottom: none; }
         .pivot-table td:last-child { border-right: none; }
         
-        /* Footer/Total Row - Sticky Bottom */
+        /* Footer/Total Row */
         .pivot-table tfoot td, .row-total td {
             background-color: #eff6ff !important;
             font-weight: 800 !important;
@@ -292,9 +292,9 @@
             </div>
         </div>
 
-        <!-- 3 Tables Side-by-Side (UNIFORM & ALIGNED) -->
+        <!-- 3 Tables Side-by-Side (COMPACT HEIGHT - ADJUST TO CONTENT) -->
         <div class="grid grid-cols-12 gap-4 h-[50vh] min-h-[400px] mb-4 items-start">
-            <!-- Monitoring KPI (4 Columns) -->
+            <!-- Monitoring KPI -->
             <div class="col-span-12 lg:col-span-4 flex flex-col h-full">
                 <div class="bg-indigo-600 text-white px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
                     <i class="ph-bold ph-monitor text-xs"></i> <h3 class="text-[11px] font-bold">Monitoring KPI</h3>
@@ -306,8 +306,8 @@
                 </div>
             </div>
 
-            <!-- Rekapan HUB (5 Columns) - NARROWER -->
-            <div class="col-span-12 lg:col-span-5 flex flex-col h-full">
+            <!-- Rekapan HUB (SEARCH REMOVED) -->
+            <div class="col-span-12 lg:col-span-6 flex flex-col h-full">
                 <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex justify-between items-center shadow-sm shrink-0">
                     <div class="flex items-center gap-2">
                         <i class="ph-bold ph-buildings text-orange-500 text-xs"></i> 
@@ -321,10 +321,10 @@
                 </div>
             </div>
 
-            <!-- Service (3 Columns) -->
-            <div class="col-span-12 lg:col-span-3 flex flex-col h-full">
+            <!-- Service -->
+            <div class="col-span-12 lg:col-span-2 flex flex-col h-full">
                 <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
-                    <i class="ph-bold ph-tag text-emerald-500 text-xs"></i> <h3 class="text-[11px] font-bold text-slate-700">Rekapan Service</h3>
+                    <i class="ph-bold ph-tag text-emerald-500 text-xs"></i> <h3 class="text-[11px] font-bold text-slate-700">Service</h3>
                 </div>
                 <div class="flex-1 overflow-hidden modern-table-container rounded-t-none border-t-0">
                     <div class="table-scroll-area h-full">
@@ -334,7 +334,7 @@
             </div>
         </div>
 
-        <!-- 4. STAGING TABLE (Screen 3 - 60vh Height) -->
+        <!-- 4. STAGING TABLE (Screen 3 - Full Height Increased) -->
         <div class="grid grid-cols-12 gap-4 h-[60vh] flex flex-col">
             <div class="col-span-12 h-full flex flex-col">
                 <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
@@ -636,7 +636,7 @@
         }
 
         // --- TABLES ---
-        // 1. KPI
+        // 1. KPI (Updated widths)
         function generateKPIRecap(data) {
             const table = document.getElementById('tableKPI');
             if(!table) return;
@@ -673,7 +673,8 @@
                         </div>`;
             }
 
-            let html = `<thead><tr><th class="w-20">HUB</th><th class="text-center w-24">Total</th><th class="text-center w-24">MM Nas</th><th class="text-center w-24">MM Reg</th><th class="text-center w-24">Trans</th><th class="text-center w-24">HUB</th></tr></thead><tbody>`;
+            // Compact widths: w-24 for HUB, w-16 for data columns
+            let html = `<thead><tr><th class="w-24">HUB</th><th class="text-center w-16">Total</th><th class="text-center w-16">MM Nas</th><th class="text-center w-16">MM Reg</th><th class="text-center w-16">Trans</th><th class="text-center w-16">HUB</th></tr></thead><tbody>`;
             keys.forEach(h => {
                 const d = hubs[h];
                 html += `<tr><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/50">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t, true)}</td></tr>`;
@@ -682,7 +683,7 @@
             table.innerHTML = html;
         }
 
-        // 2. HUB RECAP
+        // 2. HUB RECAP (Updated widths)
         function generateHubRecap(data) {
             const table = document.getElementById('tableHub');
             if(!table) return;
@@ -697,8 +698,9 @@
             const sortedHubs = Object.keys(hubs).sort();
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            let html = `<thead><tr><th class="w-40">HUB</th><th class="text-center w-24">${title}</th>`;
-            sortedPos.forEach(p => html += `<th class="text-center w-24">${p}</th>`);
+            // Reduced Hub width to w-28, Data cols to w-16
+            let html = `<thead><tr><th class="w-28">HUB</th><th class="text-center w-16 bg-indigo-50/50 text-indigo-700">${title}</th>`;
+            sortedPos.forEach(p => html += `<th class="text-center w-16">${p}</th>`);
             html += `</tr></thead><tbody>`;
 
             let gt = 0;
@@ -728,7 +730,7 @@
             table.innerHTML = html;
         }
 
-        // 3. SERVICE RECAP
+        // 3. SERVICE RECAP (Updated widths - Compact)
         function generateServiceRecap(data) {
             const table = document.getElementById('tableService');
             if(!table) return;
@@ -736,7 +738,8 @@
             data.forEach(r => { const s = r['service_code'] || "?"; svcMap[s] = (svcMap[s]||0)+1; });
             const keys = Object.keys(svcMap).sort((a,b) => svcMap[b] - svcMap[a]);
             let gt = 0;
-            let html = `<thead><tr><th class="w-40">Service</th><th class="text-center w-24">Total</th><th class="text-center w-24">%</th></tr></thead><tbody>`;
+            // Reduced Service width to w-24, Data cols to w-16
+            let html = `<thead><tr><th class="w-24">Service</th><th class="text-center w-16 bg-indigo-50/50 text-indigo-700">Total</th><th class="text-center w-16">%</th></tr></thead><tbody>`;
             keys.forEach(s => {
                 const c = svcMap[s]; gt += c;
                 const pct = data.length>0?(c/data.length)*100:0;
@@ -746,7 +749,7 @@
             table.innerHTML = html;
         }
 
-        // 4. STAGING RECAP
+        // 4. STAGING RECAP (Updated widths)
         function generateStagingRecap(data) {
             const table = document.getElementById('tableStaging');
             if(!table) return;
@@ -763,8 +766,8 @@
             const sortedPos = Object.keys(posTotals).sort((a,b)=>posTotals[b]-posTotals[a]);
             const sortedHubs = Object.keys(grouping).sort();
             
-            let html = `<thead><tr><th class="w-40">HUB</th><th class="w-40">Staging</th><th class="text-center w-24">Total</th>`;
-            sortedPos.forEach(p => html += `<th class="text-center w-24">${p}</th>`);
+            let html = `<thead><tr><th class="w-28">HUB</th><th class="w-32">Staging</th><th class="text-center w-16 bg-indigo-50/50 text-indigo-700">Total</th>`;
+            sortedPos.forEach(p => html += `<th class="text-center w-16">${p}</th>`);
             html += `</tr></thead><tbody>`;
 
             sortedHubs.forEach(h => {
