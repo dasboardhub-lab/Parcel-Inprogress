@@ -76,7 +76,7 @@
     <div class="w-full max-w-[99%] mx-auto py-2">
         
         <!-- HEADER & CONTROLS -->
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 py-2 mb-3 rounded-lg shadow-sm flex flex-col lg:flex-row justify-between items-center gap-3">
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 py-2 mb-3 rounded-lg shadow-sm flex flex-col xl:flex-row justify-between items-center gap-3">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-1.5 rounded text-white"><i class="ph-bold ph-chart-polar text-lg"></i></div>
                 <div>
@@ -96,6 +96,14 @@
                     <span class="text-slate-400 text-[10px]">-</span>
                     <input type="date" id="filterEndDate" class="bg-transparent text-xs px-1 focus:outline-none text-slate-600">
                 </div>
+
+                <select id="filterHub" class="text-xs border border-slate-200 rounded px-2 py-1 bg-white focus:ring-1 focus:ring-indigo-500 outline-none w-24">
+                    <option value="">HUB: All</option>
+                </select>
+
+                <select id="filterService" class="text-xs border border-slate-200 rounded px-2 py-1 bg-white focus:ring-1 focus:ring-indigo-500 outline-none w-24">
+                    <option value="">Svc: All</option>
+                </select>
 
                 <select id="filterPosisi" class="text-xs border border-slate-200 rounded px-2 py-1 bg-white focus:ring-1 focus:ring-indigo-500 outline-none w-28">
                     <option value="">Posisi: All</option>
@@ -382,13 +390,17 @@
         function getFilteredData() {
             const startDateEl = document.getElementById('filterStartDate');
             const endDateEl = document.getElementById('filterEndDate');
+            const hubEl = document.getElementById('filterHub');
+            const serviceEl = document.getElementById('filterService');
             const posisiEl = document.getElementById('filterPosisi');
             const searchEl = document.getElementById('searchInput');
 
-            if (!startDateEl || !endDateEl || !posisiEl || !searchEl) return allData;
+            if (!startDateEl) return allData;
 
             const startDateVal = startDateEl.value;
             const endDateVal = endDateEl.value;
+            const hubVal = hubEl.value;
+            const serviceVal = serviceEl.value;
             const posisiVal = posisiEl.value;
             const searchVal = searchEl.value.toLowerCase();
 
@@ -412,6 +424,8 @@
                 }
 
                 // Dropdown Filter
+                if (hubVal && row.delivery_hub !== hubVal) return false;
+                if (serviceVal && row.service_code !== serviceVal) return false;
                 if (posisiVal && row.Posisi !== posisiVal) return false;
 
                 // Text Search (Applies to HUB Name mostly)
@@ -426,17 +440,29 @@
         }
 
         function populateDropdowns(data) {
+            const hubs = new Set();
+            const services = new Set();
             const posisis = new Set();
-            data.forEach(r => { if(r.Posisi) posisis.add(r.Posisi); });
             
-            const select = document.getElementById('filterPosisi');
-            if(!select || select.options.length > 1) return; // Don't repopulate if exists
-            
-            Array.from(posisis).sort().forEach(val => {
-                const opt = document.createElement('option');
-                opt.value = val; opt.innerText = `Posisi: ${val}`;
-                select.appendChild(opt);
+            data.forEach(r => { 
+                if(r.delivery_hub) hubs.add(r.delivery_hub);
+                if(r.service_code) services.add(r.service_code);
+                if(r.Posisi) posisis.add(r.Posisi); 
             });
+            
+            const fill = (id, label, set) => {
+                const select = document.getElementById(id);
+                if(!select || select.options.length > 1) return;
+                Array.from(set).sort().forEach(val => {
+                    const opt = document.createElement('option');
+                    opt.value = val; opt.innerText = `${label}: ${val}`;
+                    select.appendChild(opt);
+                });
+            };
+
+            fill('filterHub', 'HUB', hubs);
+            fill('filterService', 'Svc', services);
+            fill('filterPosisi', 'Posisi', posisis);
         }
 
         function parseDateStr(dateStr) {
@@ -687,13 +713,32 @@
                     let rowVals = sortedPos.map(p => d.c[p]||0);
                     let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                     
+                    let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
+
                     html += `<tr class="hover:bg-slate-50">`;
                     if(i===0) html += `<td class="row-group-header border-b" rowspan="${stagings.length}">${h}</td>`;
                     html += `<td class="text-slate-600 border-r">${ss}</td><td class="text-center font-bold bg-indigo-50/30 text-indigo-700 border-r">${formatNumber(d.t)}</td>`;
                     
                     sortedPos.forEach(p => {
-                        const c = d.c[p]||0; const bg = getGradient(c, min, max);
-                        html += `<td class="text-center border-r" style="background-color:${bg}">${c>0?formatNumber(c):'<span class="text-slate-200">-</span>'}</td>`;
+                        const c = d.c[p]||0; 
+                        const pct = d.t>0?(c/d.t)*100:0;
+                        const bg = getGradient(c, min, max);
+                        
+                        let content = `<span class="text-slate-200">-</span>`;
+                        if(c>0) {
+                            let warn = "";
+                            // Check Mid Mile > 5%
+                            if(p.toLowerCase() === 'mid mile' && pct > 5) {
+                                warn = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[9px] mr-1"></i>`;
+                            } 
+                            // Check Max Other
+                            else if (c === maxOther) {
+                                warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[9px] mr-1"></i>`;
+                            }
+                            content = `<div>${formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
+                        }
+                        
+                        html += `<td class="text-center border-r" style="background-color:${bg}">${content}</td>`;
                     });
                     html += `</tr>`;
                 });
@@ -739,7 +784,7 @@
             renderDashboard();
         });
 
-        ['filterStartDate', 'filterEndDate', 'filterPosisi', 'searchInput'].forEach(id => {
+        ['filterStartDate', 'filterEndDate', 'filterHub', 'filterService', 'filterPosisi', 'searchInput'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.addEventListener(id==='searchInput'?'keyup':'change', renderDashboard);
         });
