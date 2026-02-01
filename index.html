@@ -18,21 +18,35 @@
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
                     },
                     colors: {
-                        slate: { 850: '#151F32' }
+                        slate: { 850: '#1e293b', 900: '#0f172a' },
+                        primary: { 
+                            50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' 
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: 0, transform: 'translateY(20px)' },
+                            '100%': { opacity: 1, transform: 'translateY(0)' },
+                        }
                     },
                     boxShadow: {
-                        'glow': '0 0 20px rgba(79, 70, 229, 0.15)',
-                        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+                        'neumorph': '20px 20px 60px #d1d5db, -20px -20px 60px #ffffff',
                     }
                 }
             }
@@ -40,457 +54,461 @@
     </script>
 
     <style>
-        body { background-color: #f1f5f9; color: #0f172a; font-size: 12px; }
+        body { 
+            background-color: #f8fafc; 
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.05) 0px, transparent 50%);
+            color: #0f172a; 
+            font-size: 13px; 
+            -webkit-font-smoothing: antialiased;
+        }
+        
         .hidden-section { display: none !important; }
         
-        /* Smooth Scrollbar */
+        /* Glass Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Loading Animation */
+        #initialLoading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loader-truck { animation: drive 2s ease-in-out infinite; }
+        @keyframes drive { 0%, 100% { transform: translateX(-5px) rotate(-1deg); } 50% { transform: translateX(5px) rotate(1deg); } }
+
+        /* Dynamic Island */
+        #dynamicIsland {
+            position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: white;
+            border-radius: 100px; padding: 0;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.3);
+            z-index: 100; display: flex; align-items: center; justify-content: center;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 0; height: 0; opacity: 0; overflow: hidden;
+        }
+        #dynamicIsland.active { width: auto; min-width: 180px; height: 48px; padding: 0 24px; opacity: 1; }
+        #dynamicIsland.expanded { border-radius: 28px; width: 360px; height: auto; padding: 28px; flex-direction: column; }
+        
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        /* Loading Overlay */
-        #initialLoading {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease;
-        }
 
-        /* Animations */
-        @keyframes bounce-truck { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
-        @keyframes road-run { 0% { transform: translateX(0); } 100% { transform: translateX(-40px); } }
-        .animate-bounce-truck { animation: bounce-truck 0.6s ease-in-out infinite; }
-        .animate-road { animation: road-run 0.8s linear infinite; }
-
-        /* --- DYNAMIC ISLAND --- */
-        #dynamicIsland {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.95); color: white;
-            border-radius: 999px; padding: 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1);
-            z-index: 100; display: flex; align-items: center; justify-content: center;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            width: 0; height: 0; opacity: 0; overflow: hidden;
-        }
-        #dynamicIsland.active { width: auto; min-width: 160px; height: 44px; padding: 0 20px; opacity: 1; }
-        #dynamicIsland.expanded { border-radius: 28px; width: 320px; height: auto; padding: 28px; flex-direction: column; }
-        .island-content { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; }
-        .island-spinner { border: 2px solid rgba(255,255,255,0.2); border-top: 2px solid #60a5fa; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* --- SUMMARY MODAL --- */
-        #summaryModalOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
-            z-index: 200; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-        #summaryModalOverlay.open { opacity: 1; pointer-events: auto; }
-        .summary-card {
-            background: white; width: 95%; max-width: 700px; border-radius: 20px;
-            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.2);
-            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 1px solid #e2e8f0; max-height: 90vh; overflow-y: auto;
-            display: flex; flex-direction: column;
-        }
-        #summaryModalOverlay.open .summary-card, #deleteModalOverlay.open #deleteModalContent { transform: scale(1); }
-
-        /* Delete Modal */
-        #deleteModalOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
-            z-index: 200; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-        #deleteModalOverlay.open { opacity: 1; pointer-events: auto; }
-        #deleteModalContent {
-            background: white; width: 100%; max-width: 320px; border-radius: 20px;
-            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.2);
-            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 1px solid #e2e8f0; padding: 24px;
-        }
-
-        /* --- MODERN TABLE --- */
+        /* Table Styling - UPDATED FOR HIGH VISIBILITY */
         .modern-table-container { 
-            background: white; border-radius: 12px; 
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            background: white; border-radius: 20px; 
             border: 1px solid #e2e8f0; overflow: hidden;
             display: flex; flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
         }
+        .table-scroll-area { overflow: auto; flex: 1; position: relative; }
+        .pivot-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
         
-        .table-scroll-area { overflow: auto; flex: 1; position: relative; scroll-behavior: smooth; }
-        
-        /* TABLE STYLING */
-        .pivot-table { 
-            width: 100%; 
-            border-collapse: separate; 
-            border-spacing: 0; 
-            font-size: 11px; 
-            table-layout: auto; /* Changed from fixed to auto for responsiveness */
-        }
-        
-        /* Header Sticky Top */
+        /* 1. Header yang Jelas & Berwarna (Dark Slate/Navy) */
         .pivot-table thead th { 
             position: sticky; top: 0; z-index: 20;
-            background: #e2e8f0; 
-            color: #475569;
-            font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 10px;
-            height: 44px; padding: 0 12px;
-            border-bottom: 2px solid #cbd5e1;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            text-align: center;
+            background: #1e293b; /* Warna Header Gelap */
+            color: #ffffff; /* Teks Putih */
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px;
+            height: 48px; padding: 0 16px;
+            border-bottom: 2px solid #0f172a;
+            white-space: nowrap; text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
         
-        /* Footer Sticky Bottom */
+        /* Sticky Left Column Handling */
+        .pivot-table th:first-child, .pivot-table td:first-child {
+            position: sticky; left: 0; z-index: 10;
+            border-right: 1px solid #e2e8f0;
+            box-shadow: 4px 0 12px -8px rgba(0,0,0,0.1);
+        }
+        /* Sticky Header First Child must match Header Color */
+        .pivot-table thead th:first-child { 
+            z-index: 30; 
+            background: #1e293b; /* Match Header */
+            color: #ffffff;
+            text-align: left;
+        }
+        
+        /* 2. Isi Tabel yang Tebal & Jelas */
+        .pivot-table td { 
+            height: 52px; padding: 8px 16px;
+            border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;
+            color: #0f172a; /* Hitam Pekat */
+            font-weight: 600; /* Semi-Bold agar Jelas */
+            white-space: nowrap; vertical-align: middle;
+        }
+        /* First Column Body Style */
+        .pivot-table td:first-child {
+            background-color: #ffffff;
+            font-weight: 800; /* Extra Bold untuk Nama HUB */
+            color: #1e293b;
+        }
+        
+        .pivot-table tr:hover td { background-color: #f8fafc; }
+        .pivot-table tr:hover td:first-child { background-color: #f8fafc; }
+        
+        /* 3. Footer (Total) yang Berbeda Warna */
         .pivot-table tfoot td {
             position: sticky; bottom: 0; z-index: 20;
-            background-color: #eff6ff !important;
-            font-weight: 800 !important;
-            color: #1e3a8a !important;
-            border-top: 2px solid #bfdbfe;
-            height: 40px;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
-            font-size: 11px;
-            text-align: center;
+            background-color: #ffedd5 !important; /* Orange Muda */
+            color: #9a3412 !important; /* Orange Tua */
+            font-weight: 800 !important; /* Sangat Tebal */
+            border-top: 2px solid #fdba74; height: 44px;
+            font-family: 'Plus Jakarta Sans', sans-serif; text-align: center;
+            font-size: 12px;
         }
-
-        /* STICKY LEFT COLUMN (Magic Fix) */
-        .pivot-table th:first-child,
-        .pivot-table td:first-child {
-            position: sticky; 
-            left: 0; 
-            z-index: 10; /* Body cells z-index */
-            background-color: #ffffff; /* Must have bg to cover scrolling content */
-            border-right: 2px solid #e2e8f0;
-            box-shadow: 4px 0 6px -2px rgba(0,0,0,0.05); /* Slight shadow to indicate scroll */
-        }
-
-        /* Hover effect on sticky column needs to match row hover */
-        .pivot-table tr:hover td:first-child { background-color: #f8fafc; }
-
-        /* Fix Corner Z-Indexes */
-        .pivot-table thead th:first-child { 
-            z-index: 30; /* Higher than normal header(20) and body-sticky(10) */
-            text-align: left; padding-left: 12px; 
-            background-color: #e2e8f0; /* Match header bg */
-        }
+        /* Sticky Footer First Child */
         .pivot-table tfoot td:first-child { 
-            z-index: 30; /* Higher than normal footer(20) */
-            text-align: left; padding-left: 12px;
-            background-color: #eff6ff !important; /* Match footer bg */
+            z-index: 30; 
+            background: #ffedd5 !important; 
+            text-align: left;
+            color: #9a3412 !important;
         }
 
-        /* Cells */
-        .pivot-table td { 
-            height: 46px; padding: 4px 12px;
-            border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;
-            color: #334155; font-weight: 500;
-            vertical-align: middle;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .pivot-table tr:hover td { background-color: #f8fafc; }
-        .pivot-table td:last-child { border-right: none; }
-        
-        .pivot-val { font-weight: 700; color: #0f172a; font-size: 12px; }
-        .pivot-pct { font-size: 10px; color: #64748b; font-weight: 600; margin-left: 2px; }
-        
-        /* Specific fix for rowspan headers */
-        .row-group-header { 
-            background: #fff; font-weight: 700; 
-            vertical-align: top !important; padding-top: 14px !important;
-            z-index: 10; /* Ensure sticky works */
-        }
+        .row-group-header { background: #fff; vertical-align: top !important; padding-top: 18px !important; color: #0f172a; font-weight: 800; }
 
-        /* Cards & Widgets */
-        .glass-panel {
-            background: white; border: 1px solid #e2e8f0;
-            border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-        }
-        
-        .kpi-card { 
-            background: white; border-radius: 14px; border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative; overflow: hidden;
-        }
-        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(79, 70, 229, 0.1); border-color: #c7d2fe; }
-        
-        /* Modern Switch */
-        .toggle-switch { appearance: none; width: 32px; height: 18px; background: #e2e8f0; border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s; }
-        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .toggle-switch:checked { background: #4f46e5; }
-        .toggle-switch:checked::after { left: 16px; }
+        /* Card Hover Animation */
+        .hover-lift { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; }
+        .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(99, 102, 241, 0.15); }
 
+        /* Inputs */
+        .input-glass {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 12px; font-weight: 600; color: #334155;
+            transition: all 0.2s; outline: none;
+        }
+        .input-glass:focus { background: white; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        .input-glass:hover { background: white; }
+
+        /* Modals */
+        #summaryModalOverlay, #deleteModalOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px);
+            z-index: 200; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #summaryModalOverlay.open, #deleteModalOverlay.open { opacity: 1; pointer-events: auto; }
+        
+        .modal-animate {
+            transform: scale(0.95) translateY(10px); opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #summaryModalOverlay.open .modal-animate, #deleteModalOverlay.open .modal-animate { transform: scale(1) translateY(0); opacity: 1; }
+
+        .toggle-checkbox { appearance: none; width: 36px; height: 20px; background: #e2e8f0; border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s; }
+        .toggle-checkbox::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .toggle-checkbox:checked { background: #4f46e5; }
+        .toggle-checkbox:checked::after { left: 18px; }
     </style>
 </head>
-<body class="antialiased selection:bg-indigo-100 selection:text-indigo-700">
+<body class="overflow-x-hidden">
 
     <!-- INITIAL LOADING -->
     <div id="initialLoading">
-        <div class="flex flex-col items-center justify-center p-6">
-            <div class="relative">
-                <div class="animate-bounce-truck relative z-10">
-                    <i class="ph-duotone ph-van text-7xl text-indigo-600 drop-shadow-2xl"></i>
-                    <i class="ph-fill ph-package text-orange-500 text-xl absolute -top-1 right-2 animate-bounce"></i>
-                </div>
+        <div class="relative mb-6">
+            <div class="w-20 h-20 bg-gradient-to-tr from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-200 loader-truck">
+                <i class="ph-bold ph-cube text-4xl"></i>
             </div>
-            <p class="mt-6 text-xs font-extrabold text-slate-500 tracking-[0.2em] uppercase">Mengantar Data...</p>
+            <div class="absolute -bottom-2 w-full h-1 bg-black/10 rounded-full blur-sm animate-pulse"></div>
         </div>
-        <button id="skipLoadingBtn" class="mt-4 px-5 py-2 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm hidden-section" onclick="forceHideLoading()">
-            Buka Mode Offline
+        <h2 class="text-sm font-display font-bold text-slate-800 tracking-widest uppercase">Memuat Dashboard</h2>
+        <p class="text-xs text-slate-400 mt-1 font-medium">Sinkronisasi data real-time...</p>
+        
+        <button id="skipLoadingBtn" class="mt-6 px-6 py-2 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm hidden-section animate-fade-in-up" onclick="forceHideLoading()">
+            Masuk Mode Offline
         </button>
     </div>
 
-    <!-- DYNAMIC ISLAND -->
+    <!-- DYNAMIC ISLAND (Notification Hub) -->
     <div id="dynamicIsland"></div>
 
     <!-- SUMMARY MODAL -->
     <div id="summaryModalOverlay">
-        <div class="summary-card">
-            <!-- Header -->
-            <div class="bg-slate-50 px-6 py-4 rounded-t-2xl border-b border-slate-100 flex justify-between items-center sticky top-0 z-10">
-                <div class="flex items-center gap-3">
-                    <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 border border-indigo-200"><i class="ph-bold ph-chart-pie-slice text-xl"></i></div>
+        <div class="summary-card bg-white w-[95%] max-w-4xl max-h-[90vh] rounded-[2rem] shadow-2xl border border-slate-100 flex flex-col modal-animate">
+            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/80 backdrop-blur-md rounded-t-[2rem] sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-2xl shadow-sm border border-indigo-100">
+                        <i class="ph-fill ph-chart-polar text-xl"></i>
+                    </div>
                     <div>
-                        <h3 class="text-sm font-bold text-slate-800" id="summaryTitle">Analisis HUB</h3>
+                        <h3 class="text-lg font-display font-bold text-slate-800" id="summaryTitle">Detail Analisis</h3>
+                        <p class="text-xs text-slate-400 font-medium">Performa HUB dan Feedback Konsumen</p>
                     </div>
                 </div>
-                <button onclick="closeSummary()" class="text-slate-400 hover:text-red-500 transition bg-white p-1 rounded-full shadow-sm border border-slate-200"><i class="ph-bold ph-x text-lg"></i></button>
+                <button onclick="closeSummary()" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"><i class="ph-bold ph-x text-lg"></i></button>
             </div>
-            <!-- Body -->
-            <div class="p-6 overflow-y-auto">
-                <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <i class="ph-fill ph-map-pin text-orange-500"></i> Top 3 Origin (Penyumbang Terbanyak)
-                </h4>
-                <div class="grid grid-cols-3 gap-3 mb-6" id="topOriginsContainer"></div>
+            
+            <div class="p-8 overflow-y-auto bg-slate-50/50">
+                <!-- Top Origins -->
+                <div class="mb-8">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <i class="ph-fill ph-map-pin text-orange-500"></i> Top Origin Contributor
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="topOriginsContainer"></div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            <i class="ph-fill ph-chat-text text-indigo-500"></i> Top Feedback
+                    <!-- Feedback -->
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i class="ph-fill ph-chat-text text-indigo-500"></i> Isu & Feedback
                         </h4>
-                        <div class="space-y-3" id="feedbackBreakdown"></div>
+                        <div class="space-y-4" id="feedbackBreakdown"></div>
                     </div>
-                    <div>
-                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            <i class="ph-fill ph-tag text-emerald-500"></i> Service Type
+                    <!-- Services -->
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i class="ph-fill ph-tag text-emerald-500"></i> Tipe Layanan
                         </h4>
-                        <div class="space-y-3" id="serviceBreakdown"></div>
+                        <div class="space-y-4" id="serviceBreakdown"></div>
                     </div>
                 </div>
             </div>
-            <!-- Footer -->
-            <div class="bg-slate-50 px-6 py-3 rounded-b-2xl border-t border-slate-100 text-center sticky bottom-0">
-                <p class="text-[10px] text-slate-400 font-medium">Total Data Dianalisa: <span class="font-bold text-slate-700" id="totalAnalyzed">0</span> Paket</p>
+            
+            <div class="px-8 py-4 bg-white border-t border-slate-100 rounded-b-[2rem] flex justify-between items-center">
+                <span class="text-xs font-bold text-slate-400">Total Sampel Data</span>
+                <span class="text-sm font-bold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200" id="totalAnalyzed">0 Paket</span>
             </div>
         </div>
     </div>
 
     <!-- DELETE MODAL -->
     <div id="deleteModalOverlay" class="hidden-section">
-        <div id="deleteModalContent">
-            <div class="flex flex-col items-center text-center">
-                <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4 border border-red-100 shadow-sm">
-                    <i class="ph-fill ph-trash text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-800 mb-2">Hapus Data Bulanan</h3>
-                <p class="text-xs text-slate-500 mb-6 leading-relaxed">Pilih bulan dan tahun data yang ingin dihapus secara permanen.</p>
-                
-                <div class="w-full mb-6 text-left">
-                     <label class="text-[10px] font-bold text-slate-400 uppercase mb-1.5 block ml-1">Pilih Bulan & Tahun</label>
-                     <input type="month" id="deleteMonthInput" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl px-4 py-3 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none cursor-pointer hover:bg-white transition-colors">
-                </div>
-                
-                <div class="flex gap-3 w-full">
-                    <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition">Batal</button>
-                    <button onclick="processDeleteRequest()" class="flex-1 py-3 rounded-xl bg-red-600 text-xs font-bold text-white hover:bg-red-700 transition shadow-lg shadow-red-200 active:scale-95">Hapus Data</button>
-                </div>
+        <div id="deleteModalContent" class="bg-white w-full max-w-sm rounded-[2rem] p-8 text-center shadow-2xl modal-animate border border-slate-100">
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-red-100">
+                <i class="ph-duotone ph-trash text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-display font-bold text-slate-800 mb-2">Hapus Data Permanen</h3>
+            <p class="text-sm text-slate-500 mb-8 leading-relaxed">Tindakan ini tidak dapat dibatalkan. Pilih periode data yang ingin dihapus dari database.</p>
+            
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-8 text-left">
+                <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block tracking-wider ml-1">Periode Bulan</label>
+                <input type="month" id="deleteMonthInput" class="w-full bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 transition-all cursor-pointer">
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">Batal</button>
+                <button onclick="processDeleteRequest()" class="flex-1 py-3 rounded-xl bg-red-600 text-white text-xs font-bold hover:bg-red-700 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all transform active:scale-95">Hapus Sekarang</button>
             </div>
         </div>
     </div>
 
-    <!-- MAIN WRAPPER -->
-    <div class="w-full max-w-[99%] mx-auto py-3 pb-8">
-        
-        <!-- HEADER -->
-        <header class="glass-panel px-4 py-2 mb-4 flex flex-col xl:flex-row justify-between items-center gap-3 sticky top-2 z-50 bg-white/95 backdrop-blur-md shadow-md">
-            <div class="flex items-center gap-3 w-full xl:w-auto">
-                <div class="bg-gradient-to-br from-indigo-600 to-violet-600 w-8 h-8 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                    <i class="ph-bold ph-chart-polar text-lg"></i>
+    <!-- NAVBAR FLOATING -->
+    <div class="fixed top-0 left-0 w-full z-40 px-4 py-4 pointer-events-none">
+        <nav class="pointer-events-auto max-w-[1600px] mx-auto glass rounded-2xl px-2 py-2 flex flex-col xl:flex-row items-center justify-between gap-4 shadow-glass transition-all duration-300 animate-fade-in-up">
+            
+            <!-- Brand -->
+            <div class="flex items-center gap-4 px-4 w-full xl:w-auto">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                    <i class="ph-bold ph-cube text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-sm font-extrabold text-slate-800 tracking-tight leading-tight">PARCEL INPROGRESS</h1>
-                    <div class="flex items-center gap-3 text-[10px] font-medium text-slate-500">
-                        <span id="connectionStatus" class="flex items-center gap-1 text-emerald-600 font-bold">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
+                    <h1 class="text-sm font-display font-extrabold text-slate-800 leading-tight">PARCEL DASHBOARD</h1>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Online
                         </span>
-                        <span class="flex items-center gap-1"><i class="ph-bold ph-clock"></i> <span id="lastUpdated">--:--</span></span>
+                        <span class="text-[10px] font-medium text-slate-400 flex items-center gap-1">
+                            <i class="ph-bold ph-clock"></i> <span id="lastUpdated">--:--</span>
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- CONTROLS -->
-            <div class="flex items-center gap-2 flex-wrap justify-end w-full xl:w-auto">
-                <button onclick="copyReport()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-[10px] font-bold cursor-pointer hover:bg-emerald-700 transition-all shadow-md active:scale-95 border border-emerald-500">
-                    <i class="ph-bold ph-whatsapp-logo text-lg"></i>
-                    <span>Salin Laporan</span>
-                </button>
-
-                <div class="flex items-center bg-slate-50 p-0.5 rounded-lg border border-slate-200">
-                    <input type="date" id="filterStartDate" class="bg-transparent text-[10px] font-semibold text-slate-600 px-2 py-1 focus:outline-none cursor-pointer">
-                    <span class="text-slate-300 text-[10px] px-1">→</span>
-                    <input type="date" id="filterEndDate" class="bg-transparent text-[10px] font-semibold text-slate-600 px-2 py-1 focus:outline-none cursor-pointer">
-                </div>
-                <div class="relative group">
-                    <select id="filterHub" class="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-[10px] font-bold rounded-lg px-3 py-1.5 pr-6 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:bg-white hover:shadow-sm">
-                        <option value="">HUB: Semua</option>
-                    </select>
-                    <i class="ph-bold ph-caret-down absolute right-2 top-2 text-slate-400 pointer-events-none"></i>
-                </div>
-                <div class="relative group">
-                    <select id="filterService" class="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-[10px] font-bold rounded-lg px-3 py-1.5 pr-6 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:bg-white hover:shadow-sm">
-                        <option value="">Svc: Semua</option>
-                    </select>
-                    <i class="ph-bold ph-caret-down absolute right-2 top-2 text-slate-400 pointer-events-none"></i>
-                </div>
-                <div class="relative group">
-                    <select id="filterPosisi" class="appearance-none bg-slate-50 border border-slate-200 text-slate-700 text-[10px] font-bold rounded-lg px-3 py-1.5 pr-6 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:bg-white hover:shadow-sm w-28">
-                        <option value="">Posisi: Semua</option>
-                    </select>
-                    <i class="ph-bold ph-caret-down absolute right-2 top-2 text-slate-400 pointer-events-none"></i>
-                </div>
-                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-lg">
-                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider" id="toggleLabel">Semua</span>
-                    <input type="checkbox" id="statusToggle" class="toggle-switch">
-                </div>
+            <!-- Toolbar -->
+            <div class="flex flex-col md:flex-row items-center gap-2 w-full xl:w-auto overflow-x-auto pb-2 md:pb-0 px-2">
                 
-                <button onclick="openDeleteModal()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-[10px] font-bold cursor-pointer hover:bg-red-100 transition-all border border-red-200 shadow-sm active:scale-95">
-                    <i class="ph-bold ph-trash text-sm"></i>
-                    <span>Hapus Data</span>
-                </button>
+                <!-- Date Filter -->
+                <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 group focus-within:border-indigo-300 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
+                    <input type="date" id="filterStartDate" class="bg-transparent text-[11px] font-bold text-slate-600 px-3 py-1.5 outline-none border-none cursor-pointer">
+                    <span class="text-slate-300 text-[10px]"><i class="ph-bold ph-arrow-right"></i></span>
+                    <input type="date" id="filterEndDate" class="bg-transparent text-[11px] font-bold text-slate-600 px-3 py-1.5 outline-none border-none cursor-pointer">
+                </div>
 
-                <button onclick="initiateUpload()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold cursor-pointer hover:bg-indigo-600 transition-all shadow-md active:scale-95">
-                    <i class="ph-bold ph-upload-simple text-sm"></i>
-                    <span>Upload</span>
-                </button>
-                <input type='file' class="hidden" id="csvFileInput" accept=".csv" />
-            </div>
-        </header>
+                <div class="w-px h-8 bg-slate-200 hidden md:block mx-1"></div>
 
-        <!-- 1. KPI CARDS -->
-        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-4">
-            <script>
-                const kpiCard = (id, label, gradFrom, gradTo, icon, delay) => document.write(`
-                    <div class="kpi-card p-4 flex flex-col justify-between h-36 animate-fade-in-up hover:bg-${gradFrom}-50/10" style="animation-delay: ${delay}ms">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-${gradFrom}-500 to-${gradTo}-600 flex items-center justify-center text-white shadow-md shadow-${gradFrom}-200">
-                                <i class="ph-bold ${icon} text-lg"></i>
-                            </div>
-                            <div class="flex flex-col items-end">
-                                <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Share</span>
-                                <div class="text-[10px] font-bold text-${gradFrom}-600 bg-${gradFrom}-50 px-2 py-0.5 rounded border border-${gradFrom}-100" id="${id}Share">0%</div>
-                            </div>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">${label}</p>
-                            <h3 class="text-2xl font-black text-slate-800 tracking-tight leading-none" id="${id}">0</h3>
-                        </div>
-                        <div class="flex items-center gap-2 pt-2 border-t border-slate-100 mt-2">
-                            <span class="text-[9px] font-semibold text-slate-400">vs Lalu:</span>
-                            <div id="${id}Comp" class="flex items-center gap-1">
-                                <span class="text-[10px] font-bold text-slate-300">-</span>
-                            </div>
-                        </div>
+                <!-- Dropdowns -->
+                <div class="flex gap-2">
+                    <select id="filterHub" class="input-glass min-w-[120px] cursor-pointer"><option value="">Semua HUB</option></select>
+                    <select id="filterService" class="input-glass w-28 cursor-pointer"><option value="">Semua Svc</option></select>
+                    <select id="filterPosisi" class="input-glass w-32 cursor-pointer"><option value="">Semua Posisi</option></select>
+                </div>
+
+                <div class="w-px h-8 bg-slate-200 hidden md:block mx-1"></div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl mr-1" title="Toggle In Area">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-12 text-right transition-colors" id="toggleLabel">Semua</span>
+                        <input type="checkbox" id="statusToggle" class="toggle-checkbox">
                     </div>
-                `);
-            </script>
+
+                    <button onclick="copyReport()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100 transition-all active:scale-95" title="Salin Laporan WA">
+                        <i class="ph-bold ph-whatsapp-logo text-lg"></i>
+                    </button>
+                    
+                    <button onclick="openDeleteModal()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition-all active:scale-95" title="Hapus Data">
+                        <i class="ph-bold ph-trash text-lg"></i>
+                    </button>
+                    
+                    <button onclick="initiateUpload()" class="h-10 px-4 flex items-center gap-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all active:scale-95" title="Upload CSV">
+                        <i class="ph-bold ph-upload-simple text-lg"></i>
+                        <span class="text-xs font-bold">Upload</span>
+                    </button>
+                    <input type='file' class="hidden" id="csvFileInput" accept=".csv" />
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 pt-28 pb-12">
+        
+        <!-- 1. KPI CARDS (Staggered Animation) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4 mb-8">
             <script>
-                // Urutan: Total -> First -> Trans -> Mid -> 3PL -> Mitra -> Last
-                kpiCard('kpiTotal', 'Total AWB', 'slate', 'gray', 'ph-stack', 0);
-                kpiCard('kpiFirstMile', 'First Mile', 'indigo', 'violet', 'ph-storefront', 100);
-                kpiCard('kpiTransport', 'Transport', 'cyan', 'blue', 'ph-airplane-in-flight', 200);
-                kpiCard('kpiMidMile', 'Mid Mile', 'orange', 'amber', 'ph-factory', 300);
-                kpiCard('kpiVendor', 'Vendor 3PL', 'purple', 'fuchsia', 'ph-truck-trailer', 400);
-                kpiCard('kpiMitra', 'Mitra Usaha', 'emerald', 'teal', 'ph-briefcase', 500);
-                kpiCard('kpiLastMile', 'Last Mile', 'blue', 'sky', 'ph-moped', 600);
+                // Modern KPI Card
+                const renderKpi = (id, label, color, icon, delay) => {
+                    // Mapping simple color names to Tailwind classes
+                    const colorMap = {
+                        'slate': { bg: 'bg-slate-50', text: 'text-slate-600', ring: 'group-hover:ring-slate-200' },
+                        'indigo': { bg: 'bg-indigo-50', text: 'text-indigo-600', ring: 'group-hover:ring-indigo-200' },
+                        'cyan': { bg: 'bg-cyan-50', text: 'text-cyan-600', ring: 'group-hover:ring-cyan-200' },
+                        'orange': { bg: 'bg-orange-50', text: 'text-orange-600', ring: 'group-hover:ring-orange-200' },
+                        'purple': { bg: 'bg-fuchsia-50', text: 'text-fuchsia-600', ring: 'group-hover:ring-fuchsia-200' }, // mapped purple to fuchsia for consistency
+                        'emerald': { bg: 'bg-emerald-50', text: 'text-emerald-600', ring: 'group-hover:ring-emerald-200' },
+                        'blue': { bg: 'bg-blue-50', text: 'text-blue-600', ring: 'group-hover:ring-blue-200' }
+                    };
+                    const theme = colorMap[color] || colorMap['slate'];
+
+                    document.write(`
+                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover-lift group opacity-0 animate-fade-in-up flex flex-col justify-between h-[140px] relative overflow-hidden" style="animation-delay: ${delay}ms">
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-transparent to-slate-50 rounded-bl-full -mr-4 -mt-4 opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+                            
+                            <div class="flex justify-between items-start z-10">
+                                <div class="w-10 h-10 rounded-xl ${theme.bg} ${theme.text} flex items-center justify-center transition-transform group-hover:rotate-12 duration-300 shadow-sm">
+                                    <i class="ph-bold ${icon} text-lg"></i>
+                                </div>
+                                <span class="text-[10px] font-bold bg-slate-50 text-slate-500 px-2 py-1 rounded-lg border border-slate-100" id="${id}Share">0%</span>
+                            </div>
+                            
+                            <div class="z-10">
+                                <h3 class="text-3xl font-display font-extrabold text-slate-800 tracking-tight leading-none mb-1 group-hover:scale-105 transition-transform origin-left" id="${id}">0</h3>
+                                <div class="flex items-center justify-between mt-1">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${label}</span>
+                                    <div id="${id}Comp" class="scale-90 origin-right transition-opacity opacity-70 group-hover:opacity-100">
+                                        <span class="text-slate-300 text-[10px]">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                }
+
+                renderKpi('kpiTotal', 'Total', 'slate', 'ph-stack', 100);
+                renderKpi('kpiFirstMile', 'First Mile', 'indigo', 'ph-storefront', 150);
+                renderKpi('kpiTransport', 'Transport', 'cyan', 'ph-airplane-in-flight', 200);
+                renderKpi('kpiMidMile', 'Mid Mile', 'orange', 'ph-factory', 250);
+                renderKpi('kpiVendor', '3PL Vendor', 'purple', 'ph-truck-trailer', 300);
+                renderKpi('kpiMitra', 'Mitra', 'emerald', 'ph-briefcase', 350);
+                renderKpi('kpiLastMile', 'Last Mile', 'blue', 'ph-moped', 400);
             </script>
         </div>
 
-        <!-- 2. CHARTS SECTION -->
-        <div class="grid grid-cols-12 gap-4 mb-4">
-            <div class="col-span-12 lg:col-span-6 glass-panel p-4 h-[50vh] flex flex-col">
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-[11px] font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wide">
-                        <span class="w-2 h-2 rounded-full bg-violet-500"></span> Tren Tahunan (HUB)
-                    </h4>
+        <!-- 2. ANALYTICS (Charts) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 500ms">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-base font-display font-bold text-slate-800">Tren Tahunan</h3>
+                        <p class="text-xs text-slate-400 font-medium">Perbandingan volume per tahun</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-violet-50 text-violet-600 flex items-center justify-center"><i class="ph-bold ph-chart-bar text-lg"></i></div>
                 </div>
-                <div class="flex-1 w-full relative"><canvas id="yearlyChart"></canvas></div>
+                <div class="h-[300px] w-full relative"><canvas id="yearlyChart"></canvas></div>
             </div>
-            <div class="col-span-12 lg:col-span-6 glass-panel p-4 h-[50vh] flex flex-col">
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-[11px] font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wide">
-                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Tren Bulanan (HUB)
-                    </h4>
+            <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 600ms">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-base font-display font-bold text-slate-800">Tren Bulanan</h3>
+                        <p class="text-xs text-slate-400 font-medium">Fluktuasi dalam satu periode</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center"><i class="ph-bold ph-chart-line-up text-lg"></i></div>
                 </div>
-                <div class="flex-1 w-full relative"><canvas id="monthlyChart"></canvas></div>
-            </div>
-        </div>
-
-        <!-- 3. DAILY CHART & MAIN TABLES -->
-        <div class="grid grid-cols-12 gap-4 mb-4">
-            <div class="col-span-12 glass-panel p-4 h-[40vh] flex flex-col">
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-[11px] font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wide">
-                        <span class="w-2 h-2 rounded-full bg-orange-500"></span> Tren Harian (Bulan Ini)
-                    </h4>
-                    <span id="currentMonthLabel" class="text-[9px] font-bold px-2 py-0.5 bg-orange-50 text-orange-600 rounded-full border border-orange-100"></span>
-                </div>
-                <div class="flex-1 w-full relative"><canvas id="dailyChart"></canvas></div>
+                <div class="h-[300px] w-full relative"><canvas id="monthlyChart"></canvas></div>
             </div>
         </div>
 
-        <!-- 3 Tables Side-by-Side (Dynamic Height on Mobile) -->
-        <div class="grid grid-cols-12 gap-4 h-auto lg:h-[35vh] lg:min-h-[350px] mb-4 items-start">
+        <!-- 3. DAILY TREND & DATA TABLES -->
+        <div class="grid grid-cols-12 gap-6 mb-8">
+            <div class="col-span-12 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 700ms">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-base font-display font-bold text-slate-800 flex items-center gap-3">
+                        <div class="w-1 h-6 bg-orange-500 rounded-full"></div> Tren Harian
+                    </h3>
+                    <span id="currentMonthLabel" class="text-[10px] font-bold bg-slate-50 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">Bulan Ini</span>
+                </div>
+                <div class="h-[280px] w-full relative"><canvas id="dailyChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- TABLE GRID ROW 1 -->
+        <div class="grid grid-cols-12 gap-6 mb-8 items-start opacity-0 animate-fade-in-up" style="animation-delay: 800ms">
             <!-- Monitoring KPI -->
-            <div class="col-span-12 lg:col-span-4 flex flex-col h-[350px] lg:h-full">
-                <div class="bg-indigo-600 text-white px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
-                    <i class="ph-bold ph-monitor text-xs"></i> <h3 class="text-[11px] font-bold">Monitoring KPI</h3>
+            <div class="col-span-12 lg:col-span-4 flex flex-col h-[520px]">
+                <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
+                    <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Monitoring KPI</h3>
+                    <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-monitor"></i></div>
                 </div>
-                <div id="containerKPI" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
+                <div id="containerKPI" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
             <!-- Rekapan HUB -->
-            <div class="col-span-12 lg:col-span-6 flex flex-col h-[350px] lg:h-full">
-                <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-2 rounded-t-xl flex justify-between items-center shadow-sm shrink-0">
-                    <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-buildings text-xs"></i> 
-                        <h3 class="text-[11px] font-bold">Rekapan HUB</h3>
-                    </div>
+            <div class="col-span-12 lg:col-span-6 flex flex-col h-[520px]">
+                <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
+                    <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Rekapan HUB</h3>
+                    <div class="w-8 h-8 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-buildings"></i></div>
                 </div>
-                <div id="containerHub" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
+                <div id="containerHub" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
             <!-- Service -->
-            <div class="col-span-12 lg:col-span-2 flex flex-col h-[350px] lg:h-full">
-                <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
-                    <i class="ph-bold ph-tag text-xs"></i> <h3 class="text-[11px] font-bold">Service</h3>
+            <div class="col-span-12 lg:col-span-2 flex flex-col h-[520px]">
+                <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
+                    <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Service</h3>
+                    <div class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-tag"></i></div>
                 </div>
-                <div id="containerService" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
+                <div id="containerService" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
         </div>
 
-        <!-- 4. STAGING TABLE -->
-        <div class="grid grid-cols-12 gap-4 h-[35vh] flex flex-col">
+        <!-- TABLE GRID ROW 2 (Staging) -->
+        <div class="grid grid-cols-12 gap-6 h-[520px] mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 900ms">
             <div class="col-span-12 h-full flex flex-col">
-                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
-                    <i class="ph-bold ph-warehouse text-xs"></i> <h3 class="text-[11px] font-bold">Rekapan Staging</h3>
+                <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
+                    <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Rekapan Staging</h3>
+                    <div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-warehouse"></i></div>
                 </div>
-                <div id="containerStaging" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
+                <div id="containerStaging" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
         </div>
 
-        <!-- Hidden Raw Table for Data -->
+        <!-- Hidden Elements for Processing -->
         <div class="hidden-section">
             <table id="tableRawBody"></table>
             <div id="rawCount"></div>
@@ -498,13 +516,18 @@
 
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC (Unchanged, Preserved 100%) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
         import { getFirestore, collection, getDocs, doc, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
         Chart.register(ChartDataLabels);
+        // Modern Chart Configuration
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.scale.grid.color = '#f1f5f9';
+        Chart.defaults.scale.grid.borderColor = 'transparent';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDXOfZbVDqtfGB0abQkTeILo-XC6a9xxKI",
@@ -813,8 +836,8 @@
                 const colors = ['bg-orange-50 border-orange-100 text-orange-700', 'bg-blue-50 border-blue-100 text-blue-700', 'bg-slate-50 border-slate-100 text-slate-700'];
                 return `
                     <div class="${colors[idx] || colors[2]} border rounded-xl p-3 text-center shadow-sm">
-                        <p class="text-xs font-bold mb-1 opacity-70">Top ${idx+1}</p>
-                        <p class="text-xl font-black leading-none mb-1">${org}</p>
+                        <p class="text-[10px] font-bold mb-1 opacity-70 uppercase tracking-wide">Top ${idx+1}</p>
+                        <p class="text-base font-black leading-none mb-1 text-slate-800">${org}</p>
                         <p class="text-[10px] font-semibold opacity-80">${count} (${pct.toFixed(0)}%)</p>
                     </div>
                 `;
@@ -829,11 +852,11 @@
                 
                 return `
                     <div class="mb-2">
-                        <div class="flex justify-between text-[10px] font-bold text-slate-600 mb-1">
+                        <div class="flex justify-between text-[11px] font-bold text-slate-600 mb-1">
                             <span class="truncate pr-2 w-48">${fb}</span>
                             <span>${count}</span>
                         </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden flex items-center">
+                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden flex items-center">
                             <div class="h-full ${barColor} rounded-full" style="width: ${pct}%"></div>
                         </div>
                     </div>
@@ -1210,17 +1233,18 @@
             const sortMonth = (a,b) => new Date(`1 ${a}`) - new Date(`1 ${b}`);
             const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
 
-            renderChart('yearlyChart', 'bar', Object.keys(yearly).sort(), Object.values(yearly), ['#8b5cf6', '#6d28d9']);
-            renderChart('monthlyChart', 'line', Object.keys(monthly).sort(sortMonth), Object.keys(monthly).sort(sortMonth).map(k=>monthly[k]), ['#3b82f6', '#1d4ed8']);
-            renderChart('dailyChart', 'bar', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), ['#f97316', '#c2410c']);
+            renderChart('yearlyChart', 'bar', Object.keys(yearly).sort(), Object.values(yearly), ['#818cf8', '#6366f1']);
+            renderChart('monthlyChart', 'line', Object.keys(monthly).sort(sortMonth), Object.keys(monthly).sort(sortMonth).map(k=>monthly[k]), ['#38bdf8', '#0ea5e9']);
+            renderChart('dailyChart', 'bar', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), ['#fb923c', '#f97316']);
         }
 
         function renderChart(id, type, labels, data, colors) {
             const ctx = document.getElementById(id).getContext('2d');
             if (chartInstances[id]) chartInstances[id].destroy();
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
             if(type === 'bar') { gradient.addColorStop(0, colors[0]); gradient.addColorStop(1, colors[1]); }
-            else { gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)'); gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)'); }
+            else { gradient.addColorStop(0, 'rgba(56, 189, 248, 0.4)'); gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)'); }
+            
             chartInstances[id] = new Chart(ctx, {
                 type: type,
                 data: {
@@ -1228,14 +1252,15 @@
                     datasets: [{
                         data: data,
                         backgroundColor: type === 'line' ? gradient : colors[0],
-                        borderColor: colors[0],
+                        borderColor: colors[1],
                         borderWidth: 0,
-                        borderRadius: 3,
-                        tension: 0.3,
+                        borderRadius: 4,
+                        tension: 0.4,
                         pointBackgroundColor: '#fff',
-                        pointBorderColor: colors[0],
+                        pointBorderColor: colors[1],
                         pointBorderWidth: 2,
                         pointRadius: 4,
+                        pointHoverRadius: 6,
                         hoverBorderWidth: 0,
                         fill: type === 'line'
                     }]
@@ -1244,11 +1269,31 @@
                     responsive: true, maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { enabled: false },
-                        datalabels: { anchor: 'end', align: 'top', color: '#64748b', font: { size: 10, weight: 'bold', family: 'Plus Jakarta Sans' }, offset: -2, formatter: (val) => formatNumber(val) }
+                        tooltip: { 
+                            enabled: true, 
+                            backgroundColor: '#1e293b', 
+                            padding: 10, 
+                            titleFont: { family: "'Plus Jakarta Sans', sans-serif" },
+                            bodyFont: { family: "'Plus Jakarta Sans', sans-serif" },
+                            cornerRadius: 8,
+                            displayColors: false 
+                        },
+                        datalabels: { 
+                            anchor: 'end', align: 'top', 
+                            color: '#94a3b8', 
+                            font: { size: 10, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" }, 
+                            offset: -2, 
+                            formatter: (val) => val > 0 ? formatNumber(val) : '' 
+                        }
                     },
-                    scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 10, family: 'Plus Jakarta Sans', weight: '500' }, color: '#94a3b8' } } },
-                    layout: { padding: { top: 25 } }
+                    scales: { 
+                        y: { display: false }, 
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '500' }, color: '#94a3b8' } 
+                        } 
+                    },
+                    layout: { padding: { top: 20 } }
                 }
             });
         }
@@ -1307,21 +1352,21 @@
                         warnIcon = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px] mr-1"></i>`;
                         cls = "text-red-600 font-bold cursor-pointer hover:bg-red-50 rounded px-2 transition-colors";
                     } else {
-                        cls = "cursor-pointer hover:bg-slate-100 rounded px-2 transition-colors";
+                        cls = "cursor-pointer hover:bg-slate-50 rounded px-2 transition-colors text-indigo-600 font-bold";
                     }
-                    return `<div class="flex flex-col items-center" onclick="openHubSummary('${hubName}')">
+                    return `<div class="flex flex-col items-center cursor-pointer group" onclick="openHubSummary('${hubName}')">
                                 <div class="pivot-val ${cls}">${v>0?formatNumber(v):'-'}</div>
-                                <div class="pivot-pct flex items-center">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div>
+                                <div class="pivot-pct flex items-center group-hover:text-indigo-500 transition-colors">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div>
                             </div>`;
                 }
 
                 return `<div class="flex flex-col items-center"><div class="pivot-val ${cls}">${v>0?formatNumber(v):'-'}</div><div class="pivot-pct flex items-center">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div></div>`;
             }
             
-            // Header UPDATED: Fixed width for HUB (Left), Min-width for others (Scrollable)
+            // Header UPDATED
             let theadContent = `<tr>
                 <th style="min-width:120px; width:120px;">HUB</th>
-                <th style="min-width:90px;" class="text-center text-indigo-700 bg-indigo-50/50">Total</th>
+                <th style="min-width:90px;" class="text-center">Total</th>
                 <th style="min-width:90px;" class="text-center">MM Nas</th>
                 <th style="min-width:90px;" class="text-center">MM Reg</th>
                 <th style="min-width:90px;" class="text-center">Vendor 3PL</th>
@@ -1331,10 +1376,10 @@
             let tbodyContent = "";
             keys.forEach(h => {
                 const d = hubs[h];
-                tbodyContent += `<tr><td class="font-bold text-slate-700 pl-3">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/50">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t, true, h)}</td></tr>`;
+                tbodyContent += `<tr><td class="font-bold text-slate-700 pl-4 border-r border-slate-100">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/30">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t, true, h)}</td></tr>`;
             });
 
-            let tfootContent = `<tr><td class="px-3">TOTAL</td><td class="text-center text-indigo-700">${formatNumber(totals.total)}</td><td class="text-center">${cell(totals.nas,totals.total)}</td><td class="text-center">${cell(totals.reg,totals.total)}</td><td class="text-center">${cell(totals.trans,totals.total)}</td><td class="text-center">${cell(totals.hub,totals.total)}</td></tr>`;
+            let tfootContent = `<tr><td class="px-4">TOTAL</td><td class="text-center">${formatNumber(totals.total)}</td><td class="text-center">${cell(totals.nas,totals.total)}</td><td class="text-center">${cell(totals.reg,totals.total)}</td><td class="text-center">${cell(totals.trans,totals.total)}</td><td class="text-center">${cell(totals.hub,totals.total)}</td></tr>`;
 
             renderStructuredTable('containerKPI', theadContent, tbodyContent, tfootContent);
         }
@@ -1353,7 +1398,7 @@
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
             // Fixed Layout logic removed, now using min-width
-            let theadContent = `<tr><th style="min-width:120px; width:120px;" class="text-left pl-4">HUB</th><th style="min-width:80px;" class="text-center bg-orange-50 text-orange-700">${title}</th>`;
+            let theadContent = `<tr><th style="min-width:130px; width:130px;" class="text-left pl-4">HUB</th><th style="min-width:80px;" class="text-center">${title}</th>`;
             sortedPos.forEach(p => theadContent += `<th style="min-width:90px;" class="text-center">${p}</th>`);
             theadContent += `</tr>`;
 
@@ -1365,7 +1410,7 @@
                 let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                 let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
 
-                tbodyContent += `<tr><td class="font-bold text-slate-700 pl-4">${h}</td><td class="text-center font-bold bg-orange-50/50 text-orange-700">${formatNumber(d.t)}</td>`;
+                tbodyContent += `<tr><td class="font-bold text-slate-700 pl-4 border-r border-slate-100">${h}</td><td class="text-center font-bold bg-orange-50/30 text-orange-600">${formatNumber(d.t)}</td>`;
                 sortedPos.forEach(p => {
                     const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
                     let content = `<span class="text-slate-300">-</span>`;
@@ -1380,8 +1425,8 @@
                 tbodyContent += `</tr>`;
             });
             
-            let tfootContent = `<tr><td class="px-4 text-left">ALL</td><td class="text-center text-orange-700 font-bold bg-orange-100">${formatNumber(gt)}</td>`;
-            sortedPos.forEach(p => tfootContent += `<td class="text-center text-indigo-900">${formatNumber(posTotals[p]||0)}</td>`);
+            let tfootContent = `<tr><td class="px-4 text-left">ALL</td><td class="text-center">${formatNumber(gt)}</td>`;
+            sortedPos.forEach(p => tfootContent += `<td class="text-center">${formatNumber(posTotals[p]||0)}</td>`);
             tfootContent += `</tr>`;
 
             renderStructuredTable('containerHub', theadContent, tbodyContent, tfootContent);
@@ -1395,16 +1440,16 @@
             let gt = 0;
             
             // Adjusted with min-width for mobile safety
-            let theadContent = `<tr><th class="text-left pl-4" style="min-width:140px;">Service</th><th class="text-center text-emerald-700 bg-emerald-50" style="min-width:80px;">Total</th><th class="text-center" style="min-width:60px;">%</th></tr>`;
+            let theadContent = `<tr><th class="text-left pl-4" style="min-width:140px;">Service</th><th class="text-center" style="min-width:80px;">Total</th><th class="text-center" style="min-width:60px;">%</th></tr>`;
             
             let tbodyContent = "";
             keys.forEach(s => {
                 const c = svcMap[s]; gt += c;
                 const pct = data.length>0?(c/data.length)*100:0;
-                tbodyContent += `<tr><td class="font-bold px-4 text-slate-700">${s}</td><td class="text-center font-bold bg-emerald-50/50 text-emerald-700">${formatNumber(c)}</td><td class="text-center text-[10px] text-slate-500 font-semibold">${pct.toFixed(1)}%</td></tr>`;
+                tbodyContent += `<tr><td class="font-bold px-4 text-slate-700">${s}</td><td class="text-center font-bold bg-emerald-50/30 text-emerald-600">${formatNumber(c)}</td><td class="text-center text-[10px] text-slate-400 font-medium">${pct.toFixed(1)}%</td></tr>`;
             });
             
-            let tfootContent = `<tr><td class="px-4 text-left">TOTAL</td><td class="text-center text-emerald-700 font-bold bg-emerald-100">${formatNumber(gt)}</td><td class="text-center text-indigo-900">100%</td></tr>`;
+            let tfootContent = `<tr><td class="px-4 text-left">TOTAL</td><td class="text-center">${formatNumber(gt)}</td><td class="text-center">100%</td></tr>`;
 
             renderStructuredTable('containerService', theadContent, tbodyContent, tfootContent);
         }
@@ -1446,7 +1491,7 @@
             let theadContent = `<tr>
                 <th style="min-width:120px; width:120px;">HUB</th>
                 <th style="min-width:130px;">Staging</th>
-                <th style="min-width:90px;" class="text-center bg-indigo-50/50 text-indigo-700">${title}</th>`;
+                <th style="min-width:90px;" class="text-center">${title}</th>`;
             
             sortedPos.forEach(p => {
                 theadContent += `<th style="min-width:90px;" class="text-center">${p}</th>`;
@@ -1486,9 +1531,9 @@
                     tbodyContent += `<tr>`;
                     if(i===0) {
                         // Rowspan ditambah 1 untuk baris Total HUB
-                        tbodyContent += `<td class="row-group-header border-b px-3 text-slate-700 font-bold align-top" rowspan="${stagings.length + 1}">${h}</td>`;
+                        tbodyContent += `<td class="row-group-header border-b border-slate-100 px-3 text-slate-800 font-bold align-top border-r" rowspan="${stagings.length + 1}">${h}</td>`;
                     }
-                    tbodyContent += `<td class="text-slate-600 border-r px-3 font-medium">${ss}</td><td class="text-center font-bold bg-indigo-50/30 text-indigo-700 border-r">${formatNumber(d.t)}</td>`;
+                    tbodyContent += `<td class="text-slate-600 border-r border-slate-50 px-3 font-medium text-[11px]">${ss}</td><td class="text-center font-bold bg-blue-50/20 text-blue-600 border-r border-slate-50">${formatNumber(d.t)}</td>`;
                     
                     sortedPos.forEach(p => {
                         const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
@@ -1503,29 +1548,29 @@
                             }
                             content = `<div>${formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
                         }
-                        tbodyContent += `<td class="text-center border-r" style="background-color:${bg}">${content}</td>`;
+                        tbodyContent += `<td class="text-center border-r border-slate-50" style="background-color:${bg}">${content}</td>`;
                     });
                     tbodyContent += `</tr>`;
                 });
 
                 // Render Baris Total per HUB (Footer Grup)
-                tbodyContent += `<tr class="bg-orange-50/50 font-bold border-b-2 border-slate-100">
-                    <td class="text-right px-3 text-orange-700 italic border-r">Total ${h}</td>
-                    <td class="text-center text-orange-800 border-r">${formatNumber(hubTotalVal)}</td>`;
+                tbodyContent += `<tr class="bg-slate-50 font-bold border-b border-slate-200">
+                    <td class="text-right px-3 text-slate-500 italic border-r border-slate-200 text-[10px]">Total ${h}</td>
+                    <td class="text-center text-slate-700 border-r border-slate-200">${formatNumber(hubTotalVal)}</td>`;
                 
                 sortedPos.forEach(p => {
                     const c = hubPosCounts[p] || 0;
-                    tbodyContent += `<td class="text-center text-slate-500 border-r">${c > 0 ? formatNumber(c) : '-'}</td>`;
+                    tbodyContent += `<td class="text-center text-slate-400 border-r border-slate-200 text-[11px]">${c > 0 ? formatNumber(c) : '-'}</td>`;
                 });
                 tbodyContent += `</tr>`;
             });
 
             let tfootContent = `<tr>
                 <td colspan="2" class="px-3 text-right">GRAND TOTAL</td>
-                <td class="text-center text-indigo-800">${formatNumber(grandTotal)}</td>`;
+                <td class="text-center">${formatNumber(grandTotal)}</td>`;
             
             sortedPos.forEach(p => {
-                tfootContent += `<td class="text-center border-r border-slate-200 text-slate-700">${formatNumber(posTotals[p]||0)}</td>`;
+                tfootContent += `<td class="text-center border-r border-slate-200 text-slate-800">${formatNumber(posTotals[p]||0)}</td>`;
             });
             tfootContent += `</tr>`;
 
@@ -1537,7 +1582,7 @@
             if(min===max) return '#f0fdf4';
             const ratio = (val-min)/(max-min);
             const hue = 120 - (ratio*120);
-            return `hsla(${hue}, 85%, 96%, 1)`;
+            return `hsla(${hue}, 85%, 96%, 0.6)`;
         }
 
         function calculateKPIs(data) {
@@ -1659,7 +1704,7 @@
         document.getElementById('statusToggle').addEventListener('change', e => {
             isGustiadiOnly = e.target.checked;
             document.getElementById('toggleLabel').innerText = isGustiadiOnly ? "In Area" : "Semua";
-            document.getElementById('toggleLabel').className = isGustiadiOnly ? "text-[10px] font-bold text-indigo-600 uppercase tracking-wide" : "text-[10px] font-bold text-slate-600 uppercase tracking-wide";
+            document.getElementById('toggleLabel').className = isGustiadiOnly ? "text-[10px] font-bold text-indigo-600 uppercase tracking-wide transition-colors w-12 text-right" : "text-[10px] font-bold text-slate-400 uppercase tracking-wide transition-colors w-12 text-right";
             renderDashboard();
         });
 
