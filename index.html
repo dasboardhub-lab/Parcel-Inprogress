@@ -1428,8 +1428,18 @@
                 grouping[h][s].c[p] = (grouping[h][s].c[p]||0)+1;
             });
 
+            // Column Sorting: Highest Total to Lowest (Existing logic is correct)
             const sortedPos = Object.keys(posTotals).sort((a,b)=>posTotals[b]-posTotals[a]);
-            const sortedHubs = Object.keys(grouping).sort();
+
+            // Row Sorting (HUB): Highest Grand Total to Lowest
+            const hubGrandTotals = {};
+            Object.keys(grouping).forEach(h => {
+                let sum = 0;
+                Object.values(grouping[h]).forEach(d => sum += d.t);
+                hubGrandTotals[h] = sum;
+            });
+            const sortedHubs = Object.keys(grouping).sort((a, b) => hubGrandTotals[b] - hubGrandTotals[a]);
+            
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
             // New Layout: Fixed min-widths instead of percentages
@@ -1447,7 +1457,8 @@
             let grandTotal = 0;
             
             sortedHubs.forEach(h => {
-                const stagings = Object.keys(grouping[h]).sort();
+                // Row Sorting (Staging/SS): Highest Total to Lowest inside HUB
+                const stagings = Object.keys(grouping[h]).sort((a, b) => grouping[h][b].t - grouping[h][a].t);
                 
                 // Hitung Total per HUB
                 let hubTotalVal = 0;
