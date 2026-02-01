@@ -128,22 +128,21 @@
             border-collapse: separate; 
             border-spacing: 0; 
             font-size: 11px; 
-            table-layout: fixed; /* Added back for uniformity if widths are set */
+            table-layout: auto; /* Changed from fixed to auto for responsiveness */
         }
         
         /* Header Sticky Top */
         .pivot-table thead th { 
             position: sticky; top: 0; z-index: 20;
-            background: #e2e8f0; /* Consistent Header BG */
+            background: #e2e8f0; 
             color: #475569;
             font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 10px;
-            height: 44px; padding: 0 8px; /* Uniform Height 44px */
+            height: 44px; padding: 0 12px;
             border-bottom: 2px solid #cbd5e1;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             text-align: center;
         }
-        .pivot-table thead th:first-child { text-align: left; padding-left: 12px; z-index: 21; }
         
         /* Footer Sticky Bottom */
         .pivot-table tfoot td {
@@ -157,11 +156,36 @@
             font-size: 11px;
             text-align: center;
         }
-        .pivot-table tfoot td:first-child { text-align: left; padding-left: 12px; z-index: 21; }
+
+        /* STICKY LEFT COLUMN (Magic Fix) */
+        .pivot-table th:first-child,
+        .pivot-table td:first-child {
+            position: sticky; 
+            left: 0; 
+            z-index: 10; /* Body cells z-index */
+            background-color: #ffffff; /* Must have bg to cover scrolling content */
+            border-right: 2px solid #e2e8f0;
+            box-shadow: 4px 0 6px -2px rgba(0,0,0,0.05); /* Slight shadow to indicate scroll */
+        }
+
+        /* Hover effect on sticky column needs to match row hover */
+        .pivot-table tr:hover td:first-child { background-color: #f8fafc; }
+
+        /* Fix Corner Z-Indexes */
+        .pivot-table thead th:first-child { 
+            z-index: 30; /* Higher than normal header(20) and body-sticky(10) */
+            text-align: left; padding-left: 12px; 
+            background-color: #e2e8f0; /* Match header bg */
+        }
+        .pivot-table tfoot td:first-child { 
+            z-index: 30; /* Higher than normal footer(20) */
+            text-align: left; padding-left: 12px;
+            background-color: #eff6ff !important; /* Match footer bg */
+        }
 
         /* Cells */
         .pivot-table td { 
-            height: 46px; padding: 4px 8px;
+            height: 46px; padding: 4px 12px;
             border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;
             color: #334155; font-weight: 500;
             vertical-align: middle;
@@ -172,7 +196,13 @@
         
         .pivot-val { font-weight: 700; color: #0f172a; font-size: 12px; }
         .pivot-pct { font-size: 10px; color: #64748b; font-weight: 600; margin-left: 2px; }
-        .row-group-header { background: #fff; font-weight: 700; border-right: 2px solid #e2e8f0 !important; vertical-align: top !important; padding-top: 12px !important; }
+        
+        /* Specific fix for rowspan headers */
+        .row-group-header { 
+            background: #fff; font-weight: 700; 
+            vertical-align: top !important; padding-top: 14px !important;
+            z-index: 10; /* Ensure sticky works */
+        }
 
         /* Cards & Widgets */
         .glass-panel {
@@ -335,13 +365,11 @@
                     <input type="checkbox" id="statusToggle" class="toggle-switch">
                 </div>
                 
-                <!-- MOVED DELETE BTN -->
                 <button onclick="openDeleteModal()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-[10px] font-bold cursor-pointer hover:bg-red-100 transition-all border border-red-200 shadow-sm active:scale-95">
                     <i class="ph-bold ph-trash text-sm"></i>
                     <span>Hapus Data</span>
                 </button>
 
-                <!-- CHANGED UPLOAD TO BUTTON TRIGGER -->
                 <button onclick="initiateUpload()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold cursor-pointer hover:bg-indigo-600 transition-all shadow-md active:scale-95">
                     <i class="ph-bold ph-upload-simple text-sm"></i>
                     <span>Upload</span>
@@ -422,18 +450,18 @@
             </div>
         </div>
 
-        <!-- 3 Tables Side-by-Side (COMPACT HEIGHT - [35vh]) -->
-        <div class="grid grid-cols-12 gap-4 h-[35vh] min-h-[350px] mb-4 items-start">
-            <!-- Monitoring KPI (4 Columns) -->
-            <div class="col-span-12 lg:col-span-4 flex flex-col h-full">
+        <!-- 3 Tables Side-by-Side (Dynamic Height on Mobile) -->
+        <div class="grid grid-cols-12 gap-4 h-auto lg:h-[35vh] lg:min-h-[350px] mb-4 items-start">
+            <!-- Monitoring KPI -->
+            <div class="col-span-12 lg:col-span-4 flex flex-col h-[350px] lg:h-full">
                 <div class="bg-indigo-600 text-white px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
                     <i class="ph-bold ph-monitor text-xs"></i> <h3 class="text-[11px] font-bold">Monitoring KPI</h3>
                 </div>
                 <div id="containerKPI" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
             </div>
 
-            <!-- Rekapan HUB (6 Columns) -->
-            <div class="col-span-12 lg:col-span-6 flex flex-col h-full">
+            <!-- Rekapan HUB -->
+            <div class="col-span-12 lg:col-span-6 flex flex-col h-[350px] lg:h-full">
                 <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-2 rounded-t-xl flex justify-between items-center shadow-sm shrink-0">
                     <div class="flex items-center gap-2">
                         <i class="ph-bold ph-buildings text-xs"></i> 
@@ -443,8 +471,8 @@
                 <div id="containerHub" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
             </div>
 
-            <!-- Service (2 Columns) -->
-            <div class="col-span-12 lg:col-span-2 flex flex-col h-full">
+            <!-- Service -->
+            <div class="col-span-12 lg:col-span-2 flex flex-col h-[350px] lg:h-full">
                 <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
                     <i class="ph-bold ph-tag text-xs"></i> <h3 class="text-[11px] font-bold">Service</h3>
                 </div>
@@ -1290,13 +1318,20 @@
                 return `<div class="flex flex-col items-center"><div class="pivot-val ${cls}">${v>0?formatNumber(v):'-'}</div><div class="pivot-pct flex items-center">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div></div>`;
             }
             
-            // Header UPDATED
-            let theadContent = `<tr><th style="width:25%">HUB</th><th style="width:15%" class="text-center text-indigo-700 bg-indigo-50/50">Total</th><th style="width:15%" class="text-center">MM Nas</th><th style="width:15%" class="text-center">MM Reg</th><th style="width:15%" class="text-center">Vendor 3PL</th><th style="width:15%" class="text-center">HUB & Trans</th></tr>`;
+            // Header UPDATED: Fixed width for HUB (Left), Min-width for others (Scrollable)
+            let theadContent = `<tr>
+                <th style="min-width:120px; width:120px;">HUB</th>
+                <th style="min-width:90px;" class="text-center text-indigo-700 bg-indigo-50/50">Total</th>
+                <th style="min-width:90px;" class="text-center">MM Nas</th>
+                <th style="min-width:90px;" class="text-center">MM Reg</th>
+                <th style="min-width:90px;" class="text-center">Vendor 3PL</th>
+                <th style="min-width:90px;" class="text-center">HUB & Trans</th>
+            </tr>`;
             
             let tbodyContent = "";
             keys.forEach(h => {
                 const d = hubs[h];
-                tbodyContent += `<tr><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/50">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t, true, h)}</td></tr>`;
+                tbodyContent += `<tr><td class="font-bold text-slate-700 pl-3">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/50">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t, true, h)}</td></tr>`;
             });
 
             let tfootContent = `<tr><td class="px-3">TOTAL</td><td class="text-center text-indigo-700">${formatNumber(totals.total)}</td><td class="text-center">${cell(totals.nas,totals.total)}</td><td class="text-center">${cell(totals.reg,totals.total)}</td><td class="text-center">${cell(totals.trans,totals.total)}</td><td class="text-center">${cell(totals.hub,totals.total)}</td></tr>`;
@@ -1317,10 +1352,9 @@
             const sortedHubs = Object.keys(hubs).sort();
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            // Width Calc: Hub fixed width, others distributed
-            // Using min-width in px for stability
-            let theadContent = `<tr><th style="width:120px; min-width:120px;" class="text-left pl-4">HUB</th><th style="width:80px; min-width:80px;" class="text-center bg-orange-50 text-orange-700">${title}</th>`;
-            sortedPos.forEach(p => theadContent += `<th style="width:80px; min-width:80px;" class="text-center">${p}</th>`);
+            // Fixed Layout logic removed, now using min-width
+            let theadContent = `<tr><th style="min-width:120px; width:120px;" class="text-left pl-4">HUB</th><th style="min-width:80px;" class="text-center bg-orange-50 text-orange-700">${title}</th>`;
+            sortedPos.forEach(p => theadContent += `<th style="min-width:90px;" class="text-center">${p}</th>`);
             theadContent += `</tr>`;
 
             let tbodyContent = "";
@@ -1360,8 +1394,8 @@
             const keys = Object.keys(svcMap).sort((a,b) => svcMap[b] - svcMap[a]);
             let gt = 0;
             
-            // Adjusted widths
-            let theadContent = `<tr><th class="text-left pl-4" style="width:50%">Service</th><th class="text-center text-emerald-700 bg-emerald-50" style="width:25%">Total</th><th class="text-center" style="width:25%">%</th></tr>`;
+            // Adjusted with min-width for mobile safety
+            let theadContent = `<tr><th class="text-left pl-4" style="min-width:140px;">Service</th><th class="text-center text-emerald-700 bg-emerald-50" style="min-width:80px;">Total</th><th class="text-center" style="min-width:60px;">%</th></tr>`;
             
             let tbodyContent = "";
             keys.forEach(s => {
@@ -1398,21 +1432,14 @@
             const sortedHubs = Object.keys(grouping).sort();
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            // Widths Calculation
-            const hubW = 10;
-            const stagingW = 15;
-            const totalW = 10;
-            const remainingW = 100 - (hubW + stagingW + totalW);
-            const dataCount = sortedPos.length;
-            const dataW = dataCount > 0 ? remainingW / dataCount : 0;
-
+            // New Layout: Fixed min-widths instead of percentages
             let theadContent = `<tr>
-                <th style="width:${hubW}%">HUB</th>
-                <th style="width:${stagingW}%">Staging</th>
-                <th style="width:${totalW}%" class="text-center bg-indigo-50/50 text-indigo-700">${title}</th>`;
+                <th style="min-width:120px; width:120px;">HUB</th>
+                <th style="min-width:130px;">Staging</th>
+                <th style="min-width:90px;" class="text-center bg-indigo-50/50 text-indigo-700">${title}</th>`;
             
             sortedPos.forEach(p => {
-                theadContent += `<th style="width:${dataW}%" class="text-center">${p}</th>`;
+                theadContent += `<th style="min-width:90px;" class="text-center">${p}</th>`;
             });
             theadContent += `</tr>`;
 
