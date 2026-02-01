@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Parcel Inprogress</title>
+    <title>Dashboard Monitoring Paket - Pro View</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -128,16 +128,16 @@
             border-collapse: separate; 
             border-spacing: 0; 
             font-size: 11px; 
-            table-layout: fixed; /* Added back for uniformity if widths are set */
+            table-layout: fixed; 
         }
         
         /* Header Sticky Top */
         .pivot-table thead th { 
             position: sticky; top: 0; z-index: 20;
-            background: #e2e8f0; /* Consistent Header BG */
+            background: #e2e8f0; 
             color: #475569;
             font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; font-size: 10px;
-            height: 44px; padding: 0 8px; /* Uniform Height 44px */
+            height: 44px; padding: 0 8px;
             border-bottom: 2px solid #cbd5e1;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -152,7 +152,7 @@
             font-weight: 800 !important;
             color: #1e3a8a !important;
             border-top: 2px solid #bfdbfe;
-            height: 40px; /* Uniform Footer Height */
+            height: 40px;
             box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
             font-size: 11px;
             text-align: center;
@@ -161,7 +161,7 @@
 
         /* Cells */
         .pivot-table td { 
-            height: 46px; padding: 4px 8px; /* Uniform Row Height 46px */
+            height: 46px; padding: 4px 8px;
             border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;
             color: #334155; font-weight: 500;
             vertical-align: middle;
@@ -335,16 +335,18 @@
                     <input type="checkbox" id="statusToggle" class="toggle-switch">
                 </div>
                 
+                <!-- MOVED DELETE BTN -->
                 <button onclick="openDeleteModal()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-[10px] font-bold cursor-pointer hover:bg-red-100 transition-all border border-red-200 shadow-sm active:scale-95">
                     <i class="ph-bold ph-trash text-sm"></i>
                     <span>Hapus Data</span>
                 </button>
 
-                <label class="group flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold cursor-pointer hover:bg-indigo-600 transition-all shadow-md active:scale-95">
+                <!-- CHANGED UPLOAD TO BUTTON TRIGGER -->
+                <button onclick="initiateUpload()" class="group flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold cursor-pointer hover:bg-indigo-600 transition-all shadow-md active:scale-95">
                     <i class="ph-bold ph-upload-simple text-sm"></i>
                     <span>Upload</span>
-                    <input type='file' class="hidden" id="csvFileInput" accept=".csv" />
-                </label>
+                </button>
+                <input type='file' class="hidden" id="csvFileInput" accept=".csv" />
             </div>
         </header>
 
@@ -376,6 +378,7 @@
                 `);
             </script>
             <script>
+                // Urutan: Total -> First -> Trans -> Mid -> 3PL -> Mitra -> Last
                 kpiCard('kpiTotal', 'Total AWB', 'slate', 'gray', 'ph-stack', 0);
                 kpiCard('kpiFirstMile', 'First Mile', 'indigo', 'violet', 'ph-storefront', 100);
                 kpiCard('kpiTransport', 'Transport', 'cyan', 'blue', 'ph-airplane-in-flight', 200);
@@ -431,10 +434,10 @@
 
             <!-- Rekapan HUB (6 Columns) -->
             <div class="col-span-12 lg:col-span-6 flex flex-col h-full">
-                <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-2 rounded-t-xl flex justify-between items-center shadow-sm shrink-0">
+                <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex justify-between items-center shadow-sm shrink-0">
                     <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-buildings text-xs"></i> 
-                        <h3 class="text-[11px] font-bold">Rekapan HUB</h3>
+                        <i class="ph-bold ph-buildings text-orange-500 text-xs"></i> 
+                        <h3 class="text-[11px] font-bold text-slate-700">Rekapan HUB</h3>
                     </div>
                 </div>
                 <div id="containerHub" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
@@ -442,18 +445,18 @@
 
             <!-- Service (2 Columns) -->
             <div class="col-span-12 lg:col-span-2 flex flex-col h-full">
-                <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
-                    <i class="ph-bold ph-tag text-xs"></i> <h3 class="text-[11px] font-bold">Service</h3>
+                <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
+                    <i class="ph-bold ph-tag text-emerald-500 text-xs"></i> <h3 class="text-[11px] font-bold text-slate-700">Service</h3>
                 </div>
                 <div id="containerService" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
             </div>
         </div>
 
         <!-- 4. STAGING TABLE -->
-        <div class="grid grid-cols-12 gap-4 h-[35vh] flex flex-col">
+        <div class="grid grid-cols-12 gap-4 h-[45vh] flex flex-col">
             <div class="col-span-12 h-full flex flex-col">
-                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
-                    <i class="ph-bold ph-warehouse text-xs"></i> <h3 class="text-[11px] font-bold">Rekapan Staging</h3>
+                <div class="bg-white border border-slate-200 border-b-0 px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
+                    <i class="ph-bold ph-warehouse text-blue-500 text-xs"></i> <h3 class="text-[11px] font-bold text-slate-700">Rekapan Staging</h3>
                 </div>
                 <div id="containerStaging" class="modern-table-container rounded-t-none border-t-0 flex-1"></div>
             </div>
@@ -501,6 +504,10 @@
         // --- PASSWORD HANDLER ---
         function requestPassword(onSuccess) {
             showIsland('password', null, onSuccess);
+        }
+        
+        window.initiateUpload = () => {
+            requestPassword(() => document.getElementById('csvFileInput').click());
         }
 
         // --- REPORT GENERATOR ---
@@ -747,6 +754,7 @@
             const originsContainer = document.getElementById('topOriginsContainer');
             const totalAnalyzed = document.getElementById('totalAnalyzed');
 
+            // Logic: HUB & Trans (Gustiadi Context)
             const stuckData = allData.filter(r => 
                 (r['delivery_hub'] === hubName) &&
                 (['mid mile', 'transport'].includes((r['Posisi'] || "").toLowerCase().trim())) &&
@@ -770,6 +778,7 @@
                 feedbacks[fb] = (feedbacks[fb] || 0) + 1;
             });
 
+            // 1. Render Top 3 Origins
             const sortedOrigins = Object.entries(origins).sort((a,b) => b[1] - a[1]).slice(0, 3);
             originsContainer.innerHTML = sortedOrigins.map(([org, count], idx) => {
                 const pct = (count / stuckData.length) * 100;
@@ -783,6 +792,7 @@
                 `;
             }).join('') || '<div class="col-span-3 text-center text-slate-400 italic text-[10px]">Data origin tidak tersedia</div>';
 
+            // 2. Render Feedback (Top 5)
             const sortedFeedback = Object.entries(feedbacks).sort((a,b) => b[1] - a[1]).slice(0, 5);
             feedbackList.innerHTML = sortedFeedback.map(([fb, count]) => {
                 const pct = (count / stuckData.length) * 100;
@@ -803,6 +813,7 @@
             }).join('');
             if(stuckData.length === 0) feedbackList.innerHTML = `<p class="text-center text-slate-400 italic text-[10px] py-2">Tidak ada data.</p>`;
 
+            // 3. Render Services (Top 5)
             const sortedSvc = Object.entries(services).sort((a,b) => b[1] - a[1]).slice(0, 5);
             breakdown.innerHTML = sortedSvc.map(([svc, count]) => {
                 const pct = (count / stuckData.length) * 100;
@@ -847,7 +858,7 @@
                 island.innerHTML = `
                     <div class="text-center mb-4">
                         <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-400 border border-slate-700"><i class="ph-fill ph-question text-2xl"></i></div>
-                        <h4 class="text-sm font-bold text-white">Konfirmasi</h4>
+                        <h4 class="text-sm font-bold text-white">Konfirmasi Upload</h4>
                         <p class="text-xs text-slate-400 mt-1">${msg}</p>
                     </div>
                     <div class="flex gap-3 w-full">
@@ -918,6 +929,75 @@
                 renderDashboard();
                 forceHideLoading();
             });
+        }
+
+        // --- MAIN RENDERER ---
+        async function processUpload(csvData) {
+            showIsland('loading', 'Memeriksa Data...');
+            
+            // 1. Filter Valid & Check Duplicates using in-memory allData
+            const existingAWBs = new Set(allData.map(r => r.awb));
+            const newRows = [];
+            let duplicates = 0;
+            let validRows = 0;
+
+            csvData.forEach(row => {
+                if (row.awb && row.awb.trim() !== "") {
+                    const cleanAwb = row.awb.trim();
+                    if (existingAWBs.has(cleanAwb)) {
+                        duplicates++;
+                    } else {
+                        newRows.push(row);
+                    }
+                    validRows++;
+                }
+            });
+
+            if (newRows.length === 0) {
+                showIsland('error', `Semua ${duplicates} data duplikat. Tidak ada data baru.`);
+                return;
+            }
+
+            showIsland('loading', `Menyimpan ${newRows.length} data baru...`);
+
+            // 2. Batch Write
+            const batchSize = 450; 
+            let successCount = 0;
+            let failCount = 0;
+            let quotaExceeded = false;
+
+            try {
+                const totalBatches = Math.ceil(newRows.length / batchSize);
+                for (let i = 0; i < totalBatches; i++) {
+                    const batch = writeBatch(db);
+                    const chunk = newRows.slice(i * batchSize, (i + 1) * batchSize);
+                    
+                    chunk.forEach(row => {
+                        const docRef = doc(db, COLLECTION_NAME, row.awb.trim());
+                        batch.set(docRef, JSON.parse(JSON.stringify(row))); 
+                    });
+
+                    await batch.commit();
+                    successCount += chunk.length;
+                }
+            } catch (error) {
+                console.error("Upload Error", error);
+                if (error.code === 'resource-exhausted') {
+                    quotaExceeded = true;
+                } else {
+                    failCount = newRows.length - successCount; 
+                }
+            }
+
+            // 3. Final Report
+            if (quotaExceeded) {
+                showIsland('error', 'Kuota Penuh! Upload ulang besok.');
+                alert(`Gagal: Kuota Database Penuh.\nSukses: ${successCount}\nDuplikat: ${duplicates}\nSilakan lanjutkan besok.`);
+            } else {
+                const msg = `Sukses: ${successCount}, Duplikat: ${duplicates}`;
+                showIsland('success', msg);
+                // Optional detailed alert if needed, or just let the island notify
+            }
         }
 
         function renderDashboard() {
@@ -1050,7 +1130,6 @@
         function updateCharts(data) {
             const yearly = {}; const monthly = {}; const daily = {};
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-            
             let latestDate = new Date(0);
             data.forEach(row => {
                 const d = parseDateStr(row['Tanggal']);
@@ -1058,50 +1137,27 @@
             });
             const cmIdx = latestDate.getMonth();
             const cy = latestDate.getFullYear();
-            
             const mLabel = document.getElementById('currentMonthLabel');
             if (mLabel) mLabel.innerText = `${months[cmIdx]} ${cy}`;
-
             data.forEach(row => {
-                const pos = (row['Posisi'] || "").toLowerCase().trim();
-                const hubX = (row['HUB X'] || "").toLowerCase().trim();
+                const pos = (row['Posisi'] || "").toLowerCase();
                 const filterPosisiEl = document.getElementById('filterPosisi');
                 const selectedPos = filterPosisiEl ? filterPosisiEl.value : '';
-                
-                // LOGIKA CHART BARU:
-                // Default: Menampilkan (Mid Mile + Transport) DAN (HUB X = Gustiadi)
-                // Jika user memilih posisi spesifik, tampilkan sesuai pilihan.
-                let includeInChart = false;
-                if (selectedPos) {
-                    includeInChart = true; // Gunakan data yang sudah difilter
-                } else {
-                    // Filter khusus Chart jika Posisi = Semua
-                    if ( (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi' ) {
-                        includeInChart = true;
-                    }
-                }
-
-                if (!includeInChart) return;
-
+                if (!selectedPos && pos !== 'mid mile') return;
                 const date = parseDateStr(row['Tanggal']);
                 if (date) {
                     const y = date.getFullYear();
                     const mKey = `${months[date.getMonth()]} ${y}`;
-                    
                     yearly[y] = (yearly[y] || 0) + 1;
                     monthly[mKey] = (monthly[mKey] || 0) + 1;
-                    
-                    // Daily: Only for current month & year
                     if (date.getMonth() === cmIdx && date.getFullYear() === cy) {
                         const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
                         daily[dKey] = (daily[dKey] || 0) + 1;
                     }
                 }
             });
-
             const sortMonth = (a,b) => new Date(`1 ${a}`) - new Date(`1 ${b}`);
             const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
-
             renderChart('yearlyChart', 'bar', Object.keys(yearly).sort(), Object.values(yearly), ['#8b5cf6', '#6d28d9']);
             renderChart('monthlyChart', 'line', Object.keys(monthly).sort(sortMonth), Object.keys(monthly).sort(sortMonth).map(k=>monthly[k]), ['#3b82f6', '#1d4ed8']);
             renderChart('dailyChart', 'bar', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), ['#f97316', '#c2410c']);
@@ -1237,13 +1293,18 @@
             const sortedHubs = Object.keys(hubs).sort();
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            // Width Calc: Hub fixed width, others distributed
-            // Using min-width in px for stability
-            let theadContent = `<tr><th style="width:120px; min-width:120px;" class="text-left pl-4">HUB</th><th style="width:80px; min-width:80px;" class="text-center bg-orange-50 text-orange-700">${title}</th>`;
-            sortedPos.forEach(p => theadContent += `<th style="width:80px; min-width:80px;" class="text-center">${p}</th>`);
+            // Width Calc
+            const colCount = sortedPos.length + 2;
+            const hubW = 20; const dataW = 80/(colCount-1);
+            let colGroup = `<colgroup><col style="width:${hubW}%">`;
+            for(let i=0; i<colCount-1; i++) colGroup += `<col style="width:${dataW}%">`;
+            colGroup += `</colgroup>`;
+
+            let theadContent = `${colGroup}<tr><th>HUB</th><th class="text-center bg-indigo-50/50 text-indigo-700">${title}</th>`;
+            sortedPos.forEach(p => theadContent += `<th class="text-center">${p}</th>`);
             theadContent += `</tr>`;
 
-            let tbodyContent = "";
+            let tbodyContent = colGroup;
             let gt = 0;
             sortedHubs.forEach(h => {
                 const d = hubs[h]; gt += d.t;
@@ -1251,7 +1312,7 @@
                 let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                 let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
 
-                tbodyContent += `<tr><td class="font-bold text-slate-700 pl-4">${h}</td><td class="text-center font-bold bg-orange-50/50 text-orange-700">${formatNumber(d.t)}</td>`;
+                tbodyContent += `<tr><td class="font-bold text-slate-700">${h}</td><td class="text-center font-bold bg-indigo-50/50 text-indigo-700">${formatNumber(d.t)}</td>`;
                 sortedPos.forEach(p => {
                     const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
                     let content = `<span class="text-slate-300">-</span>`;
@@ -1266,7 +1327,7 @@
                 tbodyContent += `</tr>`;
             });
             
-            let tfootContent = `<tr><td class="px-4 text-left">ALL</td><td class="text-center text-orange-700 font-bold bg-orange-100">${formatNumber(gt)}</td>`;
+            let tfootContent = `${colGroup}<tr><td class="px-3">ALL</td><td class="text-center text-indigo-700">${formatNumber(gt)}</td>`;
             sortedPos.forEach(p => tfootContent += `<td class="text-center text-indigo-900">${formatNumber(posTotals[p]||0)}</td>`);
             tfootContent += `</tr>`;
 
@@ -1279,39 +1340,30 @@
             data.forEach(r => { const s = r['service_code'] || "?"; svcMap[s] = (svcMap[s]||0)+1; });
             const keys = Object.keys(svcMap).sort((a,b) => svcMap[b] - svcMap[a]);
             let gt = 0;
-            
-            // Adjusted widths
-            let theadContent = `<tr><th class="text-left pl-4" style="width:50%">Service</th><th class="text-center text-emerald-700 bg-emerald-50" style="width:25%">Total</th><th class="text-center" style="width:25%">%</th></tr>`;
-            
-            let tbodyContent = "";
+            const colGroup = `<colgroup><col style="width:40%"><col style="width:30%"><col style="width:30%"></colgroup>`;
+
+            let theadContent = `${colGroup}<tr><th class="text-left">Service</th><th class="text-center text-indigo-700 bg-indigo-50/50">Total</th><th class="text-center">%</th></tr>`;
+            let tbodyContent = colGroup;
             keys.forEach(s => {
                 const c = svcMap[s]; gt += c;
                 const pct = data.length>0?(c/data.length)*100:0;
-                tbodyContent += `<tr><td class="font-bold px-4 text-slate-700">${s}</td><td class="text-center font-bold bg-emerald-50/50 text-emerald-700">${formatNumber(c)}</td><td class="text-center text-[10px] text-slate-500 font-semibold">${pct.toFixed(1)}%</td></tr>`;
+                tbodyContent += `<tr><td class="font-bold px-3 text-slate-700">${s}</td><td class="text-center font-bold bg-indigo-50/20 text-indigo-700">${formatNumber(c)}</td><td class="text-center text-[10px] text-slate-500 font-semibold">${pct.toFixed(1)}%</td></tr>`;
             });
-            
-            let tfootContent = `<tr><td class="px-4 text-left">TOTAL</td><td class="text-center text-emerald-700 font-bold bg-emerald-100">${formatNumber(gt)}</td><td class="text-center text-indigo-900">100%</td></tr>`;
+            let tfootContent = `${colGroup}<tr><td class="px-3">TOTAL</td><td class="text-center text-indigo-700">${formatNumber(gt)}</td><td class="text-center text-indigo-900">100%</td></tr>`;
 
             renderStructuredTable('containerService', theadContent, tbodyContent, tfootContent);
         }
 
         // 4. STAGING RECAP
         function generateStagingRecap(data) {
-            const table = document.getElementById('tableStaging'); // Check if element exists implicitly via container logic
-            
             const grouping = {}; const posTotals = {};
             
             data.forEach(r => {
-                const h = r['delivery_hub'] || "Unknown"; 
-                const s = r['delivery_staging'] || "Unknown"; 
-                const p = r['Posisi'] || "Unknown";
-                
+                const h = r['delivery_hub']; const s = r['delivery_staging']; const p = r['Posisi'];
                 posTotals[p] = (posTotals[p]||0)+1;
-                
                 if(!grouping[h]) grouping[h]={};
                 if(!grouping[h][s]) grouping[h][s]={t:0,c:{}};
-                grouping[h][s].t++; 
-                grouping[h][s].c[p] = (grouping[h][s].c[p]||0)+1;
+                grouping[h][s].t++; grouping[h][s].c[p] = (grouping[h][s].c[p]||0)+1;
             });
 
             const sortedPos = Object.keys(posTotals).sort((a,b)=>posTotals[b]-posTotals[a]);
@@ -1320,25 +1372,21 @@
 
             // Widths Calculation
             const hubW = 10;
-            const stagingW = 15;
-            const totalW = 10;
-            const remainingW = 100 - (hubW + stagingW + totalW);
-            const dataCount = sortedPos.length;
-            const dataW = dataCount > 0 ? remainingW / dataCount : 0;
+            const stagingW = 14;
+            const remainingW = 100 - (hubW + stagingW);
+            const dataCount = sortedPos.length + 1;
+            const dataW = remainingW / dataCount;
 
-            let theadContent = `<tr>
-                <th style="width:${hubW}%">HUB</th>
-                <th style="width:${stagingW}%">Staging</th>
-                <th style="width:${totalW}%" class="text-center bg-indigo-50/50 text-indigo-700">${title}</th>`;
-            
-            sortedPos.forEach(p => {
-                theadContent += `<th style="width:${dataW}%" class="text-center">${p}</th>`;
-            });
+            let colGroup = `<colgroup><col style="width:${hubW}%"><col style="width:${stagingW}%"><col style="width:${dataW}%">`;
+            for(let i=0; i<sortedPos.length; i++) colGroup += `<col style="width:${dataW}%">`;
+            colGroup += `</colgroup>`;
+
+            let theadContent = `${colGroup}<tr><th>HUB</th><th>Staging</th><th class="text-center bg-indigo-50/50 text-indigo-700">${title}</th>`;
+            sortedPos.forEach(p => theadContent += `<th class="text-center">${p}</th>`);
             theadContent += `</tr>`;
 
-            let tbodyContent = "";
+            let tbodyContent = colGroup;
             let grandTotal = 0;
-            
             sortedHubs.forEach(h => {
                 const stagings = Object.keys(grouping[h]).sort();
                 
@@ -1358,31 +1406,21 @@
                 // Render Baris Staging
                 stagings.forEach((ss, i) => {
                     const d = grouping[h][ss];
-                    
-                    // Calc max for gradient
                     let rowVals = sortedPos.map(p => d.c[p]||0);
-                    let min = Math.min(...rowVals.filter(v=>v>0))||0; 
-                    let max = Math.max(...rowVals);
+                    let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                     let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
 
                     tbodyContent += `<tr>`;
-                    if(i===0) {
-                        // Rowspan ditambah 1 untuk baris Total HUB
-                        tbodyContent += `<td class="row-group-header border-b px-3 text-slate-700 font-bold align-top" rowspan="${stagings.length + 1}">${h}</td>`;
-                    }
+                    if(i===0) tbodyContent += `<td class="row-group-header border-b px-3 text-slate-700 font-bold align-top" rowspan="${stagings.length + 1}">${h}</td>`;
                     tbodyContent += `<td class="text-slate-600 border-r px-3 font-medium">${ss}</td><td class="text-center font-bold bg-indigo-50/30 text-indigo-700 border-r">${formatNumber(d.t)}</td>`;
                     
                     sortedPos.forEach(p => {
                         const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
                         let content = `<span class="text-slate-300">-</span>`;
-                        
                         if(c>0) {
                             let warn = "";
-                            if(p.toLowerCase()==='mid mile' && pct>5) {
-                                warn = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px] mr-1"></i>`;
-                            } else if(c===maxOther) {
-                                warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px] mr-1"></i>`;
-                            }
+                            if(p.toLowerCase()==='mid mile' && pct>5) warn = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px] mr-1"></i>`;
+                            else if(c===maxOther) warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px] mr-1"></i>`;
                             content = `<div>${formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
                         }
                         tbodyContent += `<td class="text-center border-r" style="background-color:${bg}">${content}</td>`;
@@ -1402,13 +1440,8 @@
                 tbodyContent += `</tr>`;
             });
 
-            let tfootContent = `<tr>
-                <td colspan="2" class="px-3 text-right">GRAND TOTAL</td>
-                <td class="text-center text-indigo-800">${formatNumber(grandTotal)}</td>`;
-            
-            sortedPos.forEach(p => {
-                tfootContent += `<td class="text-center border-r border-slate-200 text-slate-700">${formatNumber(posTotals[p]||0)}</td>`;
-            });
+            let tfootContent = `${colGroup}<tr><td colspan="2" class="px-3">GRAND TOTAL</td><td class="text-center text-indigo-800">${formatNumber(grandTotal)}</td>`;
+            sortedPos.forEach(pos => tfootContent += `<td class="text-center border-r border-slate-200 text-slate-700">${formatNumber(posTotals[pos]||0)}</td>`);
             tfootContent += `</tr>`;
 
             renderStructuredTable('containerStaging', theadContent, tbodyContent, tfootContent);
