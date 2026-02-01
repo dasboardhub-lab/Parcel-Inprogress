@@ -450,7 +450,7 @@
         </div>
 
         <!-- 4. STAGING TABLE -->
-        <div class="grid grid-cols-12 gap-4 h-[45vh] flex flex-col">
+        <div class="grid grid-cols-12 gap-4 h-[35vh] flex flex-col">
             <div class="col-span-12 h-full flex flex-col">
                 <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-2 rounded-t-xl flex items-center gap-2 shadow-sm shrink-0">
                     <i class="ph-bold ph-warehouse text-xs"></i> <h3 class="text-[11px] font-bold">Rekapan Staging</h3>
@@ -1297,6 +1297,8 @@
 
         // 4. STAGING RECAP
         function generateStagingRecap(data) {
+            const table = document.getElementById('tableStaging'); // Check if element exists implicitly via container logic
+            
             const grouping = {}; const posTotals = {};
             
             data.forEach(r => {
@@ -1339,9 +1341,23 @@
             
             sortedHubs.forEach(h => {
                 const stagings = Object.keys(grouping[h]).sort();
+                
+                // Hitung Total per HUB
+                let hubTotalVal = 0;
+                let hubPosCounts = {};
+
+                stagings.forEach(ss => {
+                    const d = grouping[h][ss];
+                    hubTotalVal += d.t;
+                    sortedPos.forEach(p => {
+                        hubPosCounts[p] = (hubPosCounts[p] || 0) + (d.c[p] || 0);
+                    });
+                });
+                grandTotal += hubTotalVal;
+
+                // Render Baris Staging
                 stagings.forEach((ss, i) => {
                     const d = grouping[h][ss];
-                    grandTotal += d.t;
                     
                     // Calc max for gradient
                     let rowVals = sortedPos.map(p => d.c[p]||0);
@@ -1351,15 +1367,13 @@
 
                     tbodyContent += `<tr>`;
                     if(i===0) {
-                        tbodyContent += `<td class="row-group-header border-b px-3 text-slate-700 font-bold" rowspan="${stagings.length}">${h}</td>`;
+                        // Rowspan ditambah 1 untuk baris Total HUB
+                        tbodyContent += `<td class="row-group-header border-b px-3 text-slate-700 font-bold align-top" rowspan="${stagings.length + 1}">${h}</td>`;
                     }
-                    tbodyContent += `<td class="text-slate-600 border-r px-3 font-medium">${ss}</td>
-                                     <td class="text-center font-bold bg-indigo-50/30 text-indigo-700 border-r">${formatNumber(d.t)}</td>`;
+                    tbodyContent += `<td class="text-slate-600 border-r px-3 font-medium">${ss}</td><td class="text-center font-bold bg-indigo-50/30 text-indigo-700 border-r">${formatNumber(d.t)}</td>`;
                     
                     sortedPos.forEach(p => {
-                        const c = d.c[p]||0; 
-                        const pct = d.t>0?(c/d.t)*100:0; 
-                        const bg = getGradient(c, min, max);
+                        const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
                         let content = `<span class="text-slate-300">-</span>`;
                         
                         if(c>0) {
@@ -1375,6 +1389,17 @@
                     });
                     tbodyContent += `</tr>`;
                 });
+
+                // Render Baris Total per HUB (Footer Grup)
+                tbodyContent += `<tr class="bg-orange-50/50 font-bold border-b-2 border-slate-100">
+                    <td class="text-right px-3 text-orange-700 italic border-r">Total ${h}</td>
+                    <td class="text-center text-orange-800 border-r">${formatNumber(hubTotalVal)}</td>`;
+                
+                sortedPos.forEach(p => {
+                    const c = hubPosCounts[p] || 0;
+                    tbodyContent += `<td class="text-center text-slate-500 border-r">${c > 0 ? formatNumber(c) : '-'}</td>`;
+                });
+                tbodyContent += `</tr>`;
             });
 
             let tfootContent = `<tr>
