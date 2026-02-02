@@ -522,16 +522,32 @@
             </div>
         </div>
 
-        <!-- BARIS 3: Rekapan Staging (1 Kolom Full) -->
-        <div class="grid grid-cols-1 gap-6 h-[520px] mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 900ms">
+        <!-- BARIS 3: Rekapan Staging & Data Management (2 Kolom) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[520px] mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 900ms">
+            
+            <!-- KIRI: Rekapan Staging -->
             <div class="h-full flex flex-col">
-                <!-- PERUBAHAN: Header berwarna, Icon dikiri -->
                 <div class="bg-blue-600 px-6 py-4 rounded-t-3xl border border-blue-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
                     <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-warehouse"></i></div>
                     <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Rekapan Staging</h3>
                 </div>
                 <div id="containerStaging" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
+
+            <!-- KANAN: Manajemen Data AWB (New) -->
+            <div class="h-full flex flex-col">
+                <div class="bg-slate-800 px-6 py-4 rounded-t-3xl border border-slate-800 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-table"></i></div>
+                        <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Daftar Data AWB</h3>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-300 bg-slate-700 px-2 py-1 rounded">Top 100 View</span>
+                </div>
+                <div id="containerAwbList" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1 relative">
+                    <!-- Table will be injected here -->
+                </div>
+            </div>
+
         </div>
 
         <!-- Hidden Elements for Processing -->
@@ -546,7 +562,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, writeBatch, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
         Chart.register(ChartDataLabels);
         // Modern Chart Configuration
@@ -1048,28 +1064,48 @@
 
         newCsvInput.addEventListener('change', e => {
             const f = e.target.files[0]; if(!f) return;
-            Papa.parse(f, { header:true, skipEmptyLines:true, complete: res => {
-                const rows = res.data.length;
-                const used = getDailyQuota();
-                const remaining = DAILY_LIMIT - used;
-                
-                let msg = `Total baris file: <b>${formatNumber(rows)}</b>.<br>`;
-                msg += `Estimasi sisa kuota hari ini: <b>${formatNumber(remaining)}</b>.<br>`;
-                
-                if (rows > remaining) {
-                    msg += `<br><span class="text-red-400 font-bold">PERINGATAN: File ini mungkin akan gagal di tengah jalan karena kuota habis!</span>`;
-                } else {
-                    msg += `<span class="text-emerald-400 font-bold">Kuota Aman.</span>`;
-                }
+            Papa.parse(f, { 
+                header: true, 
+                skipEmptyLines: true, 
+                transformHeader: function(h) {
+                    return h.replace(/[\r\n"]+/g, ' ').trim();
+                },
+                complete: res => {
+                    const rows = res.data.length;
+                    const used = getDailyQuota();
+                    const remaining = DAILY_LIMIT - used;
+                    
+                    let msg = `Total baris file: <b>${formatNumber(rows)}</b>.<br>`;
+                    msg += `Estimasi sisa kuota hari ini: <b>${formatNumber(remaining)}</b>.<br>`;
+                    
+                    if (rows > remaining) {
+                        msg += `<br><span class="text-red-400 font-bold">PERINGATAN: File ini mungkin akan gagal di tengah jalan karena kuota habis!</span>`;
+                    } else {
+                        msg += `<span class="text-emerald-400 font-bold">Kuota Aman.</span>`;
+                    }
 
-                showIsland('confirm', msg, () => saveData(res.data));
-            }});
+                    showIsland('confirm', msg, () => saveData(res.data));
+                }
+            });
         });
 
         // --- MAIN RENDERER & SAVE ---
         async function saveData(data) {
             showIsland('loading', 'Menyimpan ke Cloud...');
-            const valid = data.filter(r=>r.awb);
+            const sampleRow = data[0] || {};
+            const awbKey = Object.keys(sampleRow).find(k => k.toLowerCase() === 'awb' || k.toLowerCase() === 'no resi' || k.toLowerCase().includes('awb'));
+
+            if (!awbKey) {
+                showIsland('error', 'Kolom AWB tidak ditemukan di file!');
+                return;
+            }
+
+            const valid = data.filter(r => r[awbKey] && r[awbKey].toString().trim() !== '');
+            if (valid.length === 0) {
+                showIsland('error', 'Tidak ada data valid (AWB kosong).');
+                return;
+            }
+
             const batchSize = 450; 
             const totalBatches = Math.ceil(valid.length/batchSize);
             let successCount = 0;
@@ -1079,7 +1115,10 @@
                 const chunk = valid.slice(i*batchSize, (i+1)*batchSize);
                 
                 chunk.forEach(row => {
-                    batch.set(doc(db, COLLECTION_NAME, row.awb.trim()), JSON.parse(JSON.stringify(row)), {merge:true});
+                    const docId = row[awbKey].toString().trim();
+                    const dataToSave = JSON.parse(JSON.stringify(row));
+                    dataToSave['awb'] = docId; 
+                    batch.set(doc(db, COLLECTION_NAME, docId), dataToSave, {merge:true});
                 });
                 
                 try {
@@ -1094,6 +1133,8 @@
             }
             if (successCount > 0) {
                 showIsland('success', `Berhasil upload ${formatNumber(successCount)} data!`);
+            } else {
+                showIsland('error', 'Gagal menyimpan data.');
             }
         }
 
@@ -1108,6 +1149,7 @@
             generateServiceRecap(filteredData);
             generateOriginRecap(filteredData);
             generateStagingRecap(filteredData);
+            generateAwbTable(filteredData); // NEW FUNCTION
             
             updateCharts(filteredData);
         }
@@ -1227,19 +1269,18 @@
 
         function updateCharts(data) {
             const yearly = {}; 
-            // PERBAIKAN: Inisialisasi monthly dengan semua bulan di tahun berjalan
             const monthly = {}; 
+            const daily = {};
+            
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             const currentYear = new Date().getFullYear();
             
-            // Pre-fill Jan-Dec untuk Tahun Berjalan agar selalu tampil
+            // Pre-fill Jan-Dec untuk Tahun Berjalan (Monthly)
             months.forEach(m => {
-                monthly[`${m} ${currentYear}`] = 0;
+                monthly[`${m} ${currentYear}`] = { total: 0, gustiadi: 0 };
             });
 
-            const daily = {};
-            
-            // --- 1. DAILY CHART (Tetap Mengikuti Filter Tanggal - Gunakan 'data') ---
+            // --- 1. DAILY CHART (Data terfilter tanggal) ---
             let latestDate = new Date(0);
             data.forEach(row => {
                 const d = parseDateStr(row['Tanggal']);
@@ -1251,35 +1292,27 @@
             const mLabel = document.getElementById('currentMonthLabel');
             if (mLabel) mLabel.innerText = `${months[cmIdx]} ${cy}`;
 
-            // Logic Harian (Hanya data dalam range tanggal yang dipilih)
+            // Logic Harian
             data.forEach(row => {
                 const pos = (row['Posisi'] || "").toLowerCase().trim();
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
-                const filterPosisiEl = document.getElementById('filterPosisi');
-                const selectedPos = filterPosisiEl ? filterPosisiEl.value : '';
                 
-                let includeInChart = false;
-                if (selectedPos) {
-                    includeInChart = true; 
-                } else {
-                    if ( (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi' ) {
-                        includeInChart = true;
-                    }
-                }
-
-                if (!includeInChart) return;
-
                 const date = parseDateStr(row['Tanggal']);
-                if (date) {
-                    // Daily: Only for current month & year of the filtered data
-                    if (date.getMonth() === cmIdx && date.getFullYear() === cy) {
-                        const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
-                        daily[dKey] = (daily[dKey] || 0) + 1;
+                if (date && date.getMonth() === cmIdx && date.getFullYear() === cy) {
+                    const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
+                    if (!daily[dKey]) daily[dKey] = { total: 0, gustiadi: 0 };
+                    
+                    // Hitung Total (Sesuai Filter Dashboard)
+                    daily[dKey].total++;
+                    
+                    // Hitung Gustiadi (Subset: HUB X=Gustiadi AND Posisi=Mid Mile/Transport)
+                    if (hubX === 'gustiadi' && (pos === 'mid mile' || pos === 'transport')) {
+                        daily[dKey].gustiadi++;
                     }
                 }
             });
 
-            // --- 2. TREND CHART (Abaikan Filter Tanggal - Gunakan 'allData') ---
+            // --- 2. TREND CHART (Data All / Tahunan & Bulanan) ---
             const hubVal = document.getElementById('filterHub') ? document.getElementById('filterHub').value : '';
             const serviceVal = document.getElementById('filterService') ? document.getElementById('filterService').value : '';
             const posisiVal = document.getElementById('filterPosisi') ? document.getElementById('filterPosisi').value : '';
@@ -1287,33 +1320,33 @@
             allData.forEach(row => {
                 // Apply Filters MANUAL (Kecuali Tanggal)
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
+                const pos = (row['Posisi'] || "").toLowerCase().trim();
+
                 if (isGustiadiOnly && hubX !== 'gustiadi') return;
                 
                 if (hubVal && row.delivery_hub !== hubVal) return;
                 if (serviceVal && row.service_code !== serviceVal) return;
                 if (posisiVal && row.Posisi !== posisiVal) return;
 
-                // Chart Specific Filter Logic (Sama seperti Daily)
-                const pos = (row['Posisi'] || "").toLowerCase().trim();
-                let includeInChart = false;
-                if (posisiVal) {
-                    includeInChart = true;
-                } else {
-                    if ( (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi' ) {
-                        includeInChart = true;
-                    }
-                }
-
-                if (!includeInChart) return;
-
                 const date = parseDateStr(row['Tanggal']);
                 if (date) {
                     const y = date.getFullYear();
                     const mKey = `${months[date.getMonth()]} ${y}`; 
                     
-                    yearly[y] = (yearly[y] || 0) + 1;
-                    // Monthly akan menimpa 0 jika ada data, atau menambahkan key baru jika tahun berbeda
-                    monthly[mKey] = (monthly[mKey] || 0) + 1;
+                    // Init Yearly
+                    if (!yearly[y]) yearly[y] = { total: 0, gustiadi: 0 };
+                    // Init Monthly (jika belum ada dari pre-fill)
+                    if (!monthly[mKey]) monthly[mKey] = { total: 0, gustiadi: 0 };
+
+                    // Hitung
+                    yearly[y].total++;
+                    monthly[mKey].total++;
+
+                    // Logic: HUB X=Gustiadi AND Posisi=Mid Mile/Transport
+                    if (hubX === 'gustiadi' && (pos === 'mid mile' || pos === 'transport')) {
+                        yearly[y].gustiadi++;
+                        monthly[mKey].gustiadi++;
+                    }
                 }
             });
 
@@ -1321,13 +1354,17 @@
             cachedTrendData.yearly = yearly;
             cachedTrendData.monthly = monthly;
 
-            // Render Combo Trend (Default or Current Mode)
+            // Render Combo Trend
             renderTrendChart();
 
-            // Render Daily (tetap terpisah)
+            // Render Daily
             const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
-            // PERBAIKAN: Ubah tipe grafik harian menjadi 'line'
-            renderChart('dailyChart', 'line', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), ['#fb923c', '#f97316']);
+            const dailyKeys = Object.keys(daily).sort(sortDaily);
+            const dailyTotal = dailyKeys.map(k => daily[k].total);
+            const dailyGustiadi = dailyKeys.map(k => daily[k].gustiadi);
+            
+            // Panggil fungsi render baru dengan 2 dataset
+            renderChart('dailyChart', dailyKeys, dailyTotal, dailyGustiadi);
         }
 
         // --- NEW: TOGGLE LOGIC ---
@@ -1351,40 +1388,33 @@
             const mode = currentTrendMode;
             const dataObj = cachedTrendData[mode];
             
-            // PERBAIKAN: Logika Sort Bulan Indonesia Manual
+            // Logika Sort Bulan
             const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-            
             const sortMonth = (a, b) => {
                 const partsA = a.split(' ');
                 const partsB = b.split(' ');
-                // Format key: "Jan 2024"
                 const idxA = monthsOrder.indexOf(partsA[0]);
                 const idxB = monthsOrder.indexOf(partsB[0]);
                 const yearA = parseInt(partsA[1]);
                 const yearB = parseInt(partsB[1]);
-
-                // Sort by Year then Month
                 return (yearA * 12 + idxA) - (yearB * 12 + idxB);
             };
             
-            let labels, values, type, colors;
-
+            let labels;
             if (mode === 'monthly') {
                 labels = Object.keys(dataObj).sort(sortMonth);
-                values = labels.map(k => dataObj[k]);
-                type = 'line';
-                colors = ['#38bdf8', '#0ea5e9']; // Blue Gradient
             } else {
                 labels = Object.keys(dataObj).sort();
-                values = labels.map(k => dataObj[k]);
-                type = 'bar';
-                colors = ['#818cf8', '#6366f1']; // Indigo Gradient
             }
+
+            const dataTotal = labels.map(k => dataObj[k].total);
+            const dataGustiadi = labels.map(k => dataObj[k].gustiadi);
             
-            renderChart('comboTrendChart', type, labels, values, colors);
+            renderChart('comboTrendChart', labels, dataTotal, dataGustiadi);
         }
 
-        function renderChart(id, type, labels, data, colors) {
+        // PERBAIKAN: Fungsi RenderChart Support 2 Garis
+        function renderChart(id, labels, dataTotal, dataGustiadi) {
             const canvas = document.getElementById(id);
             if (!canvas) return; 
 
@@ -1395,65 +1425,112 @@
             
             const ctx = canvas.getContext('2d');
 
+            // Gradient for Gustiadi Line (Indigo)
+            const gradientGustiadi = ctx.createLinearGradient(0, 0, 0, 300);
+            gradientGustiadi.addColorStop(0, 'rgba(99, 102, 241, 0.5)'); // Indigo 500
+            gradientGustiadi.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+            // Gradient for Total Line (Black/Dark Slate)
+            const gradientTotal = ctx.createLinearGradient(0, 0, 0, 300);
+            gradientTotal.addColorStop(0, 'rgba(15, 23, 42, 0.2)'); // Slate 900
+            gradientTotal.addColorStop(1, 'rgba(15, 23, 42, 0)');
+
             // Create Chart
             chartInstances[id] = new Chart(ctx, {
-                type: type,
+                type: 'line', // Selalu Line
                 data: {
                     labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: type === 'line' ? (ctx) => {
-                            const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
-                            gradient.addColorStop(0, colors[0]);
-                            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                            return gradient;
-                        } : colors[0],
-                        borderColor: colors[1] || colors[0],
-                        borderWidth: 2,
-                        borderRadius: 4,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: colors[1],
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        fill: type === 'line' ? true : false,
-                        tension: 0.4
-                    }]
+                    datasets: [
+                        {
+                            label: 'Total AWB',
+                            data: dataTotal,
+                            borderColor: '#0f172a', // Hitam (Slate 900)
+                            backgroundColor: gradientTotal,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#0f172a',
+                            pointBorderColor: '#fff',
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            fill: true,
+                            tension: 0.4,
+                            order: 2 // Render di belakang
+                        },
+                        {
+                            label: 'Inprogress (Gustiadi)',
+                            data: dataGustiadi,
+                            borderColor: '#6366f1', // Indigo (Warna Pembeda)
+                            backgroundColor: gradientGustiadi,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#6366f1',
+                            pointBorderColor: '#fff',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4,
+                            order: 1 // Render di depan
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
                     plugins: {
-                        legend: { display: false },
+                        legend: { 
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 10,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '600' }
+                            }
+                        },
                         tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
                             titleColor: '#1e293b',
                             bodyColor: '#475569',
                             borderColor: '#e2e8f0',
                             borderWidth: 1,
                             padding: 10,
-                            displayColors: false,
+                            boxPadding: 4,
+                            usePointStyle: true,
                             callbacks: {
                                 label: function(context) {
-                                    return formatNumber(context.raw);
+                                    return ` ${context.dataset.label}: ${formatNumber(context.raw)}`;
                                 }
                             }
                         },
                         datalabels: {
-                            // PERBAIKAN: Selalu tampilkan label data (baik bar maupun line)
-                            display: 'auto',
-                            align: 'end',
+                            display: function(context) {
+                                // Tampilkan label hanya jika nilainya > 0 dan tidak terlalu padat (opsional)
+                                return context.dataset.data[context.dataIndex] > 0;
+                            },
+                            align: 'top',
                             anchor: 'end',
-                            color: '#64748b',
-                            font: { size: 10, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
-                            offset: 4, // Beri jarak sedikit ke atas agar tidak menumpuk dengan titik garis
-                            formatter: (val) => val > 0 ? formatNumber(val) : ''
+                            color: function(context) {
+                                return context.dataset.borderColor; // Warna text mengikuti warna garis
+                            },
+                            font: { size: 9, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
+                            offset: 4,
+                            formatter: (val) => formatNumber(val)
                         }
                     },
                     scales: { 
-                        y: { display: false, beginAtZero: true }, 
+                        y: { 
+                            display: false, 
+                            beginAtZero: true 
+                        }, 
                         x: { 
                             grid: { display: false }, 
-                            ticks: { font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '500' }, color: '#94a3b8' } 
+                            ticks: { 
+                                font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '500' }, 
+                                color: '#94a3b8' 
+                            } 
                         } 
                     },
                     layout: { padding: { top: 20 } }
@@ -1684,7 +1761,7 @@
             renderStructuredTable('containerOrigin', theadContent, tbodyContent, tfootContent);
         }
 
-        // 4. STAGING RECAP (Updated with Percentage)
+        // 4. STAGING RECAP (Updated with Percentage & Fixed Syntax)
         function generateStagingRecap(data) {
             const table = document.getElementById('tableStaging'); 
             
@@ -1774,7 +1851,8 @@
                     </td>`;
                     
                     sortedPos.forEach(p => {
-                        const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
+                        // PERBAIKAN: Menambahkan parameter 'true' agar warna lebih tebal (bold)
+                        const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max, true);
                         let content = `<span class="text-slate-300">-</span>`;
                         
                         if(c>0) {
@@ -1819,11 +1897,144 @@
             renderStructuredTable('containerStaging', theadContent, tbodyContent, tfootContent);
         }
 
-        function getGradient(val, min, max) {
+        // --- 5. AWB DATA MANAGEMENT TABLE (Infinite Scroll) ---
+        let awbDataCache = []; // Menyimpan data untuk scrolling
+        let awbRenderedCount = 0; // Melacak berapa baris yang sudah tampil
+        const AWB_CHUNK_SIZE = 50; // Muat 50 baris per scroll
+        const AWB_MAX_LIMIT = 10000; // Batas maksimal total
+
+        function generateAwbTable(data) {
+            const container = document.getElementById('containerAwbList');
+            if(!container) return;
+
+            // Simpan data ke cache global & reset counter
+            awbDataCache = data;
+            awbRenderedCount = 0;
+
+            // Setup Kerangka Tabel (Header Sticky)
+            // Kita siapkan tbody kosong dengan ID 'awbTableBody' untuk diisi nanti
+            container.innerHTML = `
+                <div class="table-scroll-area h-full" id="awbScrollArea">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-100 sticky top-0 z-20 shadow-sm text-slate-600 text-[10px] uppercase font-bold tracking-wider">
+                            <tr>
+                                <th class="text-left pl-4 py-3" style="min-width:140px;">No Resi (AWB)</th>
+                                <th class="text-center" style="min-width:100px;">Staging</th>
+                                <th class="text-center" style="min-width:120px;">Posisi</th>
+                                <th class="text-center" style="min-width:80px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="awbTableBody" class="divide-y divide-slate-100 text-[11px]">
+                            <!-- Rows will be appended here -->
+                        </tbody>
+                        <tfoot class="sticky bottom-0 z-20" id="awbTableFooter">
+                            <!-- Footer info -->
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+
+            // Render batch pertama (50 data)
+            appendAwbRows();
+
+            // Pasang Event Listener Scroll
+            const scrollArea = document.getElementById('awbScrollArea');
+            scrollArea.addEventListener('scroll', () => {
+                // Jika scroll mendekati bawah (sisa 50px), muat lebih banyak
+                if (scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 50) {
+                    appendAwbRows();
+                }
+            });
+        }
+
+        function appendAwbRows() {
+            // Cek jika sudah mencapai batas atau data habis
+            if (awbRenderedCount >= awbDataCache.length || awbRenderedCount >= AWB_MAX_LIMIT) return;
+
+            const tbody = document.getElementById('awbTableBody');
+            const footer = document.getElementById('awbTableFooter');
+            
+            // Ambil potongan data berikutnya
+            const nextBatch = awbDataCache.slice(awbRenderedCount, awbRenderedCount + AWB_CHUNK_SIZE);
+            
+            if (awbRenderedCount === 0 && nextBatch.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-slate-400 italic">Tidak ada data yang sesuai filter</td></tr>`;
+                return;
+            }
+
+            // Generate HTML untuk batch ini
+            let rowsHTML = "";
+            nextBatch.forEach(row => {
+                const awb = row['awb'] || row['No Resi'] || "?";
+                const staging = row['delivery_staging'] || "-";
+                const posisi = row['Posisi'] || "-";
+                
+                rowsHTML += `
+                    <tr class="hover:bg-red-50/30 transition-colors group">
+                        <td class="font-bold text-slate-700 pl-4 border-r border-slate-100 font-mono text-[11px] select-all py-2">${awb}</td>
+                        <td class="text-center text-slate-500 border-r border-slate-50 text-[10px]">${staging}</td>
+                        <td class="text-center text-slate-500 border-r border-slate-50 text-[10px] truncate max-w-[100px]">${posisi}</td>
+                        <td class="text-center py-1">
+                            <button onclick="confirmDeleteAwb('${awb}')" class="px-2 py-1 bg-white border border-red-200 text-red-500 hover:bg-red-500 hover:text-white rounded shadow-sm transition-all text-[9px] font-bold inline-flex items-center gap-1 active:scale-95">
+                                <i class="ph-bold ph-trash"></i> Hapus
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Masukkan ke tabel (Append)
+            tbody.insertAdjacentHTML('beforeend', rowsHTML);
+            
+            // Update counter
+            awbRenderedCount += nextBatch.length;
+
+            // Update Footer Info
+            const remaining = Math.min(awbDataCache.length, AWB_MAX_LIMIT) - awbRenderedCount;
+            let footerText = `Menampilkan ${formatNumber(awbRenderedCount)} dari ${formatNumber(awbDataCache.length)} data`;
+            if (remaining > 0) footerText += ` (Scroll untuk memuat lebih banyak)`;
+            else if (awbDataCache.length > AWB_MAX_LIMIT) footerText += ` (Batas tampilan 10.000 tercapai)`;
+
+            footer.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center text-slate-400 italic font-normal bg-slate-50 border-t border-slate-200 py-2 text-[10px]">
+                        ${footerText}
+                    </td>
+                </tr>
+            `;
+        }
+
+        // --- DELETE SINGLE AWB LOGIC ---
+        window.confirmDeleteAwb = (awb) => {
+            showIsland('confirm', `Hapus permanen resi <b>${awb}</b>?`, () => deleteSingleAwb(awb));
+        }
+
+        async function deleteSingleAwb(awb) {
+            showIsland('loading', `Menghapus ${awb}...`);
+            try {
+                // Hapus dokumen berdasarkan ID (asumsi ID dokumen = AWB sesuai logika upload)
+                await deleteDoc(doc(db, COLLECTION_NAME, awb));
+                showIsland('success', `Resi ${awb} dihapus.`);
+                // Data akan auto-refresh karena onSnapshot listener
+            } catch (error) {
+                console.error("Delete Error", error);
+                showIsland('error', 'Gagal menghapus. Cek konsol.');
+            }
+        }
+
+        function getGradient(val, min, max, isBold = false) {
             if(!val) return 'transparent';
-            if(min===max) return '#f0fdf4';
+            if(min===max) return isBold ? '#dcfce7' : '#f0fdf4'; // Base color slightly darker for bold
+            
             const ratio = (val-min)/(max-min);
             const hue = 120 - (ratio*120);
+            
+            if (isBold) {
+                // Versi Tebal: Lightness dikurangi (lebih gelap), Opacity ditambah
+                return `hsla(${hue}, 90%, 88%, 0.85)`; 
+            }
+            
+            // Versi Default (Lebih Halus)
             return `hsla(${hue}, 85%, 96%, 0.6)`;
         }
 
