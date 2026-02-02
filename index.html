@@ -430,27 +430,28 @@
             </script>
         </div>
 
-        <!-- 2. ANALYTICS (Charts) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- 2. ANALYTICS (Combined Trend) -->
+        <div class="grid grid-cols-1 mb-8">
             <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 500ms">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h3 class="text-base font-display font-bold text-slate-800">Tren Tahunan</h3>
-                        <p class="text-xs text-slate-400 font-medium">Perbandingan volume per tahun</p>
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                    <div class="text-center sm:text-left">
+                        <h3 class="text-base font-display font-bold text-slate-800" id="trendTitle">Tren Bulanan</h3>
+                        <p class="text-xs text-slate-400 font-medium">Analisis volume pengiriman berdasarkan periode</p>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-violet-50 text-violet-600 flex items-center justify-center"><i class="ph-bold ph-chart-bar text-lg"></i></div>
-                </div>
-                <div class="h-[300px] w-full relative"><canvas id="yearlyChart"></canvas></div>
-            </div>
-            <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 600ms">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h3 class="text-base font-display font-bold text-slate-800">Tren Bulanan</h3>
-                        <p class="text-xs text-slate-400 font-medium">Fluktuasi dalam satu periode</p>
+                    
+                    <!-- Toggle Button Group -->
+                    <div class="bg-slate-100 p-1 rounded-xl flex items-center shadow-inner">
+                        <button onclick="setTrendMode('monthly')" id="btnMonthly" class="px-5 py-2 rounded-lg text-[11px] font-bold transition-all duration-300 bg-white text-indigo-600 shadow-sm transform scale-100">
+                            Bulanan
+                        </button>
+                        <button onclick="setTrendMode('yearly')" id="btnYearly" class="px-5 py-2 rounded-lg text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-all duration-300">
+                            Tahunan
+                        </button>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center"><i class="ph-bold ph-chart-line-up text-lg"></i></div>
                 </div>
-                <div class="h-[300px] w-full relative"><canvas id="monthlyChart"></canvas></div>
+                <div class="h-[320px] w-full relative">
+                    <canvas id="comboTrendChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -467,10 +468,11 @@
             </div>
         </div>
 
-        <!-- TABLE GRID ROW 1 -->
-        <div class="grid grid-cols-12 gap-6 mb-8 items-start opacity-0 animate-fade-in-up" style="animation-delay: 800ms">
-            <!-- Monitoring KPI -->
-            <div class="col-span-12 lg:col-span-4 flex flex-col h-[440px]">
+        <!-- BARIS 1: Monitoring KPI & Top Origin (2 Kolom) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 800ms">
+            
+            <!-- KIRI: Monitoring KPI -->
+            <div class="flex flex-col h-[440px]">
                 <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
                     <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Monitoring KPI</h3>
                     <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-monitor"></i></div>
@@ -478,8 +480,22 @@
                 <div id="containerKPI" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
-            <!-- Rekapan HUB -->
-            <div class="col-span-12 lg:col-span-6 flex flex-col h-[440px]">
+            <!-- KANAN: Top 5 Origin -->
+            <div class="flex flex-col h-[440px]">
+                <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
+                    <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Top 5 Origin</h3>
+                    <div class="w-8 h-8 bg-pink-50 text-pink-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-map-pin"></i></div>
+                </div>
+                <div id="containerOrigin" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
+            </div>
+
+        </div>
+
+        <!-- BARIS 2: Rekapan HUB & Service Breakdown (2 Kolom) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 850ms">
+            
+            <!-- KIRI: Rekapan HUB -->
+            <div class="flex flex-col h-[440px]">
                 <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
                     <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Rekapan HUB</h3>
                     <div class="w-8 h-8 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-buildings"></i></div>
@@ -487,19 +503,20 @@
                 <div id="containerHub" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
-            <!-- Service -->
-            <div class="col-span-12 lg:col-span-2 flex flex-col h-[440px]">
+            <!-- KANAN: Service Breakdown -->
+            <div class="flex flex-col h-[440px]">
                 <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
-                    <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Service</h3>
+                    <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Service Breakdown</h3>
                     <div class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-tag"></i></div>
                 </div>
                 <div id="containerService" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
+
         </div>
 
-        <!-- TABLE GRID ROW 2 (Staging) -->
-        <div class="grid grid-cols-12 gap-6 h-[520px] mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 900ms">
-            <div class="col-span-12 h-full flex flex-col">
+        <!-- BARIS 3: Rekapan Staging (1 Kolom Full) -->
+        <div class="grid grid-cols-1 gap-6 h-[520px] mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 900ms">
+            <div class="h-full flex flex-col">
                 <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
                     <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Rekapan Staging</h3>
                     <div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-warehouse"></i></div>
@@ -547,6 +564,10 @@
         let allData = [];
         let isGustiadiOnly = false;
         let chartInstances = {};
+        
+        // --- NEW TREND VARS ---
+        let currentTrendMode = 'monthly';
+        let cachedTrendData = { yearly: {}, monthly: {} };
 
         function formatNumber(num) {
             return num ? num.toLocaleString('id-ID') : '0';
@@ -928,8 +949,8 @@
                     </div>
                     <input type="password" id="islPass" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mb-3 focus:ring-1 focus:ring-orange-500 outline-none text-center tracking-widest" placeholder="Password">
                     <div class="flex gap-2 w-full">
-                        <button id="islCancel" class="flex-1 py-2 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-400 hover:bg-slate-700">Batal</button>
-                        <button id="islAuth" class="flex-1 py-2 rounded-lg bg-white text-[10px] font-bold text-slate-900 hover:bg-slate-200">Verifikasi</button>
+                        <button id="islCancel" class="flex-1 py-2.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-400 hover:bg-slate-700">Batal</button>
+                        <button id="islAuth" class="flex-1 py-2.5 rounded-lg bg-white text-[10px] font-bold text-slate-900 hover:bg-slate-200">Verifikasi</button>
                     </div>
                 `;
                 const input = document.getElementById('islPass');
@@ -982,72 +1003,88 @@
             });
         }
 
-        // --- MAIN RENDERER ---
-        async function processUpload(csvData) {
-            showIsland('loading', 'Memeriksa Data...');
-            
-            // 1. Filter Valid & Check Duplicates using in-memory allData
-            const existingAWBs = new Set(allData.map(r => r.awb));
-            const newRows = [];
-            let duplicates = 0;
-            let validRows = 0;
+        // --- QUOTA TRACKER SYSTEM (FINAL) ---
+        const DAILY_LIMIT = 20000;
+        
+        function getDailyQuota() {
+            const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+            const key = `firestore_quota_${today}`;
+            const stored = localStorage.getItem(key);
+            return stored ? parseInt(stored) : 0;
+        }
 
-            csvData.forEach(row => {
-                if (row.awb && row.awb.trim() !== "") {
-                    const cleanAwb = row.awb.trim();
-                    if (existingAWBs.has(cleanAwb)) {
-                        duplicates++;
-                    } else {
-                        newRows.push(row);
-                    }
-                    validRows++;
+        function updateDailyQuota(count) {
+            const today = new Date().toISOString().split('T')[0];
+            const key = `firestore_quota_${today}`;
+            const current = getDailyQuota();
+            localStorage.setItem(key, current + count);
+        }
+        
+        function cleanOldQuotaKeys() {
+            const today = new Date().toISOString().split('T')[0];
+            const key = `firestore_quota_${today}`;
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith('firestore_quota_') && k !== key) {
+                    localStorage.removeItem(k);
                 }
-            });
-
-            if (newRows.length === 0) {
-                showIsland('error', `Semua ${duplicates} data duplikat. Tidak ada data baru.`);
-                return;
             }
+        }
+        cleanOldQuotaKeys();
 
-            showIsland('loading', `Menyimpan ${newRows.length} data baru...`);
+        // --- CSV HANDLER ---
+        const csvInput = document.getElementById('csvFileInput');
+        const newCsvInput = csvInput.cloneNode(true);
+        csvInput.parentNode.replaceChild(newCsvInput, csvInput);
 
-            // 2. Batch Write
+        newCsvInput.addEventListener('change', e => {
+            const f = e.target.files[0]; if(!f) return;
+            Papa.parse(f, { header:true, skipEmptyLines:true, complete: res => {
+                const rows = res.data.length;
+                const used = getDailyQuota();
+                const remaining = DAILY_LIMIT - used;
+                
+                let msg = `Total baris file: <b>${formatNumber(rows)}</b>.<br>`;
+                msg += `Estimasi sisa kuota hari ini: <b>${formatNumber(remaining)}</b>.<br>`;
+                
+                if (rows > remaining) {
+                    msg += `<br><span class="text-red-400 font-bold">PERINGATAN: File ini mungkin akan gagal di tengah jalan karena kuota habis!</span>`;
+                } else {
+                    msg += `<span class="text-emerald-400 font-bold">Kuota Aman.</span>`;
+                }
+
+                showIsland('confirm', msg, () => saveData(res.data));
+            }});
+        });
+
+        // --- MAIN RENDERER & SAVE ---
+        async function saveData(data) {
+            showIsland('loading', 'Menyimpan ke Cloud...');
+            const valid = data.filter(r=>r.awb);
             const batchSize = 450; 
+            const totalBatches = Math.ceil(valid.length/batchSize);
             let successCount = 0;
-            let failCount = 0;
-            let quotaExceeded = false;
 
-            try {
-                const totalBatches = Math.ceil(newRows.length / batchSize);
-                for (let i = 0; i < totalBatches; i++) {
-                    const batch = writeBatch(db);
-                    const chunk = newRows.slice(i * batchSize, (i + 1) * batchSize);
-                    
-                    chunk.forEach(row => {
-                        const docRef = doc(db, COLLECTION_NAME, row.awb.trim());
-                        batch.set(docRef, JSON.parse(JSON.stringify(row))); 
-                    });
-
+            for(let i=0; i<totalBatches; i++) {
+                const batch = writeBatch(db);
+                const chunk = valid.slice(i*batchSize, (i+1)*batchSize);
+                
+                chunk.forEach(row => {
+                    batch.set(doc(db, COLLECTION_NAME, row.awb.trim()), JSON.parse(JSON.stringify(row)), {merge:true});
+                });
+                
+                try {
                     await batch.commit();
                     successCount += chunk.length;
-                }
-            } catch (error) {
-                console.error("Upload Error", error);
-                if (error.code === 'resource-exhausted') {
-                    quotaExceeded = true;
-                } else {
-                    failCount = newRows.length - successCount; 
+                    updateDailyQuota(chunk.length);
+                } catch (err) {
+                    console.error("Upload Error", err);
+                    showIsland('error', 'Gagal sebagian. Cek kuota.');
+                    break;
                 }
             }
-
-            // 3. Final Report
-            if (quotaExceeded) {
-                showIsland('error', 'Kuota Penuh! Upload ulang besok.');
-                alert(`Gagal: Kuota Database Penuh.\nSukses: ${successCount}\nDuplikat: ${duplicates}\nSilakan lanjutkan besok.`);
-            } else {
-                const msg = `Sukses: ${successCount}, Duplikat: ${duplicates}`;
-                showIsland('success', msg);
-                // Optional detailed alert if needed, or just let the island notify
+            if (successCount > 0) {
+                showIsland('success', `Berhasil upload ${formatNumber(successCount)} data!`);
             }
         }
 
@@ -1060,6 +1097,7 @@
             generateKPIRecap(baseData, filteredData); // Pass baseData for HUB-ignorant columns
             generateHubRecap(filteredData);
             generateServiceRecap(filteredData);
+            generateOriginRecap(filteredData);
             generateStagingRecap(filteredData);
             
             updateCharts(filteredData);
@@ -1179,9 +1217,20 @@
         }
 
         function updateCharts(data) {
-            const yearly = {}; const monthly = {}; const daily = {};
+            const yearly = {}; 
+            // PERBAIKAN: Inisialisasi monthly dengan semua bulan di tahun berjalan
+            const monthly = {}; 
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            const currentYear = new Date().getFullYear();
             
+            // Pre-fill Jan-Dec untuk Tahun Berjalan agar selalu tampil
+            months.forEach(m => {
+                monthly[`${m} ${currentYear}`] = 0;
+            });
+
+            const daily = {};
+            
+            // --- 1. DAILY CHART (Tetap Mengikuti Filter Tanggal - Gunakan 'data') ---
             let latestDate = new Date(0);
             data.forEach(row => {
                 const d = parseDateStr(row['Tanggal']);
@@ -1193,20 +1242,54 @@
             const mLabel = document.getElementById('currentMonthLabel');
             if (mLabel) mLabel.innerText = `${months[cmIdx]} ${cy}`;
 
+            // Logic Harian (Hanya data dalam range tanggal yang dipilih)
             data.forEach(row => {
                 const pos = (row['Posisi'] || "").toLowerCase().trim();
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
                 const filterPosisiEl = document.getElementById('filterPosisi');
                 const selectedPos = filterPosisiEl ? filterPosisiEl.value : '';
                 
-                // LOGIKA CHART BARU:
-                // Default: Menampilkan (Mid Mile + Transport) DAN (HUB X = Gustiadi)
-                // Jika user memilih posisi spesifik, tampilkan sesuai pilihan.
                 let includeInChart = false;
                 if (selectedPos) {
-                    includeInChart = true; // Gunakan data yang sudah difilter
+                    includeInChart = true; 
                 } else {
-                    // Filter khusus Chart jika Posisi = Semua
+                    if ( (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi' ) {
+                        includeInChart = true;
+                    }
+                }
+
+                if (!includeInChart) return;
+
+                const date = parseDateStr(row['Tanggal']);
+                if (date) {
+                    // Daily: Only for current month & year of the filtered data
+                    if (date.getMonth() === cmIdx && date.getFullYear() === cy) {
+                        const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
+                        daily[dKey] = (daily[dKey] || 0) + 1;
+                    }
+                }
+            });
+
+            // --- 2. TREND CHART (Abaikan Filter Tanggal - Gunakan 'allData') ---
+            const hubVal = document.getElementById('filterHub') ? document.getElementById('filterHub').value : '';
+            const serviceVal = document.getElementById('filterService') ? document.getElementById('filterService').value : '';
+            const posisiVal = document.getElementById('filterPosisi') ? document.getElementById('filterPosisi').value : '';
+
+            allData.forEach(row => {
+                // Apply Filters MANUAL (Kecuali Tanggal)
+                const hubX = (row['HUB X'] || "").toLowerCase().trim();
+                if (isGustiadiOnly && hubX !== 'gustiadi') return;
+                
+                if (hubVal && row.delivery_hub !== hubVal) return;
+                if (serviceVal && row.service_code !== serviceVal) return;
+                if (posisiVal && row.Posisi !== posisiVal) return;
+
+                // Chart Specific Filter Logic (Sama seperti Daily)
+                const pos = (row['Posisi'] || "").toLowerCase().trim();
+                let includeInChart = false;
+                if (posisiVal) {
+                    includeInChart = true;
+                } else {
                     if ( (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi' ) {
                         includeInChart = true;
                     }
@@ -1217,77 +1300,148 @@
                 const date = parseDateStr(row['Tanggal']);
                 if (date) {
                     const y = date.getFullYear();
-                    const mKey = `${months[date.getMonth()]} ${y}`;
+                    const mKey = `${months[date.getMonth()]} ${y}`; 
                     
                     yearly[y] = (yearly[y] || 0) + 1;
+                    // Monthly akan menimpa 0 jika ada data, atau menambahkan key baru jika tahun berbeda
                     monthly[mKey] = (monthly[mKey] || 0) + 1;
-                    
-                    // Daily: Only for current month & year
-                    if (date.getMonth() === cmIdx && date.getFullYear() === cy) {
-                        const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
-                        daily[dKey] = (daily[dKey] || 0) + 1;
-                    }
                 }
             });
 
-            const sortMonth = (a,b) => new Date(`1 ${a}`) - new Date(`1 ${b}`);
-            const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
+            // Simpan data untuk toggle
+            cachedTrendData.yearly = yearly;
+            cachedTrendData.monthly = monthly;
 
-            renderChart('yearlyChart', 'bar', Object.keys(yearly).sort(), Object.values(yearly), ['#818cf8', '#6366f1']);
-            renderChart('monthlyChart', 'line', Object.keys(monthly).sort(sortMonth), Object.keys(monthly).sort(sortMonth).map(k=>monthly[k]), ['#38bdf8', '#0ea5e9']);
-            renderChart('dailyChart', 'bar', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), ['#fb923c', '#f97316']);
+            // Render Combo Trend (Default or Current Mode)
+            renderTrendChart();
+
+            // Render Daily (tetap terpisah)
+            const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
+            // PERBAIKAN: Ubah tipe grafik harian menjadi 'line'
+            renderChart('dailyChart', 'line', Object.keys(daily).sort(sortDaily), Object.keys(daily).sort(sortDaily).map(k=>daily[k]), ['#fb923c', '#f97316']);
+        }
+
+        // --- NEW: TOGGLE LOGIC ---
+        window.setTrendMode = (mode) => {
+            currentTrendMode = mode;
+            
+            // Update Button Styles
+            const btnActive = "bg-white text-indigo-600 shadow-sm transform scale-100";
+            const btnInactive = "text-slate-400 hover:text-slate-600 bg-transparent shadow-none";
+            
+            document.getElementById('btnMonthly').className = `px-5 py-2 rounded-lg text-[11px] font-bold transition-all duration-300 ${mode === 'monthly' ? btnActive : btnInactive}`;
+            document.getElementById('btnYearly').className = `px-5 py-2 rounded-lg text-[11px] font-bold transition-all duration-300 ${mode === 'yearly' ? btnActive : btnInactive}`;
+            
+            // Update Title
+            document.getElementById('trendTitle').innerText = mode === 'monthly' ? "Tren Bulanan" : "Tren Tahunan";
+            
+            renderTrendChart();
+        }
+
+        function renderTrendChart() {
+            const mode = currentTrendMode;
+            const dataObj = cachedTrendData[mode];
+            
+            // PERBAIKAN: Logika Sort Bulan Indonesia Manual
+            const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            
+            const sortMonth = (a, b) => {
+                const partsA = a.split(' ');
+                const partsB = b.split(' ');
+                // Format key: "Jan 2024"
+                const idxA = monthsOrder.indexOf(partsA[0]);
+                const idxB = monthsOrder.indexOf(partsB[0]);
+                const yearA = parseInt(partsA[1]);
+                const yearB = parseInt(partsB[1]);
+
+                // Sort by Year then Month
+                return (yearA * 12 + idxA) - (yearB * 12 + idxB);
+            };
+            
+            let labels, values, type, colors;
+
+            if (mode === 'monthly') {
+                labels = Object.keys(dataObj).sort(sortMonth);
+                values = labels.map(k => dataObj[k]);
+                type = 'line';
+                colors = ['#38bdf8', '#0ea5e9']; // Blue Gradient
+            } else {
+                labels = Object.keys(dataObj).sort();
+                values = labels.map(k => dataObj[k]);
+                type = 'bar';
+                colors = ['#818cf8', '#6366f1']; // Indigo Gradient
+            }
+            
+            renderChart('comboTrendChart', type, labels, values, colors);
         }
 
         function renderChart(id, type, labels, data, colors) {
-            const ctx = document.getElementById(id).getContext('2d');
-            if (chartInstances[id]) chartInstances[id].destroy();
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            if(type === 'bar') { gradient.addColorStop(0, colors[0]); gradient.addColorStop(1, colors[1]); }
-            else { gradient.addColorStop(0, 'rgba(56, 189, 248, 0.4)'); gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)'); }
+            const canvas = document.getElementById(id);
+            if (!canvas) return; 
+
+            // Destroy existing chart if it exists
+            if (chartInstances[id]) {
+                chartInstances[id].destroy();
+            }
             
+            const ctx = canvas.getContext('2d');
+
+            // Create Chart
             chartInstances[id] = new Chart(ctx, {
                 type: type,
                 data: {
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: type === 'line' ? gradient : colors[0],
-                        borderColor: colors[1],
-                        borderWidth: 0,
+                        backgroundColor: type === 'line' ? (ctx) => {
+                            const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
+                            gradient.addColorStop(0, colors[0]);
+                            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                            return gradient;
+                        } : colors[0],
+                        borderColor: colors[1] || colors[0],
+                        borderWidth: 2,
                         borderRadius: 4,
-                        tension: 0.4,
                         pointBackgroundColor: '#fff',
                         pointBorderColor: colors[1],
-                        pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6,
-                        hoverBorderWidth: 0,
-                        fill: type === 'line'
+                        fill: type === 'line' ? true : false,
+                        tension: 0.4
                     }]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { 
-                            enabled: true, 
-                            backgroundColor: '#1e293b', 
-                            padding: 10, 
-                            titleFont: { family: "'Plus Jakarta Sans', sans-serif" },
-                            bodyFont: { family: "'Plus Jakarta Sans', sans-serif" },
-                            cornerRadius: 8,
-                            displayColors: false 
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#475569',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return formatNumber(context.raw);
+                                }
+                            }
                         },
-                        datalabels: { 
-                            anchor: 'end', align: 'top', 
-                            color: '#94a3b8', 
-                            font: { size: 10, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" }, 
-                            offset: -2, 
-                            formatter: (val) => val > 0 ? formatNumber(val) : '' 
+                        datalabels: {
+                            // PERBAIKAN: Selalu tampilkan label data (baik bar maupun line)
+                            display: 'auto',
+                            align: 'end',
+                            anchor: 'end',
+                            color: '#64748b',
+                            font: { size: 10, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
+                            offset: 4, // Beri jarak sedikit ke atas agar tidak menumpuk dengan titik garis
+                            formatter: (val) => val > 0 ? formatNumber(val) : ''
                         }
                     },
                     scales: { 
-                        y: { display: false }, 
+                        y: { display: false, beginAtZero: true }, 
                         x: { 
                             grid: { display: false }, 
                             ticks: { font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '500' }, color: '#94a3b8' } 
@@ -1452,6 +1606,53 @@
             let tfootContent = `<tr><td class="px-4 text-left">TOTAL</td><td class="text-center">${formatNumber(gt)}</td><td class="text-center">100%</td></tr>`;
 
             renderStructuredTable('containerService', theadContent, tbodyContent, tfootContent);
+        }
+
+        // 3.5 ORIGIN RECAP (New Function)
+        function generateOriginRecap(data) {
+            const originMap = {};
+            data.forEach(r => { const o = r['pickup_hub'] || "Unknown"; originMap[o] = (originMap[o]||0)+1; });
+            
+            // Get Top 5
+            const sortedOrigins = Object.keys(originMap).sort((a,b) => originMap[b] - originMap[a]).slice(0, 5);
+            let gt = 0;
+            
+            let theadContent = `<tr>
+                <th class="text-center" style="width:50px;">Rank</th>
+                <th class="text-left pl-4" style="min-width:140px;">Origin Name</th>
+                <th class="text-center" style="min-width:80px;">Total</th>
+                <th class="text-center" style="min-width:60px;">%</th>
+            </tr>`;
+            
+            let tbodyContent = "";
+            sortedOrigins.forEach((o, index) => {
+                const c = originMap[o]; gt += c;
+                const pct = data.length>0?(c/data.length)*100:0;
+                
+                let rankColor = "bg-slate-100 text-slate-500";
+                if(index === 0) rankColor = "bg-yellow-100 text-yellow-700 border-yellow-200";
+                if(index === 1) rankColor = "bg-slate-200 text-slate-600 border-slate-300";
+                if(index === 2) rankColor = "bg-orange-100 text-orange-700 border-orange-200";
+
+                tbodyContent += `<tr>
+                    <td class="text-center px-2">
+                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-bold border ${rankColor}">${index+1}</span>
+                    </td>
+                    <td class="font-bold px-4 text-slate-700 text-[11px] truncate max-w-[150px]" title="${o}">${o}</td>
+                    <td class="text-center font-bold bg-pink-50/30 text-pink-600">${formatNumber(c)}</td>
+                    <td class="text-center text-[10px] text-slate-400 font-medium">${pct.toFixed(1)}%</td>
+                </tr>`;
+            });
+            
+            // Note: Footer shows total of TOP 5 only, or can show total of ALL data if preferred. 
+            // Here we show Total of Top 5 to match the list shown.
+            let tfootContent = `<tr>
+                <td colspan="2" class="px-4 text-left">TOTAL (Top 5)</td>
+                <td class="text-center">${formatNumber(gt)}</td>
+                <td class="text-center">${data.length>0 ? ((gt/data.length)*100).toFixed(1) : 0}%</td>
+            </tr>`;
+
+            renderStructuredTable('containerOrigin', theadContent, tbodyContent, tfootContent);
         }
 
         // 4. STAGING RECAP
@@ -1713,27 +1914,6 @@
             const el = document.getElementById(id);
             if(el) el.addEventListener(id==='searchInput'?'keyup':'change', renderDashboard);
         });
-
-        document.getElementById('csvFileInput').addEventListener('change', e => {
-            const f = e.target.files[0]; if(!f) return;
-            Papa.parse(f, { header:true, skipEmptyLines:true, complete: res => {
-                showIsland('confirm', `Siap memproses ${res.data.length} data?`, () => saveData(res.data));
-            }});
-        });
-
-        async function saveData(data) {
-            showIsland('loading', 'Menyimpan ke Cloud...');
-            const valid = data.filter(r=>r.awb);
-            const batchSize = 450; 
-            for(let i=0; i<Math.ceil(valid.length/batchSize); i++) {
-                const batch = writeBatch(db);
-                valid.slice(i*batchSize, (i+1)*batchSize).forEach(row => {
-                    batch.set(doc(db, COLLECTION_NAME, row.awb.trim()), JSON.parse(JSON.stringify(row)), {merge:true});
-                });
-                await batch.commit();
-            }
-            showIsland('success', 'Upload Berhasil!');
-        }
 
         const dateEl = document.getElementById('currentDate');
         if(dateEl) dateEl.innerText = new Date().toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'short', year:'numeric'});
