@@ -1175,6 +1175,10 @@
             if(endDate) endDate.setHours(23,59,59,999);
 
             return allData.filter(row => {
+                // --- CLEANING DATA: HAPUS "UNKNOWN" ---
+                // Jika HUB kosong, null, atau tulisan 'Unknown', jangan tampilkan
+                if (!row['delivery_hub'] || row['delivery_hub'].toString().trim() === '' || row['delivery_hub'].toString().toLowerCase() === 'unknown') return false;
+
                 if (startDate || endDate) {
                     const rowDate = parseDateStr(row['Tanggal']);
                     if (rowDate) {
@@ -1229,6 +1233,9 @@
             const posVal = document.getElementById('filterPosisi').value;
 
             return allData.filter(row => {
+                // --- CLEANING DATA PREV PERIOD JUGA ---
+                if (!row['delivery_hub'] || row['delivery_hub'].toString().trim() === '' || row['delivery_hub'].toString().toLowerCase() === 'unknown') return false;
+
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
                 if (isGustiadiOnly && hubX !== 'gustiadi') return false;
                 if (hubVal && row.delivery_hub !== hubVal) return false;
@@ -1246,7 +1253,8 @@
             const services = new Set();
             const posisis = new Set();
             data.forEach(r => { 
-                if(r.delivery_hub) hubs.add(r.delivery_hub);
+                // Populate hanya data valid
+                if(r.delivery_hub && r.delivery_hub.trim() !== '' && r.delivery_hub.toLowerCase() !== 'unknown') hubs.add(r.delivery_hub);
                 if(r.service_code) services.add(r.service_code);
                 if(r.Posisi) posisis.add(r.Posisi); 
             });
@@ -1722,7 +1730,13 @@
         // 3.5 ORIGIN RECAP (New Function)
         function generateOriginRecap(data) {
             const originMap = {};
-            data.forEach(r => { const o = r['pickup_hub'] || "Unknown"; originMap[o] = (originMap[o]||0)+1; });
+            data.forEach(r => { 
+                // Filter Unknown Origin
+                const o = r['pickup_hub']; 
+                if (o && o.trim() !== '' && o.toLowerCase() !== 'unknown') {
+                    originMap[o] = (originMap[o]||0)+1; 
+                }
+            });
             
             // Get Top 5
             const sortedOrigins = Object.keys(originMap).sort((a,b) => originMap[b] - originMap[a]).slice(0, 5);
