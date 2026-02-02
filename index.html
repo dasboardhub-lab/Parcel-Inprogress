@@ -510,46 +510,51 @@
 
         </div>
 
-        <!-- BARIS 2: Rekapan HUB (1 Kolom Full) -->
-        <div class="grid grid-cols-1 gap-6 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 850ms">
-            <div class="flex flex-col h-[500px]">
-                <!-- PERUBAHAN: Header berwarna, Icon dikiri -->
-                <div class="bg-orange-600 px-6 py-4 rounded-t-3xl border border-orange-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
-                    <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-buildings"></i></div>
-                    <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Rekapan HUB</h3>
-                </div>
-                <div id="containerHub" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
-            </div>
-        </div>
-
-        <!-- BARIS 3: Rekapan Staging & Data Management (Grid 12: Staging 8, AWB 4) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[520px] mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 900ms">
+        <!-- NEW COMBINED ROW: HUB & Staging (Left) vs AWB (Right) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 850ms">
             
-            <!-- KIRI: Rekapan Staging (Lebih Lebar - 8 Kolom) -->
-            <div class="lg:col-span-8 h-full flex flex-col">
-                <div class="bg-blue-600 px-6 py-4 rounded-t-3xl border border-blue-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
-                    <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-warehouse"></i></div>
-                    <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Rekapan Staging</h3>
+            <!-- LEFT COLUMN WRAPPER (8/12) - Berisi HUB dan Staging -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+                
+                <!-- Rekapan HUB (Top Left) -->
+                <div class="flex flex-col h-[500px]">
+                    <div class="bg-orange-600 px-6 py-4 rounded-t-3xl border border-orange-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
+                        <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-buildings"></i></div>
+                        <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Rekapan HUB</h3>
+                    </div>
+                    <div id="containerHub" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
                 </div>
-                <div id="containerStaging" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
+
+                <!-- Rekapan Staging (Bottom Left) -->
+                <div class="flex flex-col h-[520px]">
+                    <div class="bg-blue-600 px-6 py-4 rounded-t-3xl border border-blue-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
+                        <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-warehouse"></i></div>
+                        <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Rekapan Staging</h3>
+                    </div>
+                    <div id="containerStaging" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
+                </div>
+
             </div>
 
-            <!-- KANAN: Manajemen Data AWB (Lebih Ramping - 4 Kolom) -->
-            <div class="lg:col-span-4 h-full flex flex-col">
-                <div class="bg-slate-800 px-6 py-4 rounded-t-3xl border border-slate-800 border-b-0 flex flex-col gap-3 shadow-sm shrink-0 relative z-10">
-                    <div class="flex items-center gap-4">
-                        <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-table"></i></div>
-                        <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Daftar Data AWB</h3>
+            <!-- RIGHT COLUMN WRAPPER (4/12) - Berisi Daftar AWB (Full Height) -->
+            <div class="lg:col-span-4 h-full"> 
+                <!-- Daftar Data AWB (Right - Spanning Height) -->
+                <div class="flex flex-col h-full"> 
+                    <div class="bg-slate-800 px-6 py-4 rounded-t-3xl border border-slate-800 border-b-0 flex flex-col gap-3 shadow-sm shrink-0 relative z-10">
+                        <div class="flex items-center gap-4">
+                            <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-table"></i></div>
+                            <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Daftar Data AWB</h3>
+                        </div>
+                        <!-- SEARCH INPUT AWB -->
+                        <div class="relative w-full">
+                            <input type="text" id="awbSearchInput" placeholder="Cari No Resi..." 
+                                class="w-full bg-slate-700/50 border border-slate-600 text-white text-[11px] rounded-lg px-3 py-2 pl-8 focus:outline-none focus:border-slate-500 transition-colors placeholder-slate-400">
+                            <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        </div>
                     </div>
-                    <!-- SEARCH INPUT AWB -->
-                    <div class="relative w-full">
-                        <input type="text" id="awbSearchInput" placeholder="Cari No Resi..." 
-                            class="w-full bg-slate-700/50 border border-slate-600 text-white text-[11px] rounded-lg px-3 py-2 pl-8 focus:outline-none focus:border-slate-500 transition-colors placeholder-slate-400">
-                        <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <div id="containerAwbList" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1 relative h-full">
+                        <!-- Table will be injected here -->
                     </div>
-                </div>
-                <div id="containerAwbList" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1 relative">
-                    <!-- Table will be injected here -->
                 </div>
             </div>
 
@@ -1978,7 +1983,7 @@
         let awbDataCache = []; 
         let filteredAwbCache = []; // New filtered cache
         let awbRenderedCount = 0; 
-        const AWB_CHUNK_SIZE = 40; // PERBAIKAN: Ubah jadi 40 baris per muat
+        const AWB_CHUNK_SIZE = 60; // PERBAIKAN: Ubah jadi 30 baris per muat
         const AWB_MAX_LIMIT = 10000; 
 
         function generateAwbTable(data) {
@@ -2023,9 +2028,9 @@
 
             awbRenderedCount = 0;
             
-            // PERBAIKAN: Tambahkan overflow-y-auto eksplisit dan style height
+            // PERBAIKAN: Gunakan 'absolute inset-0' agar tinggi tabel terkunci & scrollbar muncul pasti
             container.innerHTML = `
-                <div class="table-scroll-area h-full overflow-y-auto custom-scrollbar" id="awbScrollArea" style="max-height: 100%;">
+                <div class="absolute inset-0 overflow-y-auto custom-scrollbar" id="awbScrollArea">
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-slate-100 sticky top-0 z-20 shadow-sm text-slate-600 text-[10px] uppercase font-bold tracking-wider">
                             <tr>
@@ -2050,8 +2055,8 @@
             const scrollArea = document.getElementById('awbScrollArea');
             if(scrollArea) {
                 scrollArea.addEventListener('scroll', () => {
-                    // Trigger load more ketika scroll sisa 20px dari bawah
-                    if (scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 20) {
+                    // Trigger load more ketika scroll sisa 50px dari bawah (dinaikkan biar lebih responsif)
+                    if (scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 50) {
                         appendAwbRows();
                     }
                 });
