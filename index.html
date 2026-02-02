@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Parcel Inprogress</title>
+    <title>Dashboard Parcel Inprogress V1</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1096,7 +1096,9 @@
 
         // --- MAIN RENDERER & SAVE ---
         async function saveData(data) {
-            showIsland('loading', 'Menyimpan ke Cloud...');
+            showIsland('loading', 'Menganalisis Data...');
+            
+            // 1. CARI KOLOM AWB
             const sampleRow = data[0] || {};
             const awbKey = Object.keys(sampleRow).find(k => k.toLowerCase() === 'awb' || k.toLowerCase() === 'no resi' || k.toLowerCase().includes('awb'));
 
@@ -1105,25 +1107,79 @@
                 return;
             }
 
+            // 2. FILTER DATA VALID (Hanya yang punya AWB)
             const valid = data.filter(r => r[awbKey] && r[awbKey].toString().trim() !== '');
             if (valid.length === 0) {
                 showIsland('error', 'Tidak ada data valid (AWB kosong).');
                 return;
             }
 
+            // 3. SIMPLE FILTERING (Cek AWB Saja)
+            // Kita gunakan Set untuk pengecekan keberadaan AWB yang super cepat
+            const existingAwbs = new Set(allData.map(item => item.awb));
+            
+            const rowsToUpload = [];
+            let skippedCount = 0;
+            let newCount = 0;
+
+            valid.forEach(row => {
+                const docId = row[awbKey].toString().trim();
+
+                if (existingAwbs.has(docId)) {
+                    // AWB sudah ada -> SKIP (Abaikan isinya)
+                    skippedCount++; 
+                } else {
+                    // AWB belum ada -> UPLOAD (Data Baru)
+                    const cleanRow = JSON.parse(JSON.stringify(row)); 
+                    cleanRow['awb'] = docId; // Standarisasi key 'awb'
+                    rowsToUpload.push(cleanRow);
+                    newCount++;
+                }
+            });
+
+            // 4. KONFIRMASI AKHIR SEBELUM UPLOAD
+            if (rowsToUpload.length === 0) {
+                showIsland('success', `Semua ${formatNumber(skippedCount)} data AWB sudah ada! Tidak ada data baru.`);
+                return;
+            }
+
+            // Hitung estimasi kuota
+            const used = getDailyQuota();
+            const remaining = DAILY_LIMIT - used;
+            
+            let confirmMsg = `
+                <div class="text-left text-[11px] bg-slate-50 p-2 rounded-lg mb-2">
+                    <div class="flex justify-between"><span>Total File:</span> <b>${formatNumber(valid.length)}</b></div>
+                    <div class="flex justify-between text-slate-400"><span>Sudah Ada (Skip):</span> <b>${formatNumber(skippedCount)}</b></div>
+                    <div class="flex justify-between text-emerald-600 font-bold"><span>Data Baru:</span> <b>${formatNumber(newCount)}</b></div>
+                    <div class="border-t border-slate-200 mt-1 pt-1 flex justify-between font-bold"><span>Akan Diupload:</span> <span>${formatNumber(rowsToUpload.length)}</span></div>
+                </div>
+            `;
+
+            if (rowsToUpload.length > remaining) {
+                confirmMsg += `<span class="text-red-500 font-bold text-[10px]">Peringatan: Kuota tersisa ${formatNumber(remaining)}, upload mungkin terhenti.</span>`;
+            } else {
+                confirmMsg += `<span class="text-slate-400 text-[10px]">Kuota aman. Lanjutkan?</span>`;
+            }
+
+            // Tampilkan konfirmasi
+            showIsland('confirm', confirmMsg, () => executeBatchUpload(rowsToUpload));
+        }
+
+        // Fungsi Eksekusi Upload (Dipisah agar rapi)
+        async function executeBatchUpload(rows) {
+            showIsland('loading', `Mengupload ${rows.length} data...`);
+            
             const batchSize = 450; 
-            const totalBatches = Math.ceil(valid.length/batchSize);
+            const totalBatches = Math.ceil(rows.length/batchSize);
             let successCount = 0;
 
             for(let i=0; i<totalBatches; i++) {
                 const batch = writeBatch(db);
-                const chunk = valid.slice(i*batchSize, (i+1)*batchSize);
+                const chunk = rows.slice(i*batchSize, (i+1)*batchSize);
                 
                 chunk.forEach(row => {
-                    const docId = row[awbKey].toString().trim();
-                    const dataToSave = JSON.parse(JSON.stringify(row));
-                    dataToSave['awb'] = docId; 
-                    batch.set(doc(db, COLLECTION_NAME, docId), dataToSave, {merge:true});
+                    batch.set(doc(db, COLLECTION_NAME, row.awb), row, {merge:true});
                 });
                 
                 try {
@@ -1136,8 +1192,9 @@
                     break;
                 }
             }
+            
             if (successCount > 0) {
-                showIsland('success', `Berhasil upload ${formatNumber(successCount)} data!`);
+                showIsland('success', `Selesai! ${formatNumber(successCount)} data tersimpan.`);
             } else {
                 showIsland('error', 'Gagal menyimpan data.');
             }
