@@ -1533,7 +1533,7 @@
                             order: 2 // Render di belakang
                         },
                         {
-                            label: 'Inprogress (Gustiadi)',
+                            label: 'Inprogress',
                             data: dataGustiadi,
                             borderColor: '#6366f1', // Indigo (Warna Pembeda)
                             backgroundColor: gradientGustiadi,
@@ -1969,12 +1969,21 @@
                 tbodyContent += `</tr>`;
             });
 
+            // Calculate % for Grand Total (should be 100% basically)
+            const grandTotalPct = data.length > 0 ? (grandTotal / data.length) * 100 : 0; 
+
             let tfootContent = `<tr>
                 <td colspan="2" class="px-3 text-right">GRAND TOTAL</td>
-                <td class="text-center">${formatNumber(grandTotal)}</td>`;
+                <td class="text-center">
+                    <div>${formatNumber(grandTotal)}<div class="pivot-pct">100%</div></div>
+                </td>`;
             
             sortedPos.forEach(p => {
-                tfootContent += `<td class="text-center border-r border-slate-200 text-slate-800">${formatNumber(posTotals[p]||0)}</td>`;
+                const val = posTotals[p]||0;
+                const pct = grandTotal > 0 ? (val / grandTotal) * 100 : 0;
+                tfootContent += `<td class="text-center border-r border-slate-200 text-slate-800">
+                    <div>${formatNumber(val)}<div class="pivot-pct">${pct.toFixed(1)}%</div></div>
+                </td>`;
             });
             tfootContent += `</tr>`;
 
