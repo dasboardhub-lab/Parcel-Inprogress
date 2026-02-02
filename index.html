@@ -1978,7 +1978,7 @@
         let awbDataCache = []; 
         let filteredAwbCache = []; // New filtered cache
         let awbRenderedCount = 0; 
-        const AWB_CHUNK_SIZE = 50; 
+        const AWB_CHUNK_SIZE = 40; // PERBAIKAN: Ubah jadi 40 baris per muat
         const AWB_MAX_LIMIT = 10000; 
 
         function generateAwbTable(data) {
@@ -1988,7 +1988,6 @@
             // Simpan data asli
             awbDataCache = data;
             
-            // Inisialisasi input search listener jika belum ada
             const searchInput = document.getElementById('awbSearchInput');
             if(searchInput) {
                 const currentSearch = searchInput.value.toLowerCase();
@@ -2024,9 +2023,9 @@
 
             awbRenderedCount = 0;
             
-            // PERBAIKAN: Header dibuat rapat sesuai isi, Action dikecilkan
+            // PERBAIKAN: Tambahkan overflow-y-auto eksplisit dan style height
             container.innerHTML = `
-                <div class="table-scroll-area h-full" id="awbScrollArea">
+                <div class="table-scroll-area h-full overflow-y-auto custom-scrollbar" id="awbScrollArea" style="max-height: 100%;">
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-slate-100 sticky top-0 z-20 shadow-sm text-slate-600 text-[10px] uppercase font-bold tracking-wider">
                             <tr>
@@ -2039,7 +2038,7 @@
                         <tbody id="awbTableBody" class="divide-y divide-slate-100 text-[11px]">
                             <!-- Rows will be appended here -->
                         </tbody>
-                        <tfoot class="sticky bottom-0 z-20" id="awbTableFooter">
+                        <tfoot id="awbTableFooter">
                             <!-- Footer info -->
                         </tfoot>
                     </table>
@@ -2051,7 +2050,8 @@
             const scrollArea = document.getElementById('awbScrollArea');
             if(scrollArea) {
                 scrollArea.addEventListener('scroll', () => {
-                    if (scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 50) {
+                    // Trigger load more ketika scroll sisa 20px dari bawah
+                    if (scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 20) {
                         appendAwbRows();
                     }
                 });
@@ -2080,7 +2080,6 @@
                 const staging = row['delivery_staging'] || "-";
                 const posisi = row['Posisi'] || "-";
                 
-                // PERBAIKAN: Tombol Hapus jadi Icon Only, Padding diperkecil
                 rowsHTML += `
                     <tr class="hover:bg-red-50/30 transition-colors group">
                         <td class="font-bold text-slate-700 pl-3 border-r border-slate-100 font-mono text-[10px] select-all py-1.5">
@@ -2101,7 +2100,8 @@
             awbRenderedCount += nextBatch.length;
 
             const remaining = Math.min(filteredAwbCache.length, AWB_MAX_LIMIT) - awbRenderedCount;
-            let footerText = `${formatNumber(awbRenderedCount)}/${formatNumber(filteredAwbCache.length)}`;
+            let footerText = `${formatNumber(awbRenderedCount)} dari ${formatNumber(filteredAwbCache.length)}`;
+            if (remaining > 0) footerText += ` <span class="text-indigo-400 font-bold ml-1">(Scroll ▼)</span>`;
             
             footer.innerHTML = `
                 <tr>
