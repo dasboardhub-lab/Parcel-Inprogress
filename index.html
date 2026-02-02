@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Parcel Inprogress V1</title>
+    <title>Dashboard Parcel Inprogress</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1870,14 +1870,15 @@
             
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            // New Layout
+            // New Layout - PERBAIKAN: Lebar Kolom Posisi Dibuat SAMA (Fixed)
             let theadContent = `<tr>
-                <th style="min-width:120px; width:120px;">HUB</th>
-                <th style="min-width:130px;">Staging</th>
-                <th style="min-width:90px;" class="text-center">${title}</th>`;
+                <th style="width:120px; min-width:120px;" class="text-left pl-3">HUB</th>
+                <th style="width:130px; min-width:130px;" class="text-left">Staging</th>
+                <th style="width:80px; min-width:80px;" class="text-center">${title}</th>`;
             
             sortedPos.forEach(p => {
-                theadContent += `<th style="min-width:90px;" class="text-center">${p}</th>`;
+                // Paksa lebar sama (90px) untuk setiap kolom posisi agar rapi
+                theadContent += `<th style="width:90px; min-width:90px; max-width:90px;" class="text-center truncate px-1" title="${p}">${p}</th>`;
             });
             theadContent += `</tr>`;
 
@@ -1917,11 +1918,11 @@
                     tbodyContent += `<tr>`;
                     if(i===0) {
                         // Rowspan ditambah 1 untuk baris Total HUB
-                        tbodyContent += `<td class="row-group-header border-b border-slate-100 px-3 text-slate-800 font-bold align-top border-r" rowspan="${stagings.length + 1}">${h}</td>`;
+                        tbodyContent += `<td class="row-group-header border-b border-slate-100 px-3 text-slate-800 font-bold align-top border-r text-[11px]" rowspan="${stagings.length + 1}">${h}</td>`;
                     }
                     
                     // Display Staging Total with %
-                    tbodyContent += `<td class="text-slate-600 border-r border-slate-50 px-3 font-medium text-[11px]">${ss}</td>
+                    tbodyContent += `<td class="text-slate-600 border-r border-slate-50 px-3 font-medium text-[11px] truncate max-w-[130px]" title="${ss}">${ss}</td>
                     <td class="text-center font-bold bg-blue-50/20 text-blue-600 border-r border-slate-50">
                         <div>${formatNumber(d.t)}<div class="text-[10px] font-medium text-blue-400">${stagingPct.toFixed(1)}%</div></div>
                     </td>`;
@@ -1990,17 +1991,9 @@
             // Inisialisasi input search listener jika belum ada
             const searchInput = document.getElementById('awbSearchInput');
             if(searchInput) {
-                // Remove old listeners by cloning (simple trick) or just re-assign onclick
-                // For simplicity here, we assume generateAwbTable is called on refresh
-                // But better to attach listener once globally.
-                // Since this function is called on every render, let's just handle logic.
-                
-                // Clear filter on re-render if needed, or keep it?
-                // Better keep current search value
                 const currentSearch = searchInput.value.toLowerCase();
                 filterAwbData(currentSearch);
                 
-                // Attach event listener (avoid duplicate by checking custom property or removing old)
                 if (!searchInput.dataset.hasListener) {
                     searchInput.addEventListener('input', (e) => {
                         filterAwbData(e.target.value.toLowerCase());
@@ -2008,7 +2001,6 @@
                     searchInput.dataset.hasListener = 'true';
                 }
             } else {
-                // Fallback if search input not found in DOM
                 filteredAwbCache = awbDataCache; 
                 resetAwbTable();
             }
@@ -2032,15 +2024,16 @@
 
             awbRenderedCount = 0;
             
+            // PERBAIKAN: Header dibuat rapat sesuai isi, Action dikecilkan
             container.innerHTML = `
                 <div class="table-scroll-area h-full" id="awbScrollArea">
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-slate-100 sticky top-0 z-20 shadow-sm text-slate-600 text-[10px] uppercase font-bold tracking-wider">
                             <tr>
-                                <th class="text-left pl-4 py-3" style="min-width:140px;">No Resi (AWB)</th>
-                                <th class="text-center" style="min-width:100px;">Staging</th>
-                                <th class="text-center" style="min-width:120px;">Posisi</th>
-                                <th class="text-center" style="min-width:80px;">Action</th>
+                                <th class="text-left pl-3 py-3 w-auto">No Resi</th>
+                                <th class="text-center w-auto px-1">Staging</th>
+                                <th class="text-center w-auto px-1">Posisi</th>
+                                <th class="text-center w-10 px-1"><i class="ph-bold ph-gear"></i></th>
                             </tr>
                         </thead>
                         <tbody id="awbTableBody" class="divide-y divide-slate-100 text-[11px]">
@@ -2076,7 +2069,7 @@
             const nextBatch = filteredAwbCache.slice(awbRenderedCount, awbRenderedCount + AWB_CHUNK_SIZE);
             
             if (awbRenderedCount === 0 && nextBatch.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-slate-400 italic">Tidak ada data yang sesuai filter</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-slate-400 italic">Tidak ada data</td></tr>`;
                 footer.innerHTML = '';
                 return;
             }
@@ -2087,16 +2080,17 @@
                 const staging = row['delivery_staging'] || "-";
                 const posisi = row['Posisi'] || "-";
                 
+                // PERBAIKAN: Tombol Hapus jadi Icon Only, Padding diperkecil
                 rowsHTML += `
                     <tr class="hover:bg-red-50/30 transition-colors group">
-                        <td class="font-bold text-slate-700 pl-4 border-r border-slate-100 font-mono text-[11px] select-all py-2">
+                        <td class="font-bold text-slate-700 pl-3 border-r border-slate-100 font-mono text-[10px] select-all py-1.5">
                             ${awb.replace(document.getElementById('awbSearchInput')?.value || '', match => `<span class="bg-yellow-200 text-slate-900">${match}</span>`)}
                         </td>
-                        <td class="text-center text-slate-500 border-r border-slate-50 text-[10px]">${staging}</td>
-                        <td class="text-center text-slate-500 border-r border-slate-50 text-[10px] truncate max-w-[100px]">${posisi}</td>
-                        <td class="text-center py-1">
-                            <button onclick="confirmDeleteAwb('${awb}')" class="px-2 py-1 bg-white border border-red-200 text-red-500 hover:bg-red-500 hover:text-white rounded shadow-sm transition-all text-[9px] font-bold inline-flex items-center gap-1 active:scale-95">
-                                <i class="ph-bold ph-trash"></i> Hapus
+                        <td class="text-center text-slate-500 border-r border-slate-50 text-[10px] px-1">${staging}</td>
+                        <td class="text-center text-slate-500 border-r border-slate-50 text-[10px] px-1 truncate max-w-[80px]" title="${posisi}">${posisi}</td>
+                        <td class="text-center py-1 px-1">
+                            <button onclick="confirmDeleteAwb('${awb}')" class="w-7 h-7 flex items-center justify-center bg-white border border-red-200 text-red-500 hover:bg-red-500 hover:text-white rounded-lg shadow-sm transition-all active:scale-95 mx-auto" title="Hapus Data">
+                                <i class="ph-bold ph-trash text-sm"></i>
                             </button>
                         </td>
                     </tr>
@@ -2107,13 +2101,11 @@
             awbRenderedCount += nextBatch.length;
 
             const remaining = Math.min(filteredAwbCache.length, AWB_MAX_LIMIT) - awbRenderedCount;
-            let footerText = `Menampilkan ${formatNumber(awbRenderedCount)} dari ${formatNumber(filteredAwbCache.length)} data`;
-            if (remaining > 0) footerText += ` (Scroll untuk memuat lebih banyak)`;
-            else if (filteredAwbCache.length > AWB_MAX_LIMIT) footerText += ` (Batas tampilan 10.000 tercapai)`;
-
+            let footerText = `${formatNumber(awbRenderedCount)}/${formatNumber(filteredAwbCache.length)}`;
+            
             footer.innerHTML = `
                 <tr>
-                    <td colspan="4" class="text-center text-slate-400 italic font-normal bg-slate-50 border-t border-slate-200 py-2 text-[10px]">
+                    <td colspan="4" class="text-center text-slate-400 italic font-normal bg-slate-50 border-t border-slate-200 py-1.5 text-[9px]">
                         ${footerText}
                     </td>
                 </tr>
