@@ -516,8 +516,8 @@
             <!-- LEFT COLUMN WRAPPER (8/12) - Berisi HUB dan Staging -->
             <div class="lg:col-span-8 flex flex-col gap-6">
                 
-                <!-- Rekapan HUB (Top Left) -->
-                <div class="flex flex-col h-[500px]">
+                <!-- Rekapan HUB (Top Left) - Adjusted Height to ~7 rows (Header + 5 Data + Footer) -->
+                <div class="flex flex-col h-[450px]">
                     <div class="bg-orange-600 px-6 py-4 rounded-t-3xl border border-orange-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
                         <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-buildings"></i></div>
                         <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Rekapan HUB</h3>
@@ -525,8 +525,8 @@
                     <div id="containerHub" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
                 </div>
 
-                <!-- Rekapan Staging (Bottom Left) -->
-                <div class="flex flex-col h-[520px]">
+                <!-- Rekapan Staging (Bottom Left) - Adjusted Height to ~13 rows (Header + 11 Data + Footer) -->
+                <div class="flex flex-col h-[730px]">
                     <div class="bg-blue-600 px-6 py-4 rounded-t-3xl border border-blue-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
                         <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-warehouse"></i></div>
                         <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Rekapan Staging</h3>
@@ -1325,7 +1325,9 @@
                 if(!select || select.options.length > 1) return;
                 Array.from(set).sort().forEach(val => {
                     const opt = document.createElement('option');
-                    opt.value = val; opt.innerText = `${label}: ${val}`;
+                    opt.value = val; 
+                    // PERBAIKAN: Hanya menampilkan nilai (item) saja tanpa label prefix
+                    opt.innerText = val;
                     select.appendChild(opt);
                 });
             };
