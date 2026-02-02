@@ -176,6 +176,13 @@
             text-align: left;
             color: #9a3412 !important;
         }
+        
+        /* Utility for small percentage text */
+        .pivot-pct {
+            font-size: 10px;
+            font-weight: 500;
+            margin-top: 2px;
+        }
 
         .row-group-header { background: #fff; vertical-align: top !important; padding-top: 18px !important; color: #0f172a; font-weight: 800; }
 
@@ -468,11 +475,11 @@
             </div>
         </div>
 
-        <!-- BARIS 1: Monitoring KPI & Top Origin (2 Kolom) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 800ms">
+        <!-- BARIS 1: KPI (Fokus), Origin, Service (3 Kolom) -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 800ms">
             
-            <!-- KIRI: Monitoring KPI -->
-            <div class="flex flex-col h-[440px]">
+            <!-- KPI: Mengambil porsi terbesar (6 dari 12 kolom = 50%) -->
+            <div class="xl:col-span-6 flex flex-col h-[440px]">
                 <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
                     <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Monitoring KPI</h3>
                     <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-monitor"></i></div>
@@ -480,8 +487,8 @@
                 <div id="containerKPI" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
-            <!-- KANAN: Top 5 Origin -->
-            <div class="flex flex-col h-[440px]">
+            <!-- Top 5 Origin: (3 dari 12 kolom = 25%) -->
+            <div class="xl:col-span-3 flex flex-col h-[440px]">
                 <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
                     <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Top 5 Origin</h3>
                     <div class="w-8 h-8 bg-pink-50 text-pink-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-map-pin"></i></div>
@@ -489,22 +496,8 @@
                 <div id="containerOrigin" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
-        </div>
-
-        <!-- BARIS 2: Rekapan HUB & Service Breakdown (2 Kolom) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 850ms">
-            
-            <!-- KIRI: Rekapan HUB -->
-            <div class="flex flex-col h-[440px]">
-                <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
-                    <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Rekapan HUB</h3>
-                    <div class="w-8 h-8 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-buildings"></i></div>
-                </div>
-                <div id="containerHub" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
-            </div>
-
-            <!-- KANAN: Service Breakdown -->
-            <div class="flex flex-col h-[440px]">
+            <!-- Service Breakdown: (3 dari 12 kolom = 25%) -->
+            <div class="xl:col-span-3 flex flex-col h-[440px]">
                 <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
                     <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Service Breakdown</h3>
                     <div class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-tag"></i></div>
@@ -512,6 +505,17 @@
                 <div id="containerService" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
+        </div>
+
+        <!-- BARIS 2: Rekapan HUB (1 Kolom Full) -->
+        <div class="grid grid-cols-1 gap-6 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 850ms">
+            <div class="flex flex-col h-[500px]">
+                <div class="bg-white px-6 py-4 rounded-t-3xl border border-slate-200 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
+                    <h3 class="text-xs font-display font-bold text-slate-700 uppercase tracking-widest">Rekapan HUB</h3>
+                    <div class="w-8 h-8 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center"><i class="ph-bold ph-buildings"></i></div>
+                </div>
+                <div id="containerHub" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
+            </div>
         </div>
 
         <!-- BARIS 3: Rekapan Staging (1 Kolom Full) -->
@@ -1538,7 +1542,7 @@
             renderStructuredTable('containerKPI', theadContent, tbodyContent, tfootContent);
         }
 
-        // 2. HUB RECAP
+        // 2. HUB RECAP (Updated with Percentage)
         function generateHubRecap(data) {
             const hubs = {}; const posTotals = {};
             data.forEach(r => {
@@ -1550,6 +1554,8 @@
             const sortedPos = Object.keys(posTotals).sort((a,b) => posTotals[b]-posTotals[a]);
             const sortedHubs = Object.keys(hubs).sort();
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
+            
+            let gt = data.length; // Grand Total for % Calc
 
             // Fixed Layout logic removed, now using min-width
             let theadContent = `<tr><th style="min-width:130px; width:130px;" class="text-left pl-4">HUB</th><th style="min-width:80px;" class="text-center">${title}</th>`;
@@ -1557,14 +1563,22 @@
             theadContent += `</tr>`;
 
             let tbodyContent = "";
-            let gt = 0;
+            let sumTotal = 0;
             sortedHubs.forEach(h => {
-                const d = hubs[h]; gt += d.t;
+                const d = hubs[h]; sumTotal += d.t;
                 let rowVals = sortedPos.map(p => d.c[p]||0);
                 let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                 let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
+                
+                // Calculate % of Grand Total
+                const totalPct = gt > 0 ? (d.t / gt) * 100 : 0;
 
-                tbodyContent += `<tr><td class="font-bold text-slate-700 pl-4 border-r border-slate-100">${h}</td><td class="text-center font-bold bg-orange-50/30 text-orange-600">${formatNumber(d.t)}</td>`;
+                tbodyContent += `<tr>
+                    <td class="font-bold text-slate-700 pl-4 border-r border-slate-100">${h}</td>
+                    <td class="text-center font-bold bg-orange-50/30 text-orange-600">
+                        <div>${formatNumber(d.t)}<div class="text-[10px] font-medium text-orange-400">${totalPct.toFixed(1)}%</div></div>
+                    </td>`;
+                
                 sortedPos.forEach(p => {
                     const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
                     let content = `<span class="text-slate-300">-</span>`;
@@ -1579,7 +1593,7 @@
                 tbodyContent += `</tr>`;
             });
             
-            let tfootContent = `<tr><td class="px-4 text-left">ALL</td><td class="text-center">${formatNumber(gt)}</td>`;
+            let tfootContent = `<tr><td class="px-4 text-left">ALL</td><td class="text-center">${formatNumber(sumTotal)}</td>`;
             sortedPos.forEach(p => tfootContent += `<td class="text-center">${formatNumber(posTotals[p]||0)}</td>`);
             tfootContent += `</tr>`;
 
@@ -1655,9 +1669,9 @@
             renderStructuredTable('containerOrigin', theadContent, tbodyContent, tfootContent);
         }
 
-        // 4. STAGING RECAP
+        // 4. STAGING RECAP (Updated with Percentage)
         function generateStagingRecap(data) {
-            const table = document.getElementById('tableStaging'); // Check if element exists implicitly via container logic
+            const table = document.getElementById('tableStaging'); 
             
             const grouping = {}; const posTotals = {};
             
@@ -1674,10 +1688,10 @@
                 grouping[h][s].c[p] = (grouping[h][s].c[p]||0)+1;
             });
 
-            // Column Sorting: Highest Total to Lowest (Existing logic is correct)
+            // Column Sorting
             const sortedPos = Object.keys(posTotals).sort((a,b)=>posTotals[b]-posTotals[a]);
 
-            // Row Sorting (HUB): Highest Grand Total to Lowest
+            // Row Sorting (HUB)
             const hubGrandTotals = {};
             Object.keys(grouping).forEach(h => {
                 let sum = 0;
@@ -1688,7 +1702,7 @@
             
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            // New Layout: Fixed min-widths instead of percentages
+            // New Layout
             let theadContent = `<tr>
                 <th style="min-width:120px; width:120px;">HUB</th>
                 <th style="min-width:130px;">Staging</th>
@@ -1703,7 +1717,7 @@
             let grandTotal = 0;
             
             sortedHubs.forEach(h => {
-                // Row Sorting (Staging/SS): Highest Total to Lowest inside HUB
+                // Row Sorting (Staging/SS)
                 const stagings = Object.keys(grouping[h]).sort((a, b) => grouping[h][b].t - grouping[h][a].t);
                 
                 // Hitung Total per HUB
@@ -1729,12 +1743,20 @@
                     let max = Math.max(...rowVals);
                     let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
 
+                    // Staging Total Percentage (of Grand Total)
+                    const stagingPct = data.length > 0 ? (d.t / data.length) * 100 : 0;
+
                     tbodyContent += `<tr>`;
                     if(i===0) {
                         // Rowspan ditambah 1 untuk baris Total HUB
                         tbodyContent += `<td class="row-group-header border-b border-slate-100 px-3 text-slate-800 font-bold align-top border-r" rowspan="${stagings.length + 1}">${h}</td>`;
                     }
-                    tbodyContent += `<td class="text-slate-600 border-r border-slate-50 px-3 font-medium text-[11px]">${ss}</td><td class="text-center font-bold bg-blue-50/20 text-blue-600 border-r border-slate-50">${formatNumber(d.t)}</td>`;
+                    
+                    // Display Staging Total with %
+                    tbodyContent += `<td class="text-slate-600 border-r border-slate-50 px-3 font-medium text-[11px]">${ss}</td>
+                    <td class="text-center font-bold bg-blue-50/20 text-blue-600 border-r border-slate-50">
+                        <div>${formatNumber(d.t)}<div class="text-[10px] font-medium text-blue-400">${stagingPct.toFixed(1)}%</div></div>
+                    </td>`;
                     
                     sortedPos.forEach(p => {
                         const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
@@ -1754,10 +1776,14 @@
                     tbodyContent += `</tr>`;
                 });
 
-                // Render Baris Total per HUB (Footer Grup)
+                // Render Baris Total per HUB (Footer Grup) - WITH PERCENTAGE
+                const hubPct = data.length > 0 ? (hubTotalVal / data.length) * 100 : 0;
+
                 tbodyContent += `<tr class="bg-slate-50 font-bold border-b border-slate-200">
                     <td class="text-right px-3 text-slate-500 italic border-r border-slate-200 text-[10px]">Total ${h}</td>
-                    <td class="text-center text-slate-700 border-r border-slate-200">${formatNumber(hubTotalVal)}</td>`;
+                    <td class="text-center text-slate-700 border-r border-slate-200">
+                        <div>${formatNumber(hubTotalVal)}<div class="text-[10px] font-medium text-slate-400">${hubPct.toFixed(1)}%</div></div>
+                    </td>`;
                 
                 sortedPos.forEach(p => {
                     const c = hubPosCounts[p] || 0;
