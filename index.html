@@ -522,11 +522,11 @@
             </div>
         </div>
 
-        <!-- BARIS 3: Rekapan Staging & Data Management (2 Kolom) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[520px] mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 900ms">
+        <!-- BARIS 3: Rekapan Staging & Data Management (Grid 12: Staging 8, AWB 4) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[520px] mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 900ms">
             
-            <!-- KIRI: Rekapan Staging -->
-            <div class="h-full flex flex-col">
+            <!-- KIRI: Rekapan Staging (Lebih Lebar - 8 Kolom) -->
+            <div class="lg:col-span-8 h-full flex flex-col">
                 <div class="bg-blue-600 px-6 py-4 rounded-t-3xl border border-blue-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
                     <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-warehouse"></i></div>
                     <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Rekapan Staging</h3>
@@ -534,14 +534,19 @@
                 <div id="containerStaging" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
-            <!-- KANAN: Manajemen Data AWB (New) -->
-            <div class="h-full flex flex-col">
-                <div class="bg-slate-800 px-6 py-4 rounded-t-3xl border border-slate-800 border-b-0 flex items-center justify-between shadow-sm shrink-0 relative z-10">
+            <!-- KANAN: Manajemen Data AWB (Lebih Ramping - 4 Kolom) -->
+            <div class="lg:col-span-4 h-full flex flex-col">
+                <div class="bg-slate-800 px-6 py-4 rounded-t-3xl border border-slate-800 border-b-0 flex flex-col gap-3 shadow-sm shrink-0 relative z-10">
                     <div class="flex items-center gap-4">
                         <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-table"></i></div>
                         <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Daftar Data AWB</h3>
                     </div>
-                    <span class="text-[10px] font-bold text-slate-300 bg-slate-700 px-2 py-1 rounded">Top 100 View</span>
+                    <!-- SEARCH INPUT AWB -->
+                    <div class="relative w-full">
+                        <input type="text" id="awbSearchInput" placeholder="Cari No Resi..." 
+                            class="w-full bg-slate-700/50 border border-slate-600 text-white text-[11px] rounded-lg px-3 py-2 pl-8 focus:outline-none focus:border-slate-500 transition-colors placeholder-slate-400">
+                        <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    </div>
                 </div>
                 <div id="containerAwbList" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1 relative">
                     <!-- Table will be injected here -->
@@ -1897,22 +1902,65 @@
             renderStructuredTable('containerStaging', theadContent, tbodyContent, tfootContent);
         }
 
-        // --- 5. AWB DATA MANAGEMENT TABLE (Infinite Scroll) ---
-        let awbDataCache = []; // Menyimpan data untuk scrolling
-        let awbRenderedCount = 0; // Melacak berapa baris yang sudah tampil
-        const AWB_CHUNK_SIZE = 50; // Muat 50 baris per scroll
-        const AWB_MAX_LIMIT = 10000; // Batas maksimal total
+        // --- 5. AWB DATA MANAGEMENT TABLE (Infinite Scroll + Search) ---
+        let awbDataCache = []; 
+        let filteredAwbCache = []; // New filtered cache
+        let awbRenderedCount = 0; 
+        const AWB_CHUNK_SIZE = 50; 
+        const AWB_MAX_LIMIT = 10000; 
 
         function generateAwbTable(data) {
             const container = document.getElementById('containerAwbList');
             if(!container) return;
 
-            // Simpan data ke cache global & reset counter
+            // Simpan data asli
             awbDataCache = data;
-            awbRenderedCount = 0;
+            
+            // Inisialisasi input search listener jika belum ada
+            const searchInput = document.getElementById('awbSearchInput');
+            if(searchInput) {
+                // Remove old listeners by cloning (simple trick) or just re-assign onclick
+                // For simplicity here, we assume generateAwbTable is called on refresh
+                // But better to attach listener once globally.
+                // Since this function is called on every render, let's just handle logic.
+                
+                // Clear filter on re-render if needed, or keep it?
+                // Better keep current search value
+                const currentSearch = searchInput.value.toLowerCase();
+                filterAwbData(currentSearch);
+                
+                // Attach event listener (avoid duplicate by checking custom property or removing old)
+                if (!searchInput.dataset.hasListener) {
+                    searchInput.addEventListener('input', (e) => {
+                        filterAwbData(e.target.value.toLowerCase());
+                    });
+                    searchInput.dataset.hasListener = 'true';
+                }
+            } else {
+                // Fallback if search input not found in DOM
+                filteredAwbCache = awbDataCache; 
+                resetAwbTable();
+            }
+        }
 
-            // Setup Kerangka Tabel (Header Sticky)
-            // Kita siapkan tbody kosong dengan ID 'awbTableBody' untuk diisi nanti
+        function filterAwbData(searchTerm) {
+            if (!searchTerm) {
+                filteredAwbCache = awbDataCache;
+            } else {
+                filteredAwbCache = awbDataCache.filter(row => {
+                    const awb = (row['awb'] || row['No Resi'] || "").toLowerCase();
+                    return awb.includes(searchTerm);
+                });
+            }
+            resetAwbTable();
+        }
+
+        function resetAwbTable() {
+            const container = document.getElementById('containerAwbList');
+            if(!container) return;
+
+            awbRenderedCount = 0;
+            
             container.innerHTML = `
                 <div class="table-scroll-area h-full" id="awbScrollArea">
                     <table class="w-full text-left border-collapse">
@@ -1934,35 +1982,34 @@
                 </div>
             `;
 
-            // Render batch pertama (50 data)
             appendAwbRows();
 
-            // Pasang Event Listener Scroll
             const scrollArea = document.getElementById('awbScrollArea');
-            scrollArea.addEventListener('scroll', () => {
-                // Jika scroll mendekati bawah (sisa 50px), muat lebih banyak
-                if (scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 50) {
-                    appendAwbRows();
-                }
-            });
+            if(scrollArea) {
+                scrollArea.addEventListener('scroll', () => {
+                    if (scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 50) {
+                        appendAwbRows();
+                    }
+                });
+            }
         }
 
         function appendAwbRows() {
-            // Cek jika sudah mencapai batas atau data habis
-            if (awbRenderedCount >= awbDataCache.length || awbRenderedCount >= AWB_MAX_LIMIT) return;
+            // Gunakan filtered cache
+            if (awbRenderedCount >= filteredAwbCache.length || awbRenderedCount >= AWB_MAX_LIMIT) return;
 
             const tbody = document.getElementById('awbTableBody');
             const footer = document.getElementById('awbTableFooter');
             
-            // Ambil potongan data berikutnya
-            const nextBatch = awbDataCache.slice(awbRenderedCount, awbRenderedCount + AWB_CHUNK_SIZE);
+            // Ambil potongan data berikutnya dari filtered cache
+            const nextBatch = filteredAwbCache.slice(awbRenderedCount, awbRenderedCount + AWB_CHUNK_SIZE);
             
             if (awbRenderedCount === 0 && nextBatch.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-slate-400 italic">Tidak ada data yang sesuai filter</td></tr>`;
+                footer.innerHTML = '';
                 return;
             }
 
-            // Generate HTML untuk batch ini
             let rowsHTML = "";
             nextBatch.forEach(row => {
                 const awb = row['awb'] || row['No Resi'] || "?";
@@ -1971,7 +2018,9 @@
                 
                 rowsHTML += `
                     <tr class="hover:bg-red-50/30 transition-colors group">
-                        <td class="font-bold text-slate-700 pl-4 border-r border-slate-100 font-mono text-[11px] select-all py-2">${awb}</td>
+                        <td class="font-bold text-slate-700 pl-4 border-r border-slate-100 font-mono text-[11px] select-all py-2">
+                            ${awb.replace(document.getElementById('awbSearchInput')?.value || '', match => `<span class="bg-yellow-200 text-slate-900">${match}</span>`)}
+                        </td>
                         <td class="text-center text-slate-500 border-r border-slate-50 text-[10px]">${staging}</td>
                         <td class="text-center text-slate-500 border-r border-slate-50 text-[10px] truncate max-w-[100px]">${posisi}</td>
                         <td class="text-center py-1">
@@ -1983,17 +2032,13 @@
                 `;
             });
 
-            // Masukkan ke tabel (Append)
             tbody.insertAdjacentHTML('beforeend', rowsHTML);
-            
-            // Update counter
             awbRenderedCount += nextBatch.length;
 
-            // Update Footer Info
-            const remaining = Math.min(awbDataCache.length, AWB_MAX_LIMIT) - awbRenderedCount;
-            let footerText = `Menampilkan ${formatNumber(awbRenderedCount)} dari ${formatNumber(awbDataCache.length)} data`;
+            const remaining = Math.min(filteredAwbCache.length, AWB_MAX_LIMIT) - awbRenderedCount;
+            let footerText = `Menampilkan ${formatNumber(awbRenderedCount)} dari ${formatNumber(filteredAwbCache.length)} data`;
             if (remaining > 0) footerText += ` (Scroll untuk memuat lebih banyak)`;
-            else if (awbDataCache.length > AWB_MAX_LIMIT) footerText += ` (Batas tampilan 10.000 tercapai)`;
+            else if (filteredAwbCache.length > AWB_MAX_LIMIT) footerText += ` (Batas tampilan 10.000 tercapai)`;
 
             footer.innerHTML = `
                 <tr>
