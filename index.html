@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Parcel Inprogress</title>
+    <title>Dashboard Inprogress</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -301,11 +301,31 @@
                 <i class="ph-duotone ph-trash text-3xl"></i>
             </div>
             <h3 class="text-xl font-display font-bold text-slate-800 mb-2">Hapus Data Permanen</h3>
-            <p class="text-sm text-slate-500 mb-8 leading-relaxed">Tindakan ini tidak dapat dibatalkan. Pilih periode data yang ingin dihapus dari database.</p>
+            <p class="text-sm text-slate-500 mb-6 leading-relaxed">Pilih metode penghapusan data:</p>
             
+            <!-- TOGGLE MODE HAPUS -->
+            <div class="flex justify-center gap-4 mb-6 bg-slate-50 p-1.5 rounded-xl border border-slate-200 w-fit mx-auto">
+                <label class="cursor-pointer">
+                    <input type="radio" name="deleteMode" value="month" checked onchange="toggleDeleteInput()" class="peer sr-only">
+                    <span class="block px-4 py-1.5 rounded-lg text-[11px] font-bold text-slate-500 peer-checked:bg-white peer-checked:text-red-600 peer-checked:shadow-sm transition-all">Per Bulan</span>
+                </label>
+                <label class="cursor-pointer">
+                    <input type="radio" name="deleteMode" value="date" onchange="toggleDeleteInput()" class="peer sr-only">
+                    <span class="block px-4 py-1.5 rounded-lg text-[11px] font-bold text-slate-500 peer-checked:bg-white peer-checked:text-red-600 peer-checked:shadow-sm transition-all">Per Tanggal</span>
+                </label>
+            </div>
+
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-8 text-left">
-                <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block tracking-wider ml-1">Periode Bulan</label>
-                <input type="month" id="deleteMonthInput" class="w-full bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 transition-all cursor-pointer">
+                <!-- INPUT BULAN -->
+                <div id="deleteMonthContainer">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block tracking-wider ml-1">Periode Bulan</label>
+                    <input type="month" id="deleteMonthInput" class="w-full bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 transition-all cursor-pointer">
+                </div>
+                <!-- INPUT TANGGAL (Hidden by default) -->
+                <div id="deleteDateContainer" class="hidden-section">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block tracking-wider ml-1">Spesifik Tanggal</label>
+                    <input type="date" id="deleteDateInput" class="w-full bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 transition-all cursor-pointer">
+                </div>
             </div>
             
             <div class="flex gap-3">
@@ -618,148 +638,155 @@
         }
 
         // --- REPORT GENERATOR ---
+        
         window.copyReport = () => {
-            const dateStart = document.getElementById('filterStartDate').value || 'Awal';
-            const dateEnd = document.getElementById('filterEndDate').value || 'Akhir';
-            const range = `${dateStart} s/d ${dateEnd}`;
-            const total = document.getElementById('kpiTotal').innerText;
-            
-            const currData = getFilteredData();
-            const totalCurr = currData.length;
-            const prevData = getPrevPeriodData();
-            
-            const pad = (str, len) => (str + " ".repeat(len)).slice(0, len);
-            
-            const getComp = (curr, prev) => {
-                if (prev === 0) return curr > 0 ? "100%" : "0%";
-                const diff = ((curr - prev) / prev) * 100;
-                const sign = diff > 0 ? "+" : "";
-                return `${sign}${diff.toFixed(1)}%`;
-            };
+            showIsland('loading', 'Menyusun laporan...'); 
 
-            const posList = ['Last Mile', 'Vendor 3PL', 'Mid Mile', 'Mitra Pengusaha', 'Transport', 'First Mile'];
-            let posTable = `1. BREAKDOWN POSISI\n\`\`\`\n${pad('Posisi', 16)}| ${pad('Curr', 5)}| ${pad('Prev', 5)}| %\n` + "-".repeat(40) + "\n";
-            posList.forEach(p => {
-                const c = currData.filter(r => (r.Posisi||'').toLowerCase() === p.toLowerCase()).length;
-                const pr = prevData.filter(r => (r.Posisi||'').toLowerCase() === p.toLowerCase()).length;
-                posTable += `${pad(p, 16)}| ${pad(String(c), 5)}| ${pad(String(pr), 5)}| ${getComp(c, pr)}\n`;
-            });
-            posTable += `\`\`\``;
+            setTimeout(() => {
+                const dateStart = document.getElementById('filterStartDate').value || 'Awal';
+                const dateEnd = document.getElementById('filterEndDate').value || 'Akhir';
+                const range = `${dateStart} s/d ${dateEnd}`;
+                const total = document.getElementById('kpiTotal').innerText;
+                
+                const currData = getFilteredData();
+                const totalCurr = currData.length;
+                const prevData = getPrevPeriodData();
+                
+                const pad = (str, len) => (str + " ".repeat(len)).slice(0, len);
+                
+                const getComp = (curr, prev) => {
+                    if (prev === 0) return curr > 0 ? "100%" : "0%";
+                    const diff = ((curr - prev) / prev) * 100;
+                    const sign = diff > 0 ? "+" : "";
+                    return `${sign}${diff.toFixed(1)}%`;
+                };
 
-            // 2. BREAKDOWN HUB (Sorted by In Area)
-            const getHubTrans = (data) => {
-                const map = {};
-                data.forEach(r => {
-                    const h = r.delivery_hub || 'Unknown';
+                const posList = ['Last Mile', 'Vendor 3PL', 'Mid Mile', 'Mitra Pengusaha', 'Transport', 'First Mile'];
+                let posTable = `1. BREAKDOWN POSISI\n\`\`\`\n${pad('Posisi', 16)}| ${pad('Curr', 5)}| ${pad('Prev', 5)}| %\n` + "-".repeat(40) + "\n";
+                posList.forEach(p => {
+                    const c = currData.filter(r => (r.Posisi||'').toLowerCase() === p.toLowerCase()).length;
+                    const pr = prevData.filter(r => (r.Posisi||'').toLowerCase() === p.toLowerCase()).length;
+                    posTable += `${pad(p, 16)}| ${pad(String(c), 5)}| ${pad(String(pr), 5)}| ${getComp(c, pr)}\n`;
+                });
+                posTable += `\`\`\``;
+
+                // 2. BREAKDOWN HUB (Sorted by In Area)
+                const getHubTrans = (data) => {
+                    const map = {};
+                    data.forEach(r => {
+                        const h = r.delivery_hub || 'Unknown';
+                        const pos = (r.Posisi||'').toLowerCase();
+                        const hubX = (r['HUB X']||'').toLowerCase();
+                        if (!map[h]) map[h] = { total: 0, special: 0 };
+                        map[h].total++;
+                        if ((pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi') {
+                            map[h].special++;
+                        }
+                    });
+                    return map;
+                };
+                const hubMap = getHubTrans(currData);
+                const sortedHubs = Object.entries(hubMap).sort((a,b) => b[1].special - a[1].special).slice(0, 10);
+                
+                let hubTable = `2. BREAKDOWN HUB\`\`\`\n${pad('HUB', 10)}| ${pad('Total', 6)}| In Area\n` + "-".repeat(30) + "\n";
+                sortedHubs.forEach(([h, d]) => {
+                    const pct = d.total > 0 ? (d.special / d.total) * 100 : 0;
+                    const warn = pct > 5 ? "⚠️ " : ""; // Icon warning jika > 5%
+                    hubTable += `${pad(h, 10)}| ${pad(String(d.total), 6)}| ${warn}${d.special} (${pct.toFixed(0)}%)\n`;
+                });
+                hubTable += `\`\`\``;
+
+                // 3. BREAKDOWN SERVICE (Matrix)
+                const svcData = currData.filter(r => {
                     const pos = (r.Posisi||'').toLowerCase();
                     const hubX = (r['HUB X']||'').toLowerCase();
-                    if (!map[h]) map[h] = { total: 0, special: 0 };
-                    map[h].total++;
-                    if ((pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi') {
-                        map[h].special++;
+                    return (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi';
+                });
+                
+                const allSvcs = {};
+                svcData.forEach(r => { const s = r.service_code||'?'; allSvcs[s] = (allSvcs[s]||0)+1; });
+                const topSvcs = Object.keys(allSvcs).sort((a,b)=>allSvcs[b]-allSvcs[a]).slice(0,3);
+                
+                const svcHubMap = {};
+                svcData.forEach(r => {
+                    const h = r.delivery_hub || 'Unknown';
+                    const s = r.service_code || '?';
+                    if(!svcHubMap[h]) svcHubMap[h] = {};
+                    svcHubMap[h][s] = (svcHubMap[h][s]||0)+1;
+                });
+                
+                let svcTable = `3. BREAKDOWN SERVIC\n\`\`\`\n${pad('HUB', 10)}| ${topSvcs.map(s=>pad(s,5)).join('| ')}\n` + "-".repeat(12 + topSvcs.length*7) + "\n";
+                const sortedSvcHubs = Object.keys(svcHubMap).sort((a,b) => {
+                    const sumA = Object.values(svcHubMap[a]).reduce((x,y)=>x+y,0);
+                    const sumB = Object.values(svcHubMap[b]).reduce((x,y)=>x+y,0);
+                    return sumB - sumA;
+                }).slice(0,10); 
+                sortedSvcHubs.forEach(h => {
+                    let row = `${pad(h, 10)}|`;
+                    topSvcs.forEach(s => {
+                        const val = svcHubMap[h][s] || 0;
+                        row += ` ${pad(String(val), 4)}|`;
+                    });
+                    svcTable += row.slice(0,-1) + "\n";
+                });
+                svcTable += `\`\`\``;
+
+                // 4. TOP 5 ORIGIN
+                const pickupMap = {};
+                currData.forEach(r => {
+                    const p = r.pickup_hub || 'Unknown';
+                    pickupMap[p] = (pickupMap[p]||0)+1;
+                });
+                const topPickups = Object.entries(pickupMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+                let pickTable = `4. TOP 5 HUB PICKUP\n\`\`\`\n${pad('Origin', 10)}| ${pad('Count', 6)}| %\n` + "-".repeat(25) + "\n";
+                topPickups.forEach(([p, c]) => {
+                    const pct = totalCurr > 0 ? ((c/totalCurr)*100).toFixed(1) + '%' : '0%';
+                    pickTable += `${pad(p, 10)}| ${pad(String(c), 6)}| ${pct}\n`;
+                });
+                pickTable += `\`\`\``;
+
+                // 5. FEEDBACK
+                const feedData = currData.filter(r => {
+                    const pos = (r.Posisi||'').toLowerCase();
+                    const hubX = (r['HUB X']||'').toLowerCase();
+                    return (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi';
+                });
+                const feedMap = {};
+                feedData.forEach(r => {
+                    const h = r.delivery_hub || 'Unknown';
+                    let f = r.Feedback ? r.Feedback.trim() : '';
+                    if(!f) return;
+                    if(!feedMap[h]) feedMap[h] = {};
+                    feedMap[h][f] = (feedMap[h][f]||0)+1;
+                });
+                const sortedFeedHubs = Object.keys(feedMap).sort((a,b) => {
+                    const sumA = Object.values(feedMap[a]).reduce((x,y)=>x+y,0);
+                    const sumB = Object.values(feedMap[b]).reduce((x,y)=>x+y,0);
+                    return sumB - sumA;
+                });
+                let feedText = `5. FEEDBACK (In Area)\n\`\`\`\nHUB       | Feedback (Count)\n` + "-".repeat(40) + "\n";
+                sortedFeedHubs.forEach(h => {
+                    const topF = Object.entries(feedMap[h]).sort((a,b)=>b[1]-a[1])[0];
+                    if(topF) {
+                        feedText += `${pad(h, 10)}| ${topF[0]} (${topF[1]})\n`;
                     }
                 });
-                return map;
-            };
-            const hubMap = getHubTrans(currData);
-            const sortedHubs = Object.entries(hubMap).sort((a,b) => b[1].special - a[1].special).slice(0, 10);
-            
-            let hubTable = `2. BREAKDOWN HUB (Top 10 In Area)\n\`\`\`\n${pad('HUB', 10)}| ${pad('Total', 6)}| In Area\n` + "-".repeat(30) + "\n";
-            sortedHubs.forEach(([h, d]) => {
-                hubTable += `${pad(h, 10)}| ${pad(String(d.total), 6)}| ${d.special}\n`;
-            });
-            hubTable += `\`\`\``;
+                feedText += `\`\`\``;
 
-            // 3. BREAKDOWN SERVICE (Matrix)
-            const svcData = currData.filter(r => {
-                const pos = (r.Posisi||'').toLowerCase();
-                const hubX = (r['HUB X']||'').toLowerCase();
-                return (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi';
-            });
-            
-            const allSvcs = {};
-            svcData.forEach(r => { const s = r.service_code||'?'; allSvcs[s] = (allSvcs[s]||0)+1; });
-            const topSvcs = Object.keys(allSvcs).sort((a,b)=>allSvcs[b]-allSvcs[a]).slice(0,3);
-            
-            const svcHubMap = {};
-            svcData.forEach(r => {
-                const h = r.delivery_hub || 'Unknown';
-                const s = r.service_code || '?';
-                if(!svcHubMap[h]) svcHubMap[h] = {};
-                svcHubMap[h][s] = (svcHubMap[h][s]||0)+1;
-            });
-            
-            let svcTable = `3. BREAKDOWN SERVICE (In Area)\n\`\`\`\n${pad('HUB', 10)}| ${topSvcs.map(s=>pad(s,5)).join('| ')}\n` + "-".repeat(12 + topSvcs.length*7) + "\n";
-            const sortedSvcHubs = Object.keys(svcHubMap).sort((a,b) => {
-                 const sumA = Object.values(svcHubMap[a]).reduce((x,y)=>x+y,0);
-                 const sumB = Object.values(svcHubMap[b]).reduce((x,y)=>x+y,0);
-                 return sumB - sumA;
-            }).slice(0,10); 
-            sortedSvcHubs.forEach(h => {
-                let row = `${pad(h, 10)}|`;
-                topSvcs.forEach(s => {
-                    const val = svcHubMap[h][s] || 0;
-                    row += ` ${pad(String(val), 4)}|`;
-                });
-                svcTable += row.slice(0,-1) + "\n";
-            });
-            svcTable += `\`\`\``;
+                const text = `*LAPORAN MONITORING PARCEL INPROGRESS*\n` +
+                            `*HUB KAL SULAMP*\n` +
+                            `Periode: ${range}\n\n` +
+                            `*TOTAL: ${formatNumber(totalCurr)}*\n` +
+                            `------------------\n` +
+                            `${posTable}\n` +
+                            `${hubTable}\n` +
+                            `${svcTable}\n` +
+                            `${pickTable}\n` +
+                            `${feedText}\n\n` +
+                            `_Generated by Dashboard System_`;
 
-            // 4. TOP 5 ORIGIN
-            const pickupMap = {};
-            currData.forEach(r => {
-                const p = r.pickup_hub || 'Unknown';
-                pickupMap[p] = (pickupMap[p]||0)+1;
-            });
-            const topPickups = Object.entries(pickupMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
-            let pickTable = `4. TOP 5 HUB PICKUP\n\`\`\`\n${pad('Origin', 10)}| ${pad('Count', 6)}| %\n` + "-".repeat(25) + "\n";
-            topPickups.forEach(([p, c]) => {
-                const pct = totalCurr > 0 ? ((c/totalCurr)*100).toFixed(1) + '%' : '0%';
-                pickTable += `${pad(p, 10)}| ${pad(String(c), 6)}| ${pct}\n`;
-            });
-            pickTable += `\`\`\``;
-
-            // 5. FEEDBACK
-            const feedData = currData.filter(r => {
-                const pos = (r.Posisi||'').toLowerCase();
-                const hubX = (r['HUB X']||'').toLowerCase();
-                return (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi';
-            });
-            const feedMap = {};
-            feedData.forEach(r => {
-                const h = r.delivery_hub || 'Unknown';
-                let f = r.Feedback ? r.Feedback.trim() : '';
-                if(!f) return;
-                if(!feedMap[h]) feedMap[h] = {};
-                feedMap[h][f] = (feedMap[h][f]||0)+1;
-            });
-            const sortedFeedHubs = Object.keys(feedMap).sort((a,b) => {
-                 const sumA = Object.values(feedMap[a]).reduce((x,y)=>x+y,0);
-                 const sumB = Object.values(feedMap[b]).reduce((x,y)=>x+y,0);
-                 return sumB - sumA;
-            });
-            let feedText = `5. FEEDBACK (In Area)\n\`\`\`\nHUB       | Feedback (Count)\n` + "-".repeat(40) + "\n";
-            sortedFeedHubs.forEach(h => {
-                const topF = Object.entries(feedMap[h]).sort((a,b)=>b[1]-a[1])[0];
-                if(topF) {
-                    feedText += `${pad(h, 10)}| ${topF[0]} (${topF[1]})\n`;
-                }
-            });
-            feedText += `\`\`\``;
-
-            const text = `*LAPORAN MONITORING PARCEL INPROGRESS*\n` +
-                         `*HUB KAL SULAMP*\n` +
-                         `Periode: ${range}\n\n` +
-                         `*TOTAL: ${formatNumber(totalCurr)}*\n` +
-                         `------------------\n` +
-                         `${posTable}\n` +
-                         `${hubTable}\n` +
-                         `${svcTable}\n` +
-                         `${pickTable}\n` +
-                         `${feedText}\n\n` +
-                         `_Generated by Dashboard System_`;
-
-            fallbackCopyTextToClipboard(text);
+                fallbackCopyTextToClipboard(text);
+            }, 500); // Sedikit delay untuk efek "Loading"
         }
 
         function fallbackCopyTextToClipboard(text) {
@@ -788,6 +815,12 @@
         window.openDeleteModal = () => {
             const modal = document.getElementById('deleteModalOverlay');
             if(modal) {
+                // Reset form saat buka
+                document.querySelector('input[name="deleteMode"][value="month"]').checked = true;
+                toggleDeleteInput();
+                document.getElementById('deleteMonthInput').value = '';
+                document.getElementById('deleteDateInput').value = '';
+                
                 modal.classList.remove('hidden-section');
                 setTimeout(() => modal.classList.add('open'), 10);
             }
@@ -801,29 +834,62 @@
             }
         }
 
-        window.processDeleteRequest = () => {
-            const monthInput = document.getElementById('deleteMonthInput').value;
-            if (!monthInput) {
-                showIsland('error', 'Pilih bulan terlebih dahulu!');
-                return;
+        // Logic Toggle UI Input
+        window.toggleDeleteInput = () => {
+            const mode = document.querySelector('input[name="deleteMode"]:checked').value;
+            const monthCont = document.getElementById('deleteMonthContainer');
+            const dateCont = document.getElementById('deleteDateContainer');
+            
+            if (mode === 'month') {
+                monthCont.classList.remove('hidden-section');
+                dateCont.classList.add('hidden-section');
+            } else {
+                monthCont.classList.add('hidden-section');
+                dateCont.classList.remove('hidden-section');
             }
-            closeDeleteModal();
-            requestPassword(() => executeDelete(monthInput));
         }
 
-        async function executeDelete(monthInput) {
-            const [year, month] = monthInput.split('-').map(Number);
+        window.processDeleteRequest = () => {
+            const mode = document.querySelector('input[name="deleteMode"]:checked').value;
+            let val;
+            
+            if (mode === 'month') {
+                val = document.getElementById('deleteMonthInput').value;
+                if (!val) { showIsland('error', 'Pilih bulan terlebih dahulu!'); return; }
+            } else {
+                val = document.getElementById('deleteDateInput').value;
+                if (!val) { showIsland('error', 'Pilih tanggal terlebih dahulu!'); return; }
+            }
+
+            closeDeleteModal();
+            requestPassword(() => executeDelete(val, mode));
+        }
+
+        async function executeDelete(inputVal, mode) {
+            // Filter target data
             const targets = allData.filter(row => {
                 const d = parseDateStr(row.Tanggal);
-                return d && d.getFullYear() === year && (d.getMonth() + 1) === month;
+                if (!d) return false;
+
+                if (mode === 'month') {
+                    // inputVal: YYYY-MM
+                    const [year, month] = inputVal.split('-').map(Number);
+                    return d.getFullYear() === year && (d.getMonth() + 1) === month;
+                } else {
+                    // inputVal: YYYY-MM-DD
+                    const [year, month, day] = inputVal.split('-').map(Number);
+                    return d.getFullYear() === year && (d.getMonth() + 1) === month && d.getDate() === day;
+                }
             });
 
+            const label = mode === 'month' ? `bulan ${inputVal}` : `tanggal ${inputVal}`;
+
             if (targets.length === 0) {
-                showIsland('error', 'Tidak ada data di bulan tersebut.');
+                showIsland('error', `Tidak ada data pada ${label}.`);
                 return;
             }
 
-            showIsland('loading', `Menghapus ${targets.length} data...`);
+            showIsland('loading', `Menghapus ${formatNumber(targets.length)} data...`);
             const batchSize = 450;
             const batches = [];
             let currentBatch = writeBatch(db);
@@ -844,7 +910,7 @@
 
             try {
                 await Promise.all(batches);
-                showIsland('success', 'Data berhasil dihapus!');
+                showIsland('success', `Data ${label} berhasil dihapus!`);
             } catch (e) {
                 console.error(e);
                 showIsland('error', 'Gagal menghapus data.');
@@ -1281,13 +1347,28 @@
                     const d = parseDateStr(r['Tanggal']);
                     if (d && d > maxDate) maxDate = d;
                 });
-                start = maxDate; 
-                end = maxDate;
+                // Jika tidak ada filter, default ke tanggal terakhir data
+                start = maxDate ? new Date(maxDate) : new Date(); 
+                end = maxDate ? new Date(maxDate) : new Date();
             }
 
-            const duration = end - start; 
-            const prevEnd = new Date(start.getTime() - 86400000);
+            // PERBAIKAN: Normalisasi Waktu agar rentang hari akurat (Local Time)
+            // Set Start ke awal hari (00:00:00)
+            start.setHours(0, 0, 0, 0);
+            // Set End ke akhir hari (23:59:59)
+            end.setHours(23, 59, 59, 999);
+
+            // Hitung Durasi dalam milidetik
+            const duration = end.getTime() - start.getTime(); 
+            
+            // Hitung Periode Sebelumnya
+            // Prev End adalah Start Periode Aktif dikurang 1 milidetik (Jadi kemarin jam 23:59:59)
+            const prevEnd = new Date(start.getTime() - 1);
+            // Prev Start adalah Prev End dikurang durasi rentang waktu
             const prevStart = new Date(prevEnd.getTime() - duration);
+            
+            // Pastikan Prev Start dimulai dari jam 00:00:00
+            prevStart.setHours(0, 0, 0, 0);
 
             // Filters logic same as getFilteredData but with prev dates
             const hubVal = document.getElementById('filterHub').value;
@@ -1306,7 +1387,9 @@
 
                 const d = parseDateStr(row['Tanggal']);
                 if (!d) return false;
-                return d >= prevStart && d <= prevEnd;
+                
+                // Gunakan getTime() untuk perbandingan timestamp yang akurat
+                return d.getTime() >= prevStart.getTime() && d.getTime() <= prevEnd.getTime();
             });
         }
 
@@ -1338,9 +1421,16 @@
 
         function parseDateStr(dateStr) {
             if (!dateStr) return null;
-            if (dateStr.includes('-')) return new Date(dateStr);
+            
+            // PERBAIKAN: Handle YYYY-MM-DD agar selalu Local Time (menghindari masalah UTC offset)
+            if (dateStr.includes('-')) {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) return new Date(parts[0], parts[1] - 1, parts[2]); // Year, Month-1, Day (Local)
+                return new Date(dateStr);
+            }
+            
             const parts = dateStr.split('/');
-            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
+            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]); // Year, Month-1, Day (Local)
             return null;
         }
 
@@ -1743,8 +1833,13 @@
                     let content = `<span class="text-slate-300">-</span>`;
                     if(c>0) {
                         let warn = "";
-                        if(p.toLowerCase()==='mid mile' && pct>5) warn = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px] mr-1"></i>`;
-                        else if(c===maxOther) warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px] mr-1"></i>`;
+                        // PERBAIKAN: Warning muncul untuk Mid Mile DAN Transport jika > 5%
+                        if(['mid mile', 'transport'].includes(p.toLowerCase()) && pct > 5) {
+                            warn = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px] mr-1"></i>`;
+                        } 
+                        else if(c===maxOther) {
+                            warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px] mr-1"></i>`;
+                        }
                         content = `<div>${formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
                     }
                     tbodyContent += `<td class="text-center" style="background-color:${bg}">${content}</td>`;
