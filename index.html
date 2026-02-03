@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Inprogress</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard Parcel Inprogress</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -62,13 +62,14 @@
             color: #0f172a; 
             font-size: 13px; 
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden; /* Prevent horizontal scroll on body */
         }
         
         .hidden-section { display: none !important; }
         
         /* Glass Effect */
         .glass {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.95); /* Increased opacity for mobile readability */
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
@@ -96,111 +97,87 @@
             width: 0; height: 0; opacity: 0; overflow: hidden;
         }
         #dynamicIsland.active { width: auto; min-width: 180px; height: 48px; padding: 0 24px; opacity: 1; }
-        #dynamicIsland.expanded { border-radius: 28px; width: 360px; height: auto; padding: 28px; flex-direction: column; }
+        #dynamicIsland.expanded { border-radius: 28px; width: 90%; max-width: 360px; height: auto; padding: 28px; flex-direction: column; }
         
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Hide Scrollbar for Horizontal Scrollers but allow functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Table Styling - UPDATED FOR HIGH VISIBILITY */
+        /* Table Styling */
         .modern-table-container { 
             background: white; border-radius: 20px; 
             border: 1px solid #e2e8f0; overflow: hidden;
             display: flex; flex-direction: column;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
         }
-        .table-scroll-area { overflow: auto; flex: 1; position: relative; }
-        .pivot-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
+        .table-scroll-area { 
+            overflow: auto; flex: 1; position: relative; 
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+        }
+        .pivot-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; } /* Slightly smaller font for mobile */
         
-        /* 1. Header yang Jelas & Berwarna (Dark Slate/Navy) */
         .pivot-table thead th { 
             position: sticky; top: 0; z-index: 20;
-            background: #1e293b; /* Warna Header Gelap */
-            color: #ffffff; /* Teks Putih */
+            background: #1e293b; color: #ffffff;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px;
-            height: 48px; padding: 0 16px;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px;
+            height: 44px; padding: 0 12px;
             border-bottom: 2px solid #0f172a;
             white-space: nowrap; text-align: center;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
         
-        /* Sticky Left Column Handling */
         .pivot-table th:first-child, .pivot-table td:first-child {
             position: sticky; left: 0; z-index: 10;
             border-right: 1px solid #e2e8f0;
             box-shadow: 4px 0 12px -8px rgba(0,0,0,0.1);
         }
-        /* Sticky Header First Child must match Header Color */
         .pivot-table thead th:first-child { 
-            z-index: 30; 
-            background: #1e293b; /* Match Header */
-            color: #ffffff;
-            text-align: left;
+            z-index: 30; background: #1e293b; color: #ffffff; text-align: left;
         }
         
-        /* 2. Isi Tabel yang Tebal & Jelas */
         .pivot-table td { 
-            height: 52px; padding: 8px 16px;
+            height: 48px; padding: 6px 12px;
             border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;
-            color: #0f172a; /* Hitam Pekat */
-            font-weight: 600; /* Semi-Bold agar Jelas */
+            color: #0f172a; font-weight: 600;
             white-space: nowrap; vertical-align: middle;
         }
-        /* First Column Body Style */
         .pivot-table td:first-child {
-            background-color: #ffffff;
-            font-weight: 800; /* Extra Bold untuk Nama HUB */
-            color: #1e293b;
+            background-color: #ffffff; font-weight: 800; color: #1e293b;
         }
         
-        .pivot-table tr:hover td { background-color: #f8fafc; }
-        .pivot-table tr:hover td:first-child { background-color: #f8fafc; }
-        
-        /* 3. Footer (Total) yang Berbeda Warna */
         .pivot-table tfoot td {
             position: sticky; bottom: 0; z-index: 20;
-            background-color: #ffedd5 !important; /* Orange Muda */
-            color: #9a3412 !important; /* Orange Tua */
-            font-weight: 800 !important; /* Sangat Tebal */
-            border-top: 2px solid #fdba74; height: 44px;
-            font-family: 'Plus Jakarta Sans', sans-serif; text-align: center;
-            font-size: 12px;
+            background-color: #ffedd5 !important; color: #9a3412 !important;
+            font-weight: 800 !important; border-top: 2px solid #fdba74; height: 40px;
+            font-family: 'Plus Jakarta Sans', sans-serif; text-align: center; font-size: 11px;
         }
-        /* Sticky Footer First Child */
         .pivot-table tfoot td:first-child { 
-            z-index: 30; 
-            background: #ffedd5 !important; 
-            text-align: left;
-            color: #9a3412 !important;
+            z-index: 30; background: #ffedd5 !important; text-align: left; color: #9a3412 !important;
         }
         
-        /* Utility for small percentage text */
-        .pivot-pct {
-            font-size: 10px;
-            font-weight: 500;
-            margin-top: 2px;
-        }
-
+        .pivot-pct { font-size: 9px; font-weight: 500; margin-top: 2px; }
         .row-group-header { background: #fff; vertical-align: top !important; padding-top: 18px !important; color: #0f172a; font-weight: 800; }
 
-        /* Card Hover Animation */
         .hover-lift { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(99, 102, 241, 0.15); }
 
-        /* Inputs */
         .input-glass {
             background: rgba(255, 255, 255, 0.6);
             border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 8px 12px;
-            font-size: 12px; font-weight: 600; color: #334155;
+            font-size: 11px; font-weight: 600; color: #334155;
             transition: all 0.2s; outline: none;
+            width: 100%; /* Default full width on mobile */
         }
         .input-glass:focus { background: white; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-        .input-glass:hover { background: white; }
 
         /* Modals */
         #summaryModalOverlay, #deleteModalOverlay {
@@ -208,6 +185,7 @@
             background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px);
             z-index: 200; display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            padding: 1rem; /* Padding for mobile */
         }
         #summaryModalOverlay.open, #deleteModalOverlay.open { opacity: 1; pointer-events: auto; }
         
@@ -221,6 +199,12 @@
         .toggle-checkbox::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .toggle-checkbox:checked { background: #4f46e5; }
         .toggle-checkbox:checked::after { left: 18px; }
+
+        /* Desktop Overrides */
+        @media (min-width: 1024px) {
+            .input-glass { width: auto; font-size: 12px; }
+            .pivot-table { font-size: 12px; }
+        }
     </style>
 </head>
 <body class="overflow-x-hidden">
@@ -246,200 +230,200 @@
 
     <!-- SUMMARY MODAL -->
     <div id="summaryModalOverlay">
-        <div class="summary-card bg-white w-[95%] max-w-4xl max-h-[90vh] rounded-[2rem] shadow-2xl border border-slate-100 flex flex-col modal-animate">
-            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/80 backdrop-blur-md rounded-t-[2rem] sticky top-0 z-10">
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-2xl shadow-sm border border-indigo-100">
-                        <i class="ph-fill ph-chart-polar text-xl"></i>
+        <div class="summary-card bg-white w-full max-w-4xl max-h-[85vh] rounded-[2rem] shadow-2xl border border-slate-100 flex flex-col modal-animate">
+            <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white/80 backdrop-blur-md rounded-t-[2rem] sticky top-0 z-10">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl shadow-sm border border-indigo-100">
+                        <i class="ph-fill ph-chart-polar text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-display font-bold text-slate-800" id="summaryTitle">Detail Analisis</h3>
-                        <p class="text-xs text-slate-400 font-medium">Performa HUB dan Feedback Konsumen</p>
+                        <h3 class="text-base font-display font-bold text-slate-800" id="summaryTitle">Detail Analisis</h3>
+                        <p class="text-[10px] text-slate-400 font-medium">Performa HUB dan Feedback Konsumen</p>
                     </div>
                 </div>
-                <button onclick="closeSummary()" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"><i class="ph-bold ph-x text-lg"></i></button>
+                <button onclick="closeSummary()" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"><i class="ph-bold ph-x text-lg"></i></button>
             </div>
             
-            <div class="p-8 overflow-y-auto bg-slate-50/50">
+            <div class="p-6 overflow-y-auto bg-slate-50/50">
                 <!-- Top Origins -->
-                <div class="mb-8">
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <div class="mb-6">
+                    <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                         <i class="ph-fill ph-map-pin text-orange-500"></i> Top Origin Contributor
                     </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="topOriginsContainer"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="topOriginsContainer"></div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Feedback -->
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                             <i class="ph-fill ph-chat-text text-indigo-500"></i> Isu & Feedback
                         </h4>
-                        <div class="space-y-4" id="feedbackBreakdown"></div>
+                        <div class="space-y-3" id="feedbackBreakdown"></div>
                     </div>
                     <!-- Services -->
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                             <i class="ph-fill ph-tag text-emerald-500"></i> Tipe Layanan
                         </h4>
-                        <div class="space-y-4" id="serviceBreakdown"></div>
+                        <div class="space-y-3" id="serviceBreakdown"></div>
                     </div>
                 </div>
             </div>
             
-            <div class="px-8 py-4 bg-white border-t border-slate-100 rounded-b-[2rem] flex justify-between items-center">
-                <span class="text-xs font-bold text-slate-400">Total Sampel Data</span>
-                <span class="text-sm font-bold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200" id="totalAnalyzed">0 Paket</span>
+            <div class="px-6 py-4 bg-white border-t border-slate-100 rounded-b-[2rem] flex justify-between items-center">
+                <span class="text-[10px] font-bold text-slate-400">Total Sampel Data</span>
+                <span class="text-xs font-bold text-slate-800 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200" id="totalAnalyzed">0 Paket</span>
             </div>
         </div>
     </div>
 
     <!-- DELETE MODAL -->
     <div id="deleteModalOverlay" class="hidden-section">
-        <div id="deleteModalContent" class="bg-white w-full max-w-sm rounded-[2rem] p-8 text-center shadow-2xl modal-animate border border-slate-100">
-            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-red-100">
-                <i class="ph-duotone ph-trash text-3xl"></i>
+        <div id="deleteModalContent" class="bg-white w-full max-w-xs sm:max-w-sm rounded-[2rem] p-6 sm:p-8 text-center shadow-2xl modal-animate border border-slate-100">
+            <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-sm border border-red-100">
+                <i class="ph-duotone ph-trash text-2xl"></i>
             </div>
-            <h3 class="text-xl font-display font-bold text-slate-800 mb-2">Hapus Data Permanen</h3>
-            <p class="text-sm text-slate-500 mb-6 leading-relaxed">Pilih metode penghapusan data:</p>
+            <h3 class="text-lg font-display font-bold text-slate-800 mb-2">Hapus Data Permanen</h3>
+            <p class="text-xs text-slate-500 mb-6 leading-relaxed">Pilih metode penghapusan data:</p>
             
             <!-- TOGGLE MODE HAPUS -->
-            <div class="flex justify-center gap-4 mb-6 bg-slate-50 p-1.5 rounded-xl border border-slate-200 w-fit mx-auto">
-                <label class="cursor-pointer">
+            <div class="flex justify-center gap-2 mb-6 bg-slate-50 p-1 rounded-xl border border-slate-200 w-full sm:w-fit mx-auto">
+                <label class="cursor-pointer flex-1 sm:flex-none">
                     <input type="radio" name="deleteMode" value="month" checked onchange="toggleDeleteInput()" class="peer sr-only">
-                    <span class="block px-4 py-1.5 rounded-lg text-[11px] font-bold text-slate-500 peer-checked:bg-white peer-checked:text-red-600 peer-checked:shadow-sm transition-all">Per Bulan</span>
+                    <span class="block px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-500 peer-checked:bg-white peer-checked:text-red-600 peer-checked:shadow-sm transition-all text-center">Per Bulan</span>
                 </label>
-                <label class="cursor-pointer">
+                <label class="cursor-pointer flex-1 sm:flex-none">
                     <input type="radio" name="deleteMode" value="date" onchange="toggleDeleteInput()" class="peer sr-only">
-                    <span class="block px-4 py-1.5 rounded-lg text-[11px] font-bold text-slate-500 peer-checked:bg-white peer-checked:text-red-600 peer-checked:shadow-sm transition-all">Per Tanggal</span>
+                    <span class="block px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-500 peer-checked:bg-white peer-checked:text-red-600 peer-checked:shadow-sm transition-all text-center">Per Tanggal</span>
                 </label>
             </div>
 
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-8 text-left">
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6 text-left">
                 <!-- INPUT BULAN -->
                 <div id="deleteMonthContainer">
                     <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block tracking-wider ml-1">Periode Bulan</label>
-                    <input type="month" id="deleteMonthInput" class="w-full bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 transition-all cursor-pointer">
+                    <input type="month" id="deleteMonthInput" class="w-full bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 transition-all cursor-pointer">
                 </div>
                 <!-- INPUT TANGGAL (Hidden by default) -->
                 <div id="deleteDateContainer" class="hidden-section">
                     <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block tracking-wider ml-1">Spesifik Tanggal</label>
-                    <input type="date" id="deleteDateInput" class="w-full bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 transition-all cursor-pointer">
+                    <input type="date" id="deleteDateInput" class="w-full bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 transition-all cursor-pointer">
                 </div>
             </div>
             
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 py-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">Batal</button>
-                <button onclick="processDeleteRequest()" class="flex-1 py-3 rounded-xl bg-red-600 text-white text-xs font-bold hover:bg-red-700 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all transform active:scale-95">Hapus Sekarang</button>
+                <button onclick="closeDeleteModal()" class="flex-1 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">Batal</button>
+                <button onclick="processDeleteRequest()" class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold hover:bg-red-700 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all transform active:scale-95">Hapus</button>
             </div>
         </div>
     </div>
 
-    <!-- NAVBAR FLOATING -->
-    <div class="fixed top-0 left-0 w-full z-40 px-4 py-4 pointer-events-none">
-        <nav class="pointer-events-auto max-w-[1600px] mx-auto glass rounded-2xl px-2 py-2 flex flex-col xl:flex-row items-center justify-between gap-4 shadow-glass transition-all duration-300 animate-fade-in-up">
+    <!-- NAVBAR FLOATING - RESPONSIVE UPDATE -->
+    <div class="fixed top-0 left-0 w-full z-40 px-2 py-2 sm:px-4 sm:py-4 pointer-events-none">
+        <nav class="pointer-events-auto max-w-[1600px] mx-auto glass rounded-2xl px-3 py-3 flex flex-col lg:flex-row items-center justify-between gap-3 shadow-glass transition-all duration-300 animate-fade-in-up">
             
-            <!-- Brand -->
-            <div class="flex items-center gap-4 px-4 w-full xl:w-auto">
-                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                    <i class="ph-bold ph-cube text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-sm font-display font-extrabold text-slate-800 leading-tight">PARCEL DASHBOARD</h1>
-                    <div class="flex items-center gap-2 mt-0.5">
-                        <span class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
-                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Online
-                        </span>
-                        <span class="text-[10px] font-medium text-slate-400 flex items-center gap-1">
-                            <i class="ph-bold ph-clock"></i> <span id="lastUpdated">--:--</span>
-                        </span>
+            <!-- Brand & Mobile Header -->
+            <div class="flex items-center justify-between w-full lg:w-auto px-1 lg:px-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                        <i class="ph-bold ph-cube text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xs font-display font-extrabold text-slate-800 leading-tight">PARCEL DASHBOARD</h1>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="flex items-center gap-1 text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-100">
+                                <span class="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span> Online
+                            </span>
+                            <span class="text-[9px] font-medium text-slate-400 flex items-center gap-1">
+                                <i class="ph-bold ph-clock"></i> <span id="lastUpdated">--:--</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
+                <!-- Mobile only actions placeholder if needed -->
             </div>
 
-            <!-- Toolbar -->
-            <div class="flex flex-col md:flex-row items-center gap-2 w-full xl:w-auto overflow-x-auto pb-2 md:pb-0 px-2">
+            <!-- Toolbar & Actions -->
+            <div class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto">
                 
                 <!-- Date Filter -->
-                <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 group focus-within:border-indigo-300 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
-                    <input type="date" id="filterStartDate" class="bg-transparent text-[11px] font-bold text-slate-600 px-3 py-1.5 outline-none border-none cursor-pointer">
-                    <span class="text-slate-300 text-[10px]"><i class="ph-bold ph-arrow-right"></i></span>
-                    <input type="date" id="filterEndDate" class="bg-transparent text-[11px] font-bold text-slate-600 px-3 py-1.5 outline-none border-none cursor-pointer">
+                <div class="flex items-center justify-between w-full md:w-auto bg-slate-100 rounded-xl p-1 border border-slate-200 group focus-within:border-indigo-300 transition-all">
+                    <input type="date" id="filterStartDate" class="bg-transparent text-[10px] font-bold text-slate-600 px-2 py-1.5 outline-none border-none cursor-pointer w-full text-center">
+                    <span class="text-slate-300 text-[10px] mx-1"><i class="ph-bold ph-arrow-right"></i></span>
+                    <input type="date" id="filterEndDate" class="bg-transparent text-[10px] font-bold text-slate-600 px-2 py-1.5 outline-none border-none cursor-pointer w-full text-center">
                 </div>
 
-                <div class="w-px h-8 bg-slate-200 hidden md:block mx-1"></div>
-
-                <!-- Dropdowns -->
-                <div class="flex gap-2">
+                <!-- Dropdowns (Scrollable on mobile) -->
+                <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 no-scrollbar">
                     <select id="filterHub" class="input-glass min-w-[120px] cursor-pointer"><option value="">Semua HUB</option></select>
-                    <select id="filterService" class="input-glass w-28 cursor-pointer"><option value="">Semua Svc</option></select>
-                    <select id="filterPosisi" class="input-glass w-32 cursor-pointer"><option value="">Semua Posisi</option></select>
+                    <select id="filterService" class="input-glass min-w-[100px] cursor-pointer"><option value="">Semua Svc</option></select>
+                    <select id="filterPosisi" class="input-glass min-w-[110px] cursor-pointer"><option value="">Semua Posisi</option></select>
                 </div>
-
-                <div class="w-px h-8 bg-slate-200 hidden md:block mx-1"></div>
 
                 <!-- Actions -->
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl mr-1" title="Toggle In Area">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-12 text-right transition-colors" id="toggleLabel">Semua</span>
-                        <input type="checkbox" id="statusToggle" class="toggle-checkbox">
+                <div class="flex items-center justify-between w-full md:w-auto gap-2 border-t md:border-t-0 border-slate-100 pt-2 md:pt-0 mt-1 md:mt-0">
+                    <div class="flex items-center gap-2 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl mr-auto md:mr-1" title="Toggle In Area">
+                        <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 w-10 text-right transition-colors" id="toggleLabel">Semua</span>
+                        <input type="checkbox" id="statusToggle" class="toggle-checkbox scale-75 origin-right">
                     </div>
 
-                    <button onclick="copyReport()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100 transition-all active:scale-95" title="Salin Laporan WA">
-                        <i class="ph-bold ph-whatsapp-logo text-lg"></i>
-                    </button>
-                    
-                    <button onclick="openDeleteModal()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition-all active:scale-95" title="Hapus Data">
-                        <i class="ph-bold ph-trash text-lg"></i>
-                    </button>
-                    
-                    <button onclick="initiateUpload()" class="h-10 px-4 flex items-center gap-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all active:scale-95" title="Upload CSV">
-                        <i class="ph-bold ph-upload-simple text-lg"></i>
-                        <span class="text-xs font-bold">Upload</span>
-                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="copyReport()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100 transition-all active:scale-95" title="Salin Laporan WA">
+                            <i class="ph-bold ph-whatsapp-logo text-lg"></i>
+                        </button>
+                        
+                        <button onclick="openDeleteModal()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition-all active:scale-95" title="Hapus Data">
+                            <i class="ph-bold ph-trash text-lg"></i>
+                        </button>
+                        
+                        <button onclick="initiateUpload()" class="h-9 px-3 flex items-center gap-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all active:scale-95" title="Upload CSV">
+                            <i class="ph-bold ph-upload-simple text-lg"></i>
+                            <span class="hidden sm:inline text-[10px] font-bold">Upload</span>
+                        </button>
+                    </div>
                     <input type='file' class="hidden" id="csvFileInput" accept=".csv" />
                 </div>
             </div>
         </nav>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 pt-28 pb-12">
+    <!-- MAIN CONTENT - Adjusted padding for taller navbar on mobile -->
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-48 lg:pt-28 pb-12">
         
         <!-- 1. KPI CARDS (Staggered Animation) -->
-        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
             <script>
                 // Modern KPI Card
                 const renderKpi = (id, label, color, icon, delay) => {
-                    // Mapping simple color names to Tailwind classes
                     const colorMap = {
-                        'slate': { bg: 'bg-slate-50', text: 'text-slate-600', ring: 'group-hover:ring-slate-200' },
-                        'indigo': { bg: 'bg-indigo-50', text: 'text-indigo-600', ring: 'group-hover:ring-indigo-200' },
-                        'cyan': { bg: 'bg-cyan-50', text: 'text-cyan-600', ring: 'group-hover:ring-cyan-200' },
-                        'orange': { bg: 'bg-orange-50', text: 'text-orange-600', ring: 'group-hover:ring-orange-200' },
-                        'purple': { bg: 'bg-fuchsia-50', text: 'text-fuchsia-600', ring: 'group-hover:ring-fuchsia-200' }, // mapped purple to fuchsia for consistency
-                        'emerald': { bg: 'bg-emerald-50', text: 'text-emerald-600', ring: 'group-hover:ring-emerald-200' },
-                        'blue': { bg: 'bg-blue-50', text: 'text-blue-600', ring: 'group-hover:ring-blue-200' }
+                        'slate': { bg: 'bg-slate-50', text: 'text-slate-600' },
+                        'indigo': { bg: 'bg-indigo-50', text: 'text-indigo-600' },
+                        'cyan': { bg: 'bg-cyan-50', text: 'text-cyan-600' },
+                        'orange': { bg: 'bg-orange-50', text: 'text-orange-600' },
+                        'purple': { bg: 'bg-fuchsia-50', text: 'text-fuchsia-600' },
+                        'emerald': { bg: 'bg-emerald-50', text: 'text-emerald-600' },
+                        'blue': { bg: 'bg-blue-50', text: 'text-blue-600' }
                     };
                     const theme = colorMap[color] || colorMap['slate'];
 
                     document.write(`
-                        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover-lift group opacity-0 animate-fade-in-up flex flex-col justify-between h-[140px] relative overflow-hidden" style="animation-delay: ${delay}ms">
+                        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm hover-lift group opacity-0 animate-fade-in-up flex flex-col justify-between h-[120px] md:h-[140px] relative overflow-hidden" style="animation-delay: ${delay}ms">
                             <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-transparent to-slate-50 rounded-bl-full -mr-4 -mt-4 opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
                             
                             <div class="flex justify-between items-start z-10">
-                                <div class="w-10 h-10 rounded-xl ${theme.bg} ${theme.text} flex items-center justify-center transition-transform group-hover:rotate-12 duration-300 shadow-sm">
-                                    <i class="ph-bold ${icon} text-lg"></i>
+                                <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl ${theme.bg} ${theme.text} flex items-center justify-center transition-transform group-hover:rotate-12 duration-300 shadow-sm">
+                                    <i class="ph-bold ${icon} text-base md:text-lg"></i>
                                 </div>
-                                <span class="text-[10px] font-bold bg-slate-50 text-slate-500 px-2 py-1 rounded-lg border border-slate-100" id="${id}Share">0%</span>
+                                <span class="text-[9px] font-bold bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded-lg border border-slate-100" id="${id}Share">0%</span>
                             </div>
                             
                             <div class="z-10">
-                                <h3 class="text-3xl font-display font-extrabold text-slate-800 tracking-tight leading-none mb-1 group-hover:scale-105 transition-transform origin-left" id="${id}">0</h3>
+                                <h3 class="text-2xl md:text-3xl font-display font-extrabold text-slate-800 tracking-tight leading-none mb-1 group-hover:scale-105 transition-transform origin-left" id="${id}">0</h3>
                                 <div class="flex items-center justify-between mt-1">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${label}</span>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider truncate mr-1">${label}</span>
                                     <div id="${id}Comp" class="scale-90 origin-right transition-opacity opacity-70 group-hover:opacity-100">
-                                        <span class="text-slate-300 text-[10px]">--</span>
+                                        <span class="text-slate-300 text-[9px]">--</span>
                                     </div>
                                 </div>
                             </div>
@@ -458,72 +442,69 @@
         </div>
 
         <!-- 2. ANALYTICS (Combined Trend) -->
-        <div class="grid grid-cols-1 mb-8">
-            <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 500ms">
-                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <div class="grid grid-cols-1 mb-6">
+            <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 500ms">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
                     <div class="text-center sm:text-left">
-                        <h3 class="text-base font-display font-bold text-slate-800" id="trendTitle">Tren Bulanan</h3>
-                        <p class="text-xs text-slate-400 font-medium">Analisis volume pengiriman berdasarkan periode</p>
+                        <h3 class="text-sm font-display font-bold text-slate-800" id="trendTitle">Tren Bulanan</h3>
+                        <p class="text-[10px] text-slate-400 font-medium">Analisis volume pengiriman berdasarkan periode</p>
                     </div>
                     
                     <!-- Toggle Button Group -->
-                    <div class="bg-slate-100 p-1 rounded-xl flex items-center shadow-inner">
-                        <button onclick="setTrendMode('monthly')" id="btnMonthly" class="px-5 py-2 rounded-lg text-[11px] font-bold transition-all duration-300 bg-white text-indigo-600 shadow-sm transform scale-100">
+                    <div class="bg-slate-100 p-1 rounded-xl flex items-center shadow-inner scale-90 sm:scale-100 origin-right">
+                        <button onclick="setTrendMode('monthly')" id="btnMonthly" class="px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 bg-white text-indigo-600 shadow-sm transform scale-100">
                             Bulanan
                         </button>
-                        <button onclick="setTrendMode('yearly')" id="btnYearly" class="px-5 py-2 rounded-lg text-[11px] font-bold text-slate-400 hover:text-slate-600 transition-all duration-300">
+                        <button onclick="setTrendMode('yearly')" id="btnYearly" class="px-4 py-1.5 rounded-lg text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-all duration-300">
                             Tahunan
                         </button>
                     </div>
                 </div>
-                <div class="h-[320px] w-full relative">
+                <div class="h-[250px] md:h-[320px] w-full relative">
                     <canvas id="comboTrendChart"></canvas>
                 </div>
             </div>
         </div>
 
         <!-- 3. DAILY TREND & DATA TABLES -->
-        <div class="grid grid-cols-12 gap-6 mb-8">
-            <div class="col-span-12 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 700ms">
+        <div class="grid grid-cols-12 gap-4 mb-6">
+            <div class="col-span-12 bg-white rounded-3xl p-5 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 700ms">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-base font-display font-bold text-slate-800 flex items-center gap-3">
-                        <div class="w-1 h-6 bg-orange-500 rounded-full"></div> Tren Harian
+                    <h3 class="text-sm font-display font-bold text-slate-800 flex items-center gap-2">
+                        <div class="w-1 h-5 bg-orange-500 rounded-full"></div> Tren Harian
                     </h3>
-                    <span id="currentMonthLabel" class="text-[10px] font-bold bg-slate-50 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">Bulan Ini</span>
+                    <span id="currentMonthLabel" class="text-[9px] font-bold bg-slate-50 text-slate-500 px-2.5 py-1 rounded-full border border-slate-200 shadow-sm">Bulan Ini</span>
                 </div>
-                <div class="h-[280px] w-full relative"><canvas id="dailyChart"></canvas></div>
+                <div class="h-[250px] md:h-[280px] w-full relative"><canvas id="dailyChart"></canvas></div>
             </div>
         </div>
 
-        <!-- BARIS 1: KPI (Fokus), Origin, Service (3 Kolom) -->
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 800ms">
+        <!-- BARIS 1: KPI, Origin, Service -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 800ms">
             
-            <!-- KPI: Mengambil porsi terbesar (6 dari 12 kolom = 50%) -->
-            <div class="xl:col-span-6 flex flex-col h-[440px]">
-                <!-- PERUBAHAN: Header berwarna, Icon dikiri -->
-                <div class="bg-indigo-600 px-6 py-4 rounded-t-3xl border border-indigo-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
-                    <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-monitor"></i></div>
-                    <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Monitoring KPI</h3>
+            <!-- KPI -->
+            <div class="xl:col-span-6 flex flex-col h-[400px] lg:h-[440px]">
+                <div class="bg-indigo-600 px-5 py-3 rounded-t-3xl border border-indigo-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
+                    <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-monitor"></i></div>
+                    <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Monitoring KPI</h3>
                 </div>
                 <div id="containerKPI" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
-            <!-- Top 5 Origin: (3 dari 12 kolom = 25%) -->
-            <div class="xl:col-span-3 flex flex-col h-[440px]">
-                <!-- PERUBAHAN: Header berwarna, Icon dikiri -->
-                <div class="bg-pink-600 px-6 py-4 rounded-t-3xl border border-pink-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
-                    <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-map-pin"></i></div>
-                    <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Top 5 Origin</h3>
+            <!-- Top 5 Origin -->
+            <div class="xl:col-span-3 flex flex-col h-[400px] lg:h-[440px]">
+                <div class="bg-pink-600 px-5 py-3 rounded-t-3xl border border-pink-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
+                    <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-map-pin"></i></div>
+                    <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Top 5 Origin</h3>
                 </div>
                 <div id="containerOrigin" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
-            <!-- Service Breakdown: (3 dari 12 kolom = 25%) -->
-            <div class="xl:col-span-3 flex flex-col h-[440px]">
-                <!-- PERUBAHAN: Header berwarna, Icon dikiri -->
-                <div class="bg-emerald-600 px-6 py-4 rounded-t-3xl border border-emerald-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
-                    <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-tag"></i></div>
-                    <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Service Breakdown</h3>
+            <!-- Service Breakdown -->
+            <div class="xl:col-span-3 flex flex-col h-[400px] lg:h-[440px]">
+                <div class="bg-emerald-600 px-5 py-3 rounded-t-3xl border border-emerald-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
+                    <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-tag"></i></div>
+                    <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Service Breakdown</h3>
                 </div>
                 <div id="containerService" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
@@ -531,44 +512,43 @@
         </div>
 
         <!-- NEW COMBINED ROW: HUB & Staging (Left) vs AWB (Right) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 850ms">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 850ms">
             
-            <!-- LEFT COLUMN WRAPPER (8/12) - Berisi HUB dan Staging -->
-            <div class="lg:col-span-8 flex flex-col gap-6">
+            <!-- LEFT COLUMN WRAPPER -->
+            <div class="lg:col-span-8 flex flex-col gap-4">
                 
-                <!-- Rekapan HUB (Top Left) - Adjusted Height to ~7 rows (Header + 5 Data + Footer) -->
-                <div class="flex flex-col h-[450px]">
-                    <div class="bg-orange-600 px-6 py-4 rounded-t-3xl border border-orange-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
-                        <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-buildings"></i></div>
-                        <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Rekapan HUB</h3>
+                <!-- Rekapan HUB -->
+                <div class="flex flex-col h-[400px] lg:h-[450px]">
+                    <div class="bg-orange-600 px-5 py-3 rounded-t-3xl border border-orange-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
+                        <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-buildings"></i></div>
+                        <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Rekapan HUB</h3>
                     </div>
                     <div id="containerHub" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
                 </div>
 
-                <!-- Rekapan Staging (Bottom Left) - Adjusted Height to ~13 rows (Header + 11 Data + Footer) -->
-                <div class="flex flex-col h-[730px]">
-                    <div class="bg-blue-600 px-6 py-4 rounded-t-3xl border border-blue-600 border-b-0 flex items-center justify-start gap-4 shadow-sm shrink-0 relative z-10">
-                        <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-warehouse"></i></div>
-                        <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Rekapan Staging</h3>
+                <!-- Rekapan Staging -->
+                <div class="flex flex-col h-[500px] lg:h-[730px]">
+                    <div class="bg-blue-600 px-5 py-3 rounded-t-3xl border border-blue-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
+                        <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-warehouse"></i></div>
+                        <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Rekapan Staging</h3>
                     </div>
                     <div id="containerStaging" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
                 </div>
 
             </div>
 
-            <!-- RIGHT COLUMN WRAPPER (4/12) - Berisi Daftar AWB (Full Height) -->
-            <div class="lg:col-span-4 h-full"> 
-                <!-- Daftar Data AWB (Right - Spanning Height) -->
+            <!-- RIGHT COLUMN WRAPPER (AWB List) -->
+            <div class="lg:col-span-4 h-[500px] lg:h-auto"> 
                 <div class="flex flex-col h-full"> 
-                    <div class="bg-slate-800 px-6 py-4 rounded-t-3xl border border-slate-800 border-b-0 flex flex-col gap-3 shadow-sm shrink-0 relative z-10">
-                        <div class="flex items-center gap-4">
-                            <div class="w-8 h-8 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-table"></i></div>
-                            <h3 class="text-xs font-display font-bold text-white uppercase tracking-widest">Daftar Data AWB</h3>
+                    <div class="bg-slate-800 px-5 py-3 rounded-t-3xl border border-slate-800 border-b-0 flex flex-col gap-3 shadow-sm shrink-0 relative z-10">
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-table"></i></div>
+                            <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Daftar Data AWB</h3>
                         </div>
                         <!-- SEARCH INPUT AWB -->
                         <div class="relative w-full">
                             <input type="text" id="awbSearchInput" placeholder="Cari No Resi..." 
-                                class="w-full bg-slate-700/50 border border-slate-600 text-white text-[11px] rounded-lg px-3 py-2 pl-8 focus:outline-none focus:border-slate-500 transition-colors placeholder-slate-400">
+                                class="w-full bg-slate-700/50 border border-slate-600 text-white text-[10px] rounded-lg px-3 py-2 pl-8 focus:outline-none focus:border-slate-500 transition-colors placeholder-slate-400">
                             <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                         </div>
                     </div>
@@ -588,14 +568,13 @@
 
     </div>
 
-    <!-- JAVASCRIPT LOGIC (Unchanged, Preserved 100%) -->
+    <!-- JAVASCRIPT LOGIC (Unchanged) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
         import { getFirestore, collection, getDocs, doc, writeBatch, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
         Chart.register(ChartDataLabels);
-        // Modern Chart Configuration
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
         Chart.defaults.color = '#64748b';
         Chart.defaults.scale.grid.color = '#f1f5f9';
@@ -620,7 +599,6 @@
         let isGustiadiOnly = false;
         let chartInstances = {};
         
-        // --- NEW TREND VARS ---
         let currentTrendMode = 'monthly';
         let cachedTrendData = { yearly: {}, monthly: {} };
 
@@ -688,7 +666,7 @@
                 const hubMap = getHubTrans(currData);
                 const sortedHubs = Object.entries(hubMap).sort((a,b) => b[1].special - a[1].special).slice(0, 10);
                 
-                let hubTable = `2. BREAKDOWN HUB\`\`\`\n${pad('HUB', 10)}| ${pad('Total', 6)}| In Area\n` + "-".repeat(30) + "\n";
+                let hubTable = `2. BREAKDOWN HUB (Top 10 In Area)\n\`\`\`\n${pad('HUB', 10)}| ${pad('Total', 6)}| In Area\n` + "-".repeat(30) + "\n";
                 sortedHubs.forEach(([h, d]) => {
                     const pct = d.total > 0 ? (d.special / d.total) * 100 : 0;
                     const warn = pct > 5 ? "⚠️ " : ""; // Icon warning jika > 5%
@@ -715,7 +693,7 @@
                     svcHubMap[h][s] = (svcHubMap[h][s]||0)+1;
                 });
                 
-                let svcTable = `3. BREAKDOWN SERVIC\n\`\`\`\n${pad('HUB', 10)}| ${topSvcs.map(s=>pad(s,5)).join('| ')}\n` + "-".repeat(12 + topSvcs.length*7) + "\n";
+                let svcTable = `3. BREAKDOWN SERVICE (In Area)\n\`\`\`\n${pad('HUB', 10)}| ${topSvcs.map(s=>pad(s,5)).join('| ')}\n` + "-".repeat(12 + topSvcs.length*7) + "\n";
                 const sortedSvcHubs = Object.keys(svcHubMap).sort((a,b) => {
                     const sumA = Object.values(svcHubMap[a]).reduce((x,y)=>x+y,0);
                     const sumB = Object.values(svcHubMap[b]).reduce((x,y)=>x+y,0);
@@ -958,9 +936,9 @@
                 const colors = ['bg-orange-50 border-orange-100 text-orange-700', 'bg-blue-50 border-blue-100 text-blue-700', 'bg-slate-50 border-slate-100 text-slate-700'];
                 return `
                     <div class="${colors[idx] || colors[2]} border rounded-xl p-3 text-center shadow-sm">
-                        <p class="text-[10px] font-bold mb-1 opacity-70 uppercase tracking-wide">Top ${idx+1}</p>
-                        <p class="text-base font-black leading-none mb-1 text-slate-800">${org}</p>
-                        <p class="text-[10px] font-semibold opacity-80">${count} (${pct.toFixed(0)}%)</p>
+                        <p class="text-[9px] font-bold mb-1 opacity-70 uppercase tracking-wide">Top ${idx+1}</p>
+                        <p class="text-sm font-black leading-none mb-1 text-slate-800 truncate px-2" title="${org}">${org}</p>
+                        <p class="text-[9px] font-semibold opacity-80">${count} (${pct.toFixed(0)}%)</p>
                     </div>
                 `;
             }).join('') || '<div class="col-span-3 text-center text-slate-400 italic text-[10px]">Data origin tidak tersedia</div>';
@@ -974,8 +952,8 @@
                 
                 return `
                     <div class="mb-2">
-                        <div class="flex justify-between text-[11px] font-bold text-slate-600 mb-1">
-                            <span class="truncate pr-2 w-48">${fb}</span>
+                        <div class="flex justify-between text-[10px] font-bold text-slate-600 mb-1">
+                            <span class="truncate pr-2 w-48" title="${fb}">${fb}</span>
                             <span>${count}</span>
                         </div>
                         <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden flex items-center">
@@ -991,7 +969,7 @@
             breakdown.innerHTML = sortedSvc.map(([svc, count]) => {
                 const pct = (count / stuckData.length) * 100;
                 return `
-                    <div class="flex items-center justify-between text-[11px] mb-2 border-b border-dashed border-slate-100 pb-1 last:border-0">
+                    <div class="flex items-center justify-between text-[10px] mb-2 border-b border-dashed border-slate-100 pb-1 last:border-0">
                         <span class="font-bold text-slate-600">${svc}</span>
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-emerald-600">${count}</span>
@@ -1186,7 +1164,6 @@
             }
 
             // 3. SIMPLE FILTERING (Cek AWB Saja)
-            // Kita gunakan Set untuk pengecekan keberadaan AWB yang super cepat
             const existingAwbs = new Set(allData.map(item => item.awb));
             
             const rowsToUpload = [];
@@ -1197,12 +1174,10 @@
                 const docId = row[awbKey].toString().trim();
 
                 if (existingAwbs.has(docId)) {
-                    // AWB sudah ada -> SKIP (Abaikan isinya)
                     skippedCount++; 
                 } else {
-                    // AWB belum ada -> UPLOAD (Data Baru)
                     const cleanRow = JSON.parse(JSON.stringify(row)); 
-                    cleanRow['awb'] = docId; // Standarisasi key 'awb'
+                    cleanRow['awb'] = docId; 
                     rowsToUpload.push(cleanRow);
                     newCount++;
                 }
@@ -1214,7 +1189,6 @@
                 return;
             }
 
-            // Hitung estimasi kuota
             const used = getDailyQuota();
             const remaining = DAILY_LIMIT - used;
             
@@ -1233,11 +1207,9 @@
                 confirmMsg += `<span class="text-slate-400 text-[10px]">Kuota aman. Lanjutkan?</span>`;
             }
 
-            // Tampilkan konfirmasi
             showIsland('confirm', confirmMsg, () => executeBatchUpload(rowsToUpload));
         }
 
-        // Fungsi Eksekusi Upload (Dipisah agar rapi)
         async function executeBatchUpload(rows) {
             showIsland('loading', `Mengupload ${rows.length} data...`);
             
@@ -1272,17 +1244,17 @@
         }
 
         function renderDashboard() {
-            const baseData = getBaseFilteredData(); // For KPI columns logic
-            const filteredData = getFilteredData(); // For generic tables
+            const baseData = getBaseFilteredData();
+            const filteredData = getFilteredData(); 
 
             calculateKPIs(filteredData);
             
-            generateKPIRecap(baseData, filteredData); // Pass baseData for HUB-ignorant columns
+            generateKPIRecap(baseData, filteredData); 
             generateHubRecap(filteredData);
             generateServiceRecap(filteredData);
             generateOriginRecap(filteredData);
             generateStagingRecap(filteredData);
-            generateAwbTable(filteredData); // NEW FUNCTION
+            generateAwbTable(filteredData); 
             
             updateCharts(filteredData);
         }
@@ -1303,8 +1275,6 @@
             if(endDate) endDate.setHours(23,59,59,999);
 
             return allData.filter(row => {
-                // --- CLEANING DATA: HAPUS "UNKNOWN" ---
-                // Jika HUB kosong, null, atau tulisan 'Unknown', jangan tampilkan
                 if (!row['delivery_hub'] || row['delivery_hub'].toString().trim() === '' || row['delivery_hub'].toString().toLowerCase() === 'unknown') return false;
 
                 if (startDate || endDate) {
@@ -1330,7 +1300,6 @@
             });
         }
 
-        // Helper to get Prev Period Data for Reports/KPIs
         function getPrevPeriodData() {
             const startDateEl = document.getElementById('filterStartDate');
             const endDateEl = document.getElementById('filterEndDate');
@@ -1347,36 +1316,24 @@
                     const d = parseDateStr(r['Tanggal']);
                     if (d && d > maxDate) maxDate = d;
                 });
-                // Jika tidak ada filter, default ke tanggal terakhir data
                 start = maxDate ? new Date(maxDate) : new Date(); 
                 end = maxDate ? new Date(maxDate) : new Date();
             }
 
-            // PERBAIKAN: Normalisasi Waktu agar rentang hari akurat (Local Time)
-            // Set Start ke awal hari (00:00:00)
             start.setHours(0, 0, 0, 0);
-            // Set End ke akhir hari (23:59:59)
             end.setHours(23, 59, 59, 999);
 
-            // Hitung Durasi dalam milidetik
             const duration = end.getTime() - start.getTime(); 
-            
-            // Hitung Periode Sebelumnya
-            // Prev End adalah Start Periode Aktif dikurang 1 milidetik (Jadi kemarin jam 23:59:59)
             const prevEnd = new Date(start.getTime() - 1);
-            // Prev Start adalah Prev End dikurang durasi rentang waktu
             const prevStart = new Date(prevEnd.getTime() - duration);
             
-            // Pastikan Prev Start dimulai dari jam 00:00:00
             prevStart.setHours(0, 0, 0, 0);
 
-            // Filters logic same as getFilteredData but with prev dates
             const hubVal = document.getElementById('filterHub').value;
             const svcVal = document.getElementById('filterService').value;
             const posVal = document.getElementById('filterPosisi').value;
 
             return allData.filter(row => {
-                // --- CLEANING DATA PREV PERIOD JUGA ---
                 if (!row['delivery_hub'] || row['delivery_hub'].toString().trim() === '' || row['delivery_hub'].toString().toLowerCase() === 'unknown') return false;
 
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
@@ -1388,7 +1345,6 @@
                 const d = parseDateStr(row['Tanggal']);
                 if (!d) return false;
                 
-                // Gunakan getTime() untuk perbandingan timestamp yang akurat
                 return d.getTime() >= prevStart.getTime() && d.getTime() <= prevEnd.getTime();
             });
         }
@@ -1398,7 +1354,6 @@
             const services = new Set();
             const posisis = new Set();
             data.forEach(r => { 
-                // Populate hanya data valid
                 if(r.delivery_hub && r.delivery_hub.trim() !== '' && r.delivery_hub.toLowerCase() !== 'unknown') hubs.add(r.delivery_hub);
                 if(r.service_code) services.add(r.service_code);
                 if(r.Posisi) posisis.add(r.Posisi); 
@@ -1409,7 +1364,6 @@
                 Array.from(set).sort().forEach(val => {
                     const opt = document.createElement('option');
                     opt.value = val; 
-                    // PERBAIKAN: Hanya menampilkan nilai (item) saja tanpa label prefix
                     opt.innerText = val;
                     select.appendChild(opt);
                 });
@@ -1421,16 +1375,13 @@
 
         function parseDateStr(dateStr) {
             if (!dateStr) return null;
-            
-            // PERBAIKAN: Handle YYYY-MM-DD agar selalu Local Time (menghindari masalah UTC offset)
             if (dateStr.includes('-')) {
                 const parts = dateStr.split('-');
-                if (parts.length === 3) return new Date(parts[0], parts[1] - 1, parts[2]); // Year, Month-1, Day (Local)
+                if (parts.length === 3) return new Date(parts[0], parts[1] - 1, parts[2]); 
                 return new Date(dateStr);
             }
-            
             const parts = dateStr.split('/');
-            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]); // Year, Month-1, Day (Local)
+            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]); 
             return null;
         }
 
@@ -1442,12 +1393,10 @@
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             const currentYear = new Date().getFullYear();
             
-            // Pre-fill Jan-Dec untuk Tahun Berjalan (Monthly)
             months.forEach(m => {
                 monthly[`${m} ${currentYear}`] = { total: 0, gustiadi: 0 };
             });
 
-            // --- 1. DAILY CHART (Data terfilter tanggal) ---
             let latestDate = new Date(0);
             data.forEach(row => {
                 const d = parseDateStr(row['Tanggal']);
@@ -1459,7 +1408,6 @@
             const mLabel = document.getElementById('currentMonthLabel');
             if (mLabel) mLabel.innerText = `${months[cmIdx]} ${cy}`;
 
-            // Logic Harian
             data.forEach(row => {
                 const pos = (row['Posisi'] || "").toLowerCase().trim();
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
@@ -1468,24 +1416,18 @@
                 if (date && date.getMonth() === cmIdx && date.getFullYear() === cy) {
                     const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
                     if (!daily[dKey]) daily[dKey] = { total: 0, gustiadi: 0 };
-                    
-                    // Hitung Total (Sesuai Filter Dashboard)
                     daily[dKey].total++;
-                    
-                    // Hitung Gustiadi (Subset: HUB X=Gustiadi AND Posisi=Mid Mile/Transport)
                     if (hubX === 'gustiadi' && (pos === 'mid mile' || pos === 'transport')) {
                         daily[dKey].gustiadi++;
                     }
                 }
             });
 
-            // --- 2. TREND CHART (Data All / Tahunan & Bulanan) ---
             const hubVal = document.getElementById('filterHub') ? document.getElementById('filterHub').value : '';
             const serviceVal = document.getElementById('filterService') ? document.getElementById('filterService').value : '';
             const posisiVal = document.getElementById('filterPosisi') ? document.getElementById('filterPosisi').value : '';
 
             allData.forEach(row => {
-                // Apply Filters MANUAL (Kecuali Tanggal)
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
                 const pos = (row['Posisi'] || "").toLowerCase().trim();
 
@@ -1500,16 +1442,12 @@
                     const y = date.getFullYear();
                     const mKey = `${months[date.getMonth()]} ${y}`; 
                     
-                    // Init Yearly
                     if (!yearly[y]) yearly[y] = { total: 0, gustiadi: 0 };
-                    // Init Monthly (jika belum ada dari pre-fill)
                     if (!monthly[mKey]) monthly[mKey] = { total: 0, gustiadi: 0 };
 
-                    // Hitung
                     yearly[y].total++;
                     monthly[mKey].total++;
 
-                    // Logic: HUB X=Gustiadi AND Posisi=Mid Mile/Transport
                     if (hubX === 'gustiadi' && (pos === 'mid mile' || pos === 'transport')) {
                         yearly[y].gustiadi++;
                         monthly[mKey].gustiadi++;
@@ -1517,35 +1455,28 @@
                 }
             });
 
-            // Simpan data untuk toggle
             cachedTrendData.yearly = yearly;
             cachedTrendData.monthly = monthly;
 
-            // Render Combo Trend
             renderTrendChart();
 
-            // Render Daily
             const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
             const dailyKeys = Object.keys(daily).sort(sortDaily);
             const dailyTotal = dailyKeys.map(k => daily[k].total);
             const dailyGustiadi = dailyKeys.map(k => daily[k].gustiadi);
             
-            // Panggil fungsi render baru dengan 2 dataset
             renderChart('dailyChart', dailyKeys, dailyTotal, dailyGustiadi);
         }
 
-        // --- NEW: TOGGLE LOGIC ---
         window.setTrendMode = (mode) => {
             currentTrendMode = mode;
             
-            // Update Button Styles
             const btnActive = "bg-white text-indigo-600 shadow-sm transform scale-100";
             const btnInactive = "text-slate-400 hover:text-slate-600 bg-transparent shadow-none";
             
-            document.getElementById('btnMonthly').className = `px-5 py-2 rounded-lg text-[11px] font-bold transition-all duration-300 ${mode === 'monthly' ? btnActive : btnInactive}`;
-            document.getElementById('btnYearly').className = `px-5 py-2 rounded-lg text-[11px] font-bold transition-all duration-300 ${mode === 'yearly' ? btnActive : btnInactive}`;
+            document.getElementById('btnMonthly').className = `px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 ${mode === 'monthly' ? btnActive : btnInactive}`;
+            document.getElementById('btnYearly').className = `px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 ${mode === 'yearly' ? btnActive : btnInactive}`;
             
-            // Update Title
             document.getElementById('trendTitle').innerText = mode === 'monthly' ? "Tren Bulanan" : "Tren Tahunan";
             
             renderTrendChart();
@@ -1555,7 +1486,6 @@
             const mode = currentTrendMode;
             const dataObj = cachedTrendData[mode];
             
-            // Logika Sort Bulan
             const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             const sortMonth = (a, b) => {
                 const partsA = a.split(' ');
@@ -1580,38 +1510,33 @@
             renderChart('comboTrendChart', labels, dataTotal, dataGustiadi);
         }
 
-        // PERBAIKAN: Fungsi RenderChart Support 2 Garis
         function renderChart(id, labels, dataTotal, dataGustiadi) {
             const canvas = document.getElementById(id);
             if (!canvas) return; 
 
-            // Destroy existing chart if it exists
             if (chartInstances[id]) {
                 chartInstances[id].destroy();
             }
             
             const ctx = canvas.getContext('2d');
 
-            // Gradient for Gustiadi Line (Indigo)
             const gradientGustiadi = ctx.createLinearGradient(0, 0, 0, 300);
-            gradientGustiadi.addColorStop(0, 'rgba(99, 102, 241, 0.5)'); // Indigo 500
+            gradientGustiadi.addColorStop(0, 'rgba(99, 102, 241, 0.5)'); 
             gradientGustiadi.addColorStop(1, 'rgba(99, 102, 241, 0)');
 
-            // Gradient for Total Line (Black/Dark Slate)
             const gradientTotal = ctx.createLinearGradient(0, 0, 0, 300);
-            gradientTotal.addColorStop(0, 'rgba(15, 23, 42, 0.2)'); // Slate 900
+            gradientTotal.addColorStop(0, 'rgba(15, 23, 42, 0.2)'); 
             gradientTotal.addColorStop(1, 'rgba(15, 23, 42, 0)');
 
-            // Create Chart
             chartInstances[id] = new Chart(ctx, {
-                type: 'line', // Selalu Line
+                type: 'line', 
                 data: {
                     labels: labels,
                     datasets: [
                         {
                             label: 'Total AWB',
                             data: dataTotal,
-                            borderColor: '#0f172a', // Hitam (Slate 900)
+                            borderColor: '#0f172a', 
                             backgroundColor: gradientTotal,
                             borderWidth: 2,
                             pointBackgroundColor: '#0f172a',
@@ -1620,12 +1545,12 @@
                             pointHoverRadius: 5,
                             fill: true,
                             tension: 0.4,
-                            order: 2 // Render di belakang
+                            order: 2 
                         },
                         {
                             label: 'Inprogress',
                             data: dataGustiadi,
-                            borderColor: '#6366f1', // Indigo (Warna Pembeda)
+                            borderColor: '#6366f1', 
                             backgroundColor: gradientGustiadi,
                             borderWidth: 2,
                             pointBackgroundColor: '#6366f1',
@@ -1634,7 +1559,7 @@
                             pointHoverRadius: 6,
                             fill: true,
                             tension: 0.4,
-                            order: 1 // Render di depan
+                            order: 1 
                         }
                     ]
                 },
@@ -1674,13 +1599,12 @@
                         },
                         datalabels: {
                             display: function(context) {
-                                // Tampilkan label hanya jika nilainya > 0 dan tidak terlalu padat (opsional)
                                 return context.dataset.data[context.dataIndex] > 0;
                             },
                             align: 'top',
                             anchor: 'end',
                             color: function(context) {
-                                return context.dataset.borderColor; // Warna text mengikuti warna garis
+                                return context.dataset.borderColor; 
                             },
                             font: { size: 9, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
                             offset: 4,
@@ -1705,7 +1629,6 @@
             });
         }
 
-        // --- HELPER UNTUK RENDER TABEL (Fixed Layout) ---
         function renderStructuredTable(containerId, theadHTML, tbodyHTML, tfootHTML) {
             const container = document.getElementById(containerId);
             if(!container) return;
@@ -1720,7 +1643,7 @@
             `;
         }
 
-        // 1. KPI (Updated Logic with baseData)
+        // 1. KPI 
         function generateKPIRecap(baseData, filteredData) {
             const hubs = {}; const totals = { total: 0, nas: 0, reg: 0, trans: 0, hub: 0 };
             
@@ -1735,17 +1658,13 @@
                     hubs[h].t++; totals.total++;
                 }
 
-                // 1. MM Nasional (All HUB X)
                 const groupFull = ['mid mile','mitra pengusaha','transport','vendor 3pl'];
                 if(groupFull.includes(pos)) { hubs[h].nas++; totals.nas++; }
                 
-                // 2. MM REG (HUB X = Gustiadi)
                 if(groupFull.includes(pos) && hubX === 'gustiadi') { hubs[h].reg++; totals.reg++; }
                 
-                // 3. Vendor 3PL (HUB X = Gustiadi) - NEW NAME & LOGIC
                 if(pos === 'vendor 3pl' && hubX === 'gustiadi') { hubs[h].trans++; totals.trans++; }
                 
-                // 4. HUB & Trans (HUB X = Gustiadi) - NEW NAME & LOGIC
                 if(['mid mile', 'transport'].includes(pos) && hubX === 'gustiadi') { hubs[h].hub++; totals.hub++; }
             });
 
@@ -1770,7 +1689,6 @@
                 return `<div class="flex flex-col items-center"><div class="pivot-val ${cls}">${v>0?formatNumber(v):'-'}</div><div class="pivot-pct flex items-center">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div></div>`;
             }
             
-            // Header UPDATED
             let theadContent = `<tr>
                 <th style="min-width:120px; width:120px;">HUB</th>
                 <th style="min-width:90px;" class="text-center">Total</th>
@@ -1791,7 +1709,7 @@
             renderStructuredTable('containerKPI', theadContent, tbodyContent, tfootContent);
         }
 
-        // 2. HUB RECAP (Updated with Percentage)
+        // 2. HUB RECAP 
         function generateHubRecap(data) {
             const hubs = {}; const posTotals = {};
             data.forEach(r => {
@@ -1804,9 +1722,8 @@
             const sortedHubs = Object.keys(hubs).sort();
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
             
-            let gt = data.length; // Grand Total for % Calc
+            let gt = data.length; 
 
-            // Fixed Layout logic removed, now using min-width
             let theadContent = `<tr><th style="min-width:130px; width:130px;" class="text-left pl-4">HUB</th><th style="min-width:80px;" class="text-center">${title}</th>`;
             sortedPos.forEach(p => theadContent += `<th style="min-width:90px;" class="text-center">${p}</th>`);
             theadContent += `</tr>`;
@@ -1819,7 +1736,6 @@
                 let min = Math.min(...rowVals.filter(v=>v>0))||0; let max = Math.max(...rowVals);
                 let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
                 
-                // Calculate % of Grand Total
                 const totalPct = gt > 0 ? (d.t / gt) * 100 : 0;
 
                 tbodyContent += `<tr>
@@ -1833,7 +1749,6 @@
                     let content = `<span class="text-slate-300">-</span>`;
                     if(c>0) {
                         let warn = "";
-                        // PERBAIKAN: Warning muncul untuk Mid Mile DAN Transport jika > 5%
                         if(['mid mile', 'transport'].includes(p.toLowerCase()) && pct > 5) {
                             warn = `<i class="ph-fill ph-warning text-red-500 animate-pulse text-[10px] mr-1"></i>`;
                         } 
@@ -1847,13 +1762,10 @@
                 tbodyContent += `</tr>`;
             });
             
-            // PERBAIKAN: Menambahkan persentase (%) pada baris Footer ALL
             let tfootContent = `<tr><td class="px-4 text-left">ALL</td>`;
             
-            // Total Column Footer (100%)
             tfootContent += `<td class="text-center"><div>${formatNumber(sumTotal)}<div class="pivot-pct">100%</div></div></td>`;
             
-            // Posisi Columns Footer dengan %
             sortedPos.forEach(p => {
                 const val = posTotals[p] || 0;
                 const pct = sumTotal > 0 ? (val / sumTotal) * 100 : 0;
@@ -1871,7 +1783,6 @@
             const keys = Object.keys(svcMap).sort((a,b) => svcMap[b] - svcMap[a]);
             let gt = 0;
             
-            // Adjusted with min-width for mobile safety
             let theadContent = `<tr><th class="text-left pl-4" style="min-width:140px;">Service</th><th class="text-center" style="min-width:80px;">Total</th><th class="text-center" style="min-width:60px;">%</th></tr>`;
             
             let tbodyContent = "";
@@ -1886,18 +1797,16 @@
             renderStructuredTable('containerService', theadContent, tbodyContent, tfootContent);
         }
 
-        // 3.5 ORIGIN RECAP (New Function)
+        // 3.5 ORIGIN RECAP 
         function generateOriginRecap(data) {
             const originMap = {};
             data.forEach(r => { 
-                // Filter Unknown Origin
                 const o = r['pickup_hub']; 
                 if (o && o.trim() !== '' && o.toLowerCase() !== 'unknown') {
                     originMap[o] = (originMap[o]||0)+1; 
                 }
             });
             
-            // Get Top 5
             const sortedOrigins = Object.keys(originMap).sort((a,b) => originMap[b] - originMap[a]).slice(0, 5);
             let gt = 0;
             
@@ -1928,8 +1837,6 @@
                 </tr>`;
             });
             
-            // Note: Footer shows total of TOP 5 only, or can show total of ALL data if preferred. 
-            // Here we show Total of Top 5 to match the list shown.
             let tfootContent = `<tr>
                 <td colspan="2" class="px-4 text-left">TOTAL (Top 5)</td>
                 <td class="text-center">${formatNumber(gt)}</td>
@@ -1939,7 +1846,7 @@
             renderStructuredTable('containerOrigin', theadContent, tbodyContent, tfootContent);
         }
 
-        // 4. STAGING RECAP (Updated with Percentage & Fixed Syntax)
+        // 4. STAGING RECAP
         function generateStagingRecap(data) {
             const table = document.getElementById('tableStaging'); 
             
@@ -1958,10 +1865,8 @@
                 grouping[h][s].c[p] = (grouping[h][s].c[p]||0)+1;
             });
 
-            // Column Sorting
             const sortedPos = Object.keys(posTotals).sort((a,b)=>posTotals[b]-posTotals[a]);
 
-            // Row Sorting (HUB)
             const hubGrandTotals = {};
             Object.keys(grouping).forEach(h => {
                 let sum = 0;
@@ -1972,14 +1877,12 @@
             
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            // New Layout - PERBAIKAN: Lebar Kolom Posisi Dibuat SAMA (Fixed)
             let theadContent = `<tr>
                 <th style="width:120px; min-width:120px;" class="text-left pl-3">HUB</th>
                 <th style="width:130px; min-width:130px;" class="text-left">Staging</th>
                 <th style="width:80px; min-width:80px;" class="text-center">${title}</th>`;
             
             sortedPos.forEach(p => {
-                // Paksa lebar sama (90px) untuk setiap kolom posisi agar rapi
                 theadContent += `<th style="width:90px; min-width:90px; max-width:90px;" class="text-center truncate px-1" title="${p}">${p}</th>`;
             });
             theadContent += `</tr>`;
@@ -1988,10 +1891,8 @@
             let grandTotal = 0;
             
             sortedHubs.forEach(h => {
-                // Row Sorting (Staging/SS)
                 const stagings = Object.keys(grouping[h]).sort((a, b) => grouping[h][b].t - grouping[h][a].t);
                 
-                // Hitung Total per HUB
                 let hubTotalVal = 0;
                 let hubPosCounts = {};
 
@@ -2004,33 +1905,27 @@
                 });
                 grandTotal += hubTotalVal;
 
-                // Render Baris Staging
                 stagings.forEach((ss, i) => {
                     const d = grouping[h][ss];
                     
-                    // Calc max for gradient
                     let rowVals = sortedPos.map(p => d.c[p]||0);
                     let min = Math.min(...rowVals.filter(v=>v>0))||0; 
                     let max = Math.max(...rowVals);
                     let maxOther = Math.max(...sortedPos.filter(p=>p.toLowerCase()!=='mid mile').map(p=>d.c[p]||0));
 
-                    // Staging Total Percentage (of Grand Total)
                     const stagingPct = data.length > 0 ? (d.t / data.length) * 100 : 0;
 
                     tbodyContent += `<tr>`;
                     if(i===0) {
-                        // Rowspan ditambah 1 untuk baris Total HUB
                         tbodyContent += `<td class="row-group-header border-b border-slate-100 px-3 text-slate-800 font-bold align-top border-r text-[11px]" rowspan="${stagings.length + 1}">${h}</td>`;
                     }
                     
-                    // Display Staging Total with %
                     tbodyContent += `<td class="text-slate-600 border-r border-slate-50 px-3 font-medium text-[11px] truncate max-w-[130px]" title="${ss}">${ss}</td>
                     <td class="text-center font-bold bg-blue-50/20 text-blue-600 border-r border-slate-50">
                         <div>${formatNumber(d.t)}<div class="text-[10px] font-medium text-blue-400">${stagingPct.toFixed(1)}%</div></div>
                     </td>`;
                     
                     sortedPos.forEach(p => {
-                        // PERBAIKAN: Menambahkan parameter 'true' agar warna lebih tebal (bold)
                         const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max, true);
                         let content = `<span class="text-slate-300">-</span>`;
                         
@@ -2048,7 +1943,6 @@
                     tbodyContent += `</tr>`;
                 });
 
-                // Render Baris Total per HUB (Footer Grup) - WITH PERCENTAGE
                 const hubPct = data.length > 0 ? (hubTotalVal / data.length) * 100 : 0;
 
                 tbodyContent += `<tr class="bg-slate-50 font-bold border-b border-slate-200">
@@ -2064,7 +1958,6 @@
                 tbodyContent += `</tr>`;
             });
 
-            // Calculate % for Grand Total (should be 100% basically)
             const grandTotalPct = data.length > 0 ? (grandTotal / data.length) * 100 : 0; 
 
             let tfootContent = `<tr>
@@ -2085,18 +1978,17 @@
             renderStructuredTable('containerStaging', theadContent, tbodyContent, tfootContent);
         }
 
-        // --- 5. AWB DATA MANAGEMENT TABLE (Infinite Scroll + Search) ---
+        // --- 5. AWB DATA MANAGEMENT TABLE ---
         let awbDataCache = []; 
-        let filteredAwbCache = []; // New filtered cache
+        let filteredAwbCache = []; 
         let awbRenderedCount = 0; 
-        const AWB_CHUNK_SIZE = 60; // PERBAIKAN: Ubah jadi 30 baris per muat
+        const AWB_CHUNK_SIZE = 60; 
         const AWB_MAX_LIMIT = 10000; 
 
         function generateAwbTable(data) {
             const container = document.getElementById('containerAwbList');
             if(!container) return;
 
-            // Simpan data asli
             awbDataCache = data;
             
             const searchInput = document.getElementById('awbSearchInput');
@@ -2134,7 +2026,6 @@
 
             awbRenderedCount = 0;
             
-            // PERBAIKAN: Gunakan 'absolute inset-0' agar tinggi tabel terkunci & scrollbar muncul pasti
             container.innerHTML = `
                 <div class="absolute inset-0 overflow-y-auto custom-scrollbar" id="awbScrollArea">
                     <table class="w-full text-left border-collapse">
@@ -2161,7 +2052,6 @@
             const scrollArea = document.getElementById('awbScrollArea');
             if(scrollArea) {
                 scrollArea.addEventListener('scroll', () => {
-                    // Trigger load more ketika scroll sisa 50px dari bawah (dinaikkan biar lebih responsif)
                     if (scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 50) {
                         appendAwbRows();
                     }
@@ -2170,13 +2060,11 @@
         }
 
         function appendAwbRows() {
-            // Gunakan filtered cache
             if (awbRenderedCount >= filteredAwbCache.length || awbRenderedCount >= AWB_MAX_LIMIT) return;
 
             const tbody = document.getElementById('awbTableBody');
             const footer = document.getElementById('awbTableFooter');
             
-            // Ambil potongan data berikutnya dari filtered cache
             const nextBatch = filteredAwbCache.slice(awbRenderedCount, awbRenderedCount + AWB_CHUNK_SIZE);
             
             if (awbRenderedCount === 0 && nextBatch.length === 0) {
@@ -2231,10 +2119,8 @@
         async function deleteSingleAwb(awb) {
             showIsland('loading', `Menghapus ${awb}...`);
             try {
-                // Hapus dokumen berdasarkan ID (asumsi ID dokumen = AWB sesuai logika upload)
                 await deleteDoc(doc(db, COLLECTION_NAME, awb));
                 showIsland('success', `Resi ${awb} dihapus.`);
-                // Data akan auto-refresh karena onSnapshot listener
             } catch (error) {
                 console.error("Delete Error", error);
                 showIsland('error', 'Gagal menghapus. Cek konsol.');
@@ -2243,17 +2129,15 @@
 
         function getGradient(val, min, max, isBold = false) {
             if(!val) return 'transparent';
-            if(min===max) return isBold ? '#dcfce7' : '#f0fdf4'; // Base color slightly darker for bold
+            if(min===max) return isBold ? '#dcfce7' : '#f0fdf4'; 
             
             const ratio = (val-min)/(max-min);
             const hue = 120 - (ratio*120);
             
             if (isBold) {
-                // Versi Tebal: Lightness dikurangi (lebih gelap), Opacity ditambah
                 return `hsla(${hue}, 90%, 88%, 0.85)`; 
             }
             
-            // Versi Default (Lebih Halus)
             return `hsla(${hue}, 85%, 96%, 0.6)`;
         }
 
@@ -2331,19 +2215,16 @@
                 
                 if(el) el.innerText = formatNumber(curr);
                 
-                // 1. Share %
                 if(shareEl) {
                     const share = counts.total > 0 ? (curr / counts.total) * 100 : 0;
                     shareEl.innerText = share.toFixed(1) + '%';
                 }
 
-                // 2. Comparison %
                 if(compEl && showComp) {
                     let diffPct = 0;
                     let html = '';
                     
                     if (prev === 0) {
-                         // If prev 0 and curr > 0, it's 100% increase theoretically or infinite
                          diffPct = curr > 0 ? 100 : 0; 
                     } else {
                          diffPct = ((curr - prev) / prev) * 100;
@@ -2353,7 +2234,7 @@
                         html = `<span class="text-[9px] font-bold text-slate-400">0%</span>`;
                     } else {
                         const isIncrease = diffPct > 0;
-                        const color = isIncrease ? 'text-red-500' : 'text-emerald-500'; // Increase in stuck packages is bad (Red)
+                        const color = isIncrease ? 'text-red-500' : 'text-emerald-500'; 
                         const icon = isIncrease ? 'ph-trend-up' : 'ph-trend-down';
                         const sign = isIncrease ? '+' : '';
                         html = `<i class="ph-bold ${icon} ${color} text-[10px]"></i><span class="text-[9px] font-bold ${color} ml-1">${sign}${diffPct.toFixed(1)}%</span>`;
@@ -2376,7 +2257,7 @@
         document.getElementById('statusToggle').addEventListener('change', e => {
             isGustiadiOnly = e.target.checked;
             document.getElementById('toggleLabel').innerText = isGustiadiOnly ? "In Area" : "Semua";
-            document.getElementById('toggleLabel').className = isGustiadiOnly ? "text-[10px] font-bold text-indigo-600 uppercase tracking-wide transition-colors w-12 text-right" : "text-[10px] font-bold text-slate-400 uppercase tracking-wide transition-colors w-12 text-right";
+            document.getElementById('toggleLabel').className = isGustiadiOnly ? "text-[9px] font-bold text-indigo-600 uppercase tracking-wide transition-colors w-10 text-right" : "text-[9px] font-bold text-slate-400 uppercase tracking-wide transition-colors w-10 text-right";
             renderDashboard();
         });
 
