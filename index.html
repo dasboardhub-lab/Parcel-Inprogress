@@ -527,12 +527,21 @@
                 </div>
 
                 <!-- Rekapan Staging -->
-                <div class="flex flex-col h-[500px] lg:h-[730px]">
+                <div class="flex flex-col h-[500px] lg:h-[600px]">
                     <div class="bg-blue-600 px-5 py-3 rounded-t-3xl border border-blue-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
                         <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-warehouse"></i></div>
                         <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Rekapan Staging</h3>
                     </div>
                     <div id="containerStaging" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
+                </div>
+
+                <!-- BARU: Rincian Last Opcode (Transport & Mid Mile) -->
+                <div class="flex flex-col h-[400px] lg:h-[500px]">
+                    <div class="bg-violet-600 px-5 py-3 rounded-t-3xl border border-violet-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
+                        <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-list-checks"></i></div>
+                        <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Rincian Last Opcode (Trans & Mid Mile)</h3>
+                    </div>
+                    <div id="containerOpcode" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
                 </div>
 
             </div>
@@ -1254,6 +1263,7 @@
             generateServiceRecap(filteredData);
             generateOriginRecap(filteredData);
             generateStagingRecap(filteredData);
+            generateOpcodeRecap(filteredData); // --- CALL FUNCTION BARU ---
             generateAwbTable(filteredData); 
             
             updateCharts(filteredData);
@@ -1976,6 +1986,146 @@
             tfootContent += `</tr>`;
 
             renderStructuredTable('containerStaging', theadContent, tbodyContent, tfootContent);
+        }
+
+        // --- 4.5 OPCODE RECAP (NEW FEATURE - GROUPED HEADERS) ---
+        function generateOpcodeRecap(data) {
+            // 1. Filter Data (Hanya Transport & Mid Mile)
+            const targetPositions = ['transport', 'mid mile'];
+            const relevantData = data.filter(r => {
+                const p = (r['Posisi']||"").toLowerCase().trim();
+                return targetPositions.includes(p);
+            });
+
+            // 2. Scan Unique Opcodes & Group Data
+            const hubs = {};
+            const opcodesByPos = { 'Transport': new Set(), 'Mid Mile': new Set() };
+
+            relevantData.forEach(r => {
+                const h = r['delivery_hub'] || "Unknown";
+                // Cari kolom Last Opcode (Case Insensitive)
+                const opKey = Object.keys(r).find(k => k.toLowerCase().includes('last opcode') || k.toLowerCase() === 'status terakhir') || 'Last Opcode';
+                const op = r[opKey] || "Unknown";
+                
+                let p = (r['Posisi']||"").toLowerCase().trim();
+                let pKey = p === 'transport' ? 'Transport' : 'Mid Mile';
+
+                opcodesByPos[pKey].add(op);
+
+                if(!hubs[h]) hubs[h] = { 'Transport': {}, 'Mid Mile': {} };
+                if(!hubs[h][pKey][op]) hubs[h][pKey][op] = 0;
+                hubs[h][pKey][op]++;
+            });
+
+            const transOps = Array.from(opcodesByPos['Transport']).sort();
+            const mmOps = Array.from(opcodesByPos['Mid Mile']).sort();
+            const sortedHubs = Object.keys(hubs).sort();
+
+            // 3. Build Header (Multi-Row / Grouped)
+            let theadHTML = `<tr>
+                <th style="min-width:140px; width:140px; z-index:50;" class="text-left pl-4 bg-slate-800 text-white" rowspan="2">HUB</th>`;
+            
+            // Header Group Level 1: Transport
+            if (transOps.length > 0) {
+                theadHTML += `<th colspan="${transOps.length}" class="text-center bg-cyan-100 text-cyan-800 border-b border-cyan-200 tracking-widest font-extrabold text-[11px]">TRANSPORT</th>`;
+            } else {
+                theadHTML += `<th class="text-center bg-slate-50 text-slate-400 font-normal italic text-[10px]">Transport (No Data)</th>`;
+            }
+
+            // --- PEMBATAS (SPACER) HEADER ---
+            theadHTML += `<th rowspan="2" style="width:6px; min-width:6px; padding:0; background:#f1f5f9; border-left:1px solid #e2e8f0; border-right:1px solid #e2e8f0;"></th>`;
+
+            // Header Group Level 1: Mid Mile
+            if (mmOps.length > 0) {
+                theadHTML += `<th colspan="${mmOps.length}" class="text-center bg-orange-100 text-orange-800 border-b border-orange-200 tracking-widest font-extrabold text-[11px]">MID MILE</th>`;
+            } else {
+                theadHTML += `<th class="text-center bg-slate-50 text-slate-400 font-normal italic text-[10px]">Mid Mile (No Data)</th>`;
+            }
+            theadHTML += `</tr><tr>`;
+
+            // Header Group Level 2: Specific Opcodes
+            // Transport Opcodes
+            if (transOps.length > 0) {
+                transOps.forEach(op => {
+                    theadHTML += `<th style="min-width:110px; top:44px;" class="text-center bg-cyan-50 text-cyan-700 border-b-2 border-cyan-100 text-[9px] font-bold uppercase truncate" title="${op}">${op}</th>`;
+                });
+            } else {
+                theadHTML += `<th style="min-width:50px; top:44px;" class="bg-slate-50"></th>`;
+            }
+
+            // Mid Mile Opcodes
+            if (mmOps.length > 0) {
+                mmOps.forEach(op => {
+                    theadHTML += `<th style="min-width:110px; top:44px;" class="text-center bg-orange-50 text-orange-700 border-b-2 border-orange-100 text-[9px] font-bold uppercase truncate" title="${op}">${op}</th>`;
+                });
+            } else {
+                theadHTML += `<th style="min-width:50px; top:44px;" class="bg-slate-50"></th>`;
+            }
+            theadHTML += `</tr>`;
+
+            // 4. Build Body
+            let tbodyHTML = "";
+            sortedHubs.forEach(h => {
+                tbodyHTML += `<tr><td class="font-bold text-slate-700 pl-4 border-r border-slate-100 bg-white sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] text-[11px]">${h}</td>`;
+                
+                // Transport Values
+                if (transOps.length > 0) {
+                    transOps.forEach(op => {
+                        const val = hubs[h]['Transport'][op] || 0;
+                        const bg = val > 0 ? 'bg-cyan-50/30' : '';
+                        const text = val > 0 ? 'text-cyan-700 font-bold' : 'text-slate-300';
+                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? formatNumber(val) : '-'}</td>`;
+                    });
+                } else {
+                    tbodyHTML += `<td class="bg-slate-50/50"></td>`;
+                }
+
+                // --- PEMBATAS (SPACER) BODY ---
+                tbodyHTML += `<td style="padding:0; background:#f1f5f9; border-left:1px solid #e2e8f0; border-right:1px solid #e2e8f0;"></td>`;
+
+                // Mid Mile Values
+                if (mmOps.length > 0) {
+                    mmOps.forEach(op => {
+                        const val = hubs[h]['Mid Mile'][op] || 0;
+                        const bg = val > 0 ? 'bg-orange-50/30' : '';
+                        const text = val > 0 ? 'text-orange-700 font-bold' : 'text-slate-300';
+                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? formatNumber(val) : '-'}</td>`;
+                    });
+                } else {
+                    tbodyHTML += `<td class="bg-slate-50/50"></td>`;
+                }
+
+                tbodyHTML += `</tr>`;
+            });
+
+            // 5. Build Footer (Totals)
+            let tfootHTML = `<tr><td class="px-4 text-left font-extrabold sticky left-0 bg-indigo-50 text-indigo-900 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">TOTAL</td>`;
+            
+            if (transOps.length > 0) {
+                transOps.forEach(op => {
+                    let sum = 0;
+                    sortedHubs.forEach(h => sum += (hubs[h]['Transport'][op] || 0));
+                    tfootHTML += `<td class="text-center font-bold text-cyan-800 bg-cyan-100/50 border-t-2 border-cyan-200">${formatNumber(sum)}</td>`;
+                });
+            } else {
+                tfootHTML += `<td></td>`;
+            }
+
+            // --- PEMBATAS (SPACER) FOOTER ---
+            tfootHTML += `<td style="padding:0; background:#cbd5e1; border-left:1px solid #94a3b8; border-right:1px solid #94a3b8;"></td>`;
+
+            if (mmOps.length > 0) {
+                mmOps.forEach(op => {
+                    let sum = 0;
+                    sortedHubs.forEach(h => sum += (hubs[h]['Mid Mile'][op] || 0));
+                    tfootHTML += `<td class="text-center font-bold text-orange-800 bg-orange-100/50 border-t-2 border-orange-200">${formatNumber(sum)}</td>`;
+                });
+            } else {
+                tfootHTML += `<td></td>`;
+            }
+            tfootHTML += `</tr>`;
+
+            renderStructuredTable('containerOpcode', theadHTML, tbodyHTML, tfootHTML);
         }
 
         // --- 5. AWB DATA MANAGEMENT TABLE ---
