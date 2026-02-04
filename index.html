@@ -514,11 +514,11 @@
         <!-- NEW COMBINED ROW: HUB & Staging (Left) vs AWB (Right) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 850ms">
             
-            <!-- LEFT COLUMN WRAPPER -->
-            <div class="lg:col-span-8 flex flex-col gap-4">
+            <!-- LEFT COLUMN WRAPPER (Diperlebar dari span-8 ke span-9) -->
+            <div class="lg:col-span-9 flex flex-col gap-4">
                 
                 <!-- Rekapan HUB -->
-                <div class="flex flex-col h-[400px] lg:h-[400px]">
+                <div class="flex flex-col h-[400px] lg:h-[450px]">
                     <div class="bg-orange-600 px-5 py-3 rounded-t-3xl border border-orange-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
                         <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-buildings"></i></div>
                         <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Rekapan HUB</h3>
@@ -546,8 +546,8 @@
 
             </div>
 
-            <!-- RIGHT COLUMN WRAPPER (AWB List) -->
-            <div class="lg:col-span-4 h-[500px] lg:h-auto"> 
+            <!-- RIGHT COLUMN WRAPPER (AWB List) - (Dipersempit dari span-4 ke span-3) -->
+            <div class="lg:col-span-3 h-[500px] lg:h-auto"> 
                 <div class="flex flex-col h-full"> 
                     <div class="bg-slate-800 px-5 py-3 rounded-t-3xl border border-slate-800 border-b-0 flex flex-col gap-3 shadow-sm shrink-0 relative z-10">
                         <div class="flex items-center gap-3">
@@ -1887,9 +1887,10 @@
             
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
+            // ADJUSTED WIDTHS: Reduced by ~60% (120px -> 50px, 130px -> 55px)
             let theadContent = `<tr>
-                <th style="width:120px; min-width:120px;" class="text-left pl-3">HUB</th>
-                <th style="width:130px; min-width:130px;" class="text-left">Staging</th>
+                <th style="width:50px; min-width:50px;" class="text-left pl-2">HUB</th>
+                <th style="width:55px; min-width:55px;" class="text-left">Staging</th>
                 <th style="width:80px; min-width:80px;" class="text-center">${title}</th>`;
             
             sortedPos.forEach(p => {
@@ -1927,10 +1928,12 @@
 
                     tbodyContent += `<tr>`;
                     if(i===0) {
-                        tbodyContent += `<td class="row-group-header border-b border-slate-100 px-3 text-slate-800 font-bold align-top border-r text-[11px]" rowspan="${stagings.length + 1}">${h}</td>`;
+                        // Added truncate and max-width to cell content
+                        tbodyContent += `<td class="row-group-header border-b border-slate-100 px-2 text-slate-800 font-bold align-top border-r text-[10px] truncate max-w-[50px]" title="${h}" rowspan="${stagings.length + 1}">${h}</td>`;
                     }
                     
-                    tbodyContent += `<td class="text-slate-600 border-r border-slate-50 px-3 font-medium text-[11px] truncate max-w-[130px]" title="${ss}">${ss}</td>
+                    // Added truncate and max-width to staging cell
+                    tbodyContent += `<td class="text-slate-600 border-r border-slate-50 px-2 font-medium text-[10px] truncate max-w-[55px]" title="${ss}">${ss}</td>
                     <td class="text-center font-bold bg-blue-50/20 text-blue-600 border-r border-slate-50">
                         <div>${formatNumber(d.t)}<div class="text-[10px] font-medium text-blue-400">${stagingPct.toFixed(1)}%</div></div>
                     </td>`;
