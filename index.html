@@ -455,8 +455,9 @@
                         <button onclick="setTrendMode('monthly')" id="btnMonthly" class="px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 bg-white text-indigo-600 shadow-sm transform scale-100">
                             Bulanan
                         </button>
-                        <button onclick="setTrendMode('yearly')" id="btnYearly" class="px-4 py-1.5 rounded-lg text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-all duration-300">
-                            Tahunan
+                        <!-- CHANGE: Tahunan to Mingguan -->
+                        <button onclick="setTrendMode('weekly')" id="btnWeekly" class="px-4 py-1.5 rounded-lg text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-all duration-300">
+                            Mingguan
                         </button>
                     </div>
                 </div>
@@ -609,10 +610,25 @@
         let chartInstances = {};
         
         let currentTrendMode = 'monthly';
-        let cachedTrendData = { yearly: {}, monthly: {} };
+        // CHANGE: Initialize with weekly instead of yearly
+        let cachedTrendData = { weekly: {}, monthly: {} };
 
         function formatNumber(num) {
             return num ? num.toLocaleString('id-ID') : '0';
+        }
+
+        // --- HELPER: GET ISO WEEK NUMBER (Senin-Minggu) ---
+        function getISOWeekNumber(d) {
+            // Copy date so don't modify original
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            // Set to nearest Thursday: current date + 4 - current day number
+            // Make Sunday's day number 7
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+            // Get first day of year
+            var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            // Calculate full weeks to nearest Thursday
+            var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+            return [d.getUTCFullYear(), weekNo];
         }
 
         // --- PASSWORD HANDLER ---
@@ -1396,13 +1412,15 @@
         }
 
         function updateCharts(data) {
-            const yearly = {}; 
+            // CHANGE: Replace yearly with weekly logic
+            const weekly = {}; 
             const monthly = {}; 
             const daily = {};
             
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             const currentYear = new Date().getFullYear();
             
+            // Init monthly placeholder for current year
             months.forEach(m => {
                 monthly[`${m} ${currentYear}`] = { total: 0, gustiadi: 0 };
             });
@@ -1418,6 +1436,7 @@
             const mLabel = document.getElementById('currentMonthLabel');
             if (mLabel) mLabel.innerText = `${months[cmIdx]} ${cy}`;
 
+            // --- Process Daily Chart Data (Current Month Only) ---
             data.forEach(row => {
                 const pos = (row['Posisi'] || "").toLowerCase().trim();
                 const hubX = (row['HUB X'] || "").toLowerCase().trim();
@@ -1433,6 +1452,7 @@
                 }
             });
 
+            // --- Process Trend Charts (Weekly & Monthly) based on Filters ---
             const hubVal = document.getElementById('filterHub') ? document.getElementById('filterHub').value : '';
             const serviceVal = document.getElementById('filterService') ? document.getElementById('filterService').value : '';
             const posisiVal = document.getElementById('filterPosisi') ? document.getElementById('filterPosisi').value : '';
@@ -1452,20 +1472,25 @@
                     const y = date.getFullYear();
                     const mKey = `${months[date.getMonth()]} ${y}`; 
                     
-                    if (!yearly[y]) yearly[y] = { total: 0, gustiadi: 0 };
+                    // Weekly Calculation
+                    const [wYear, wNum] = getISOWeekNumber(date);
+                    // Format key: "W01 2025" (padding zero for sorting)
+                    const wKey = `W${wNum.toString().padStart(2,'0')} ${wYear}`;
+
+                    if (!weekly[wKey]) weekly[wKey] = { total: 0, gustiadi: 0 };
                     if (!monthly[mKey]) monthly[mKey] = { total: 0, gustiadi: 0 };
 
-                    yearly[y].total++;
+                    weekly[wKey].total++;
                     monthly[mKey].total++;
 
                     if (hubX === 'gustiadi' && (pos === 'mid mile' || pos === 'transport')) {
-                        yearly[y].gustiadi++;
+                        weekly[wKey].gustiadi++;
                         monthly[mKey].gustiadi++;
                     }
                 }
             });
 
-            cachedTrendData.yearly = yearly;
+            cachedTrendData.weekly = weekly;
             cachedTrendData.monthly = monthly;
 
             renderTrendChart();
@@ -1485,9 +1510,9 @@
             const btnInactive = "text-slate-400 hover:text-slate-600 bg-transparent shadow-none";
             
             document.getElementById('btnMonthly').className = `px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 ${mode === 'monthly' ? btnActive : btnInactive}`;
-            document.getElementById('btnYearly').className = `px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 ${mode === 'yearly' ? btnActive : btnInactive}`;
+            document.getElementById('btnWeekly').className = `px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 ${mode === 'weekly' ? btnActive : btnInactive}`;
             
-            document.getElementById('trendTitle').innerText = mode === 'monthly' ? "Tren Bulanan" : "Tren Tahunan";
+            document.getElementById('trendTitle').innerText = mode === 'monthly' ? "Tren Bulanan" : "Tren Mingguan";
             
             renderTrendChart();
         }
@@ -1497,21 +1522,34 @@
             const dataObj = cachedTrendData[mode];
             
             const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-            const sortMonth = (a, b) => {
-                const partsA = a.split(' ');
-                const partsB = b.split(' ');
-                const idxA = monthsOrder.indexOf(partsA[0]);
-                const idxB = monthsOrder.indexOf(partsB[0]);
-                const yearA = parseInt(partsA[1]);
-                const yearB = parseInt(partsB[1]);
-                return (yearA * 12 + idxA) - (yearB * 12 + idxB);
-            };
             
             let labels;
+            
             if (mode === 'monthly') {
+                const sortMonth = (a, b) => {
+                    const partsA = a.split(' ');
+                    const partsB = b.split(' ');
+                    const idxA = monthsOrder.indexOf(partsA[0]);
+                    const idxB = monthsOrder.indexOf(partsB[0]);
+                    const yearA = parseInt(partsA[1]);
+                    const yearB = parseInt(partsB[1]);
+                    return (yearA * 12 + idxA) - (yearB * 12 + idxB);
+                };
                 labels = Object.keys(dataObj).sort(sortMonth);
             } else {
-                labels = Object.keys(dataObj).sort();
+                // Sort Weekly: "W05 2025" -> Sort by Year then Week
+                const sortWeekly = (a, b) => {
+                    const [wA, yA] = a.split(' ');
+                    const [wB, yB] = b.split(' ');
+                    const yearA = parseInt(yA);
+                    const yearB = parseInt(yB);
+                    const weekA = parseInt(wA.replace('W',''));
+                    const weekB = parseInt(wB.replace('W',''));
+                    
+                    if (yearA !== yearB) return yearA - yearB;
+                    return weekA - weekB;
+                };
+                labels = Object.keys(dataObj).sort(sortWeekly);
             }
 
             const dataTotal = labels.map(k => dataObj[k].total);
