@@ -1562,10 +1562,6 @@
             const canvas = document.getElementById(id);
             if (!canvas) return; 
 
-            if (chartInstances[id]) {
-                chartInstances[id].destroy();
-            }
-            
             const ctx = canvas.getContext('2d');
 
             const gradientGustiadi = ctx.createLinearGradient(0, 0, 0, 300);
@@ -1576,105 +1572,115 @@
             gradientTotal.addColorStop(0, 'rgba(15, 23, 42, 0.2)'); 
             gradientTotal.addColorStop(1, 'rgba(15, 23, 42, 0)');
 
-            chartInstances[id] = new Chart(ctx, {
-                type: 'line', 
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Total AWB',
-                            data: dataTotal,
-                            borderColor: '#0f172a', 
-                            backgroundColor: gradientTotal,
-                            borderWidth: 2,
-                            pointBackgroundColor: '#0f172a',
-                            pointBorderColor: '#fff',
-                            pointRadius: 3,
-                            pointHoverRadius: 5,
-                            fill: true,
-                            tension: 0.4,
-                            order: 2 
-                        },
-                        {
-                            label: 'Inprogress',
-                            data: dataGustiadi,
-                            borderColor: '#6366f1', 
-                            backgroundColor: gradientGustiadi,
-                            borderWidth: 2,
-                            pointBackgroundColor: '#6366f1',
-                            pointBorderColor: '#fff',
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            fill: true,
-                            tension: 0.4,
-                            order: 1 
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    plugins: {
-                        legend: { 
-                            display: true,
-                            position: 'top',
-                            align: 'end',
-                            labels: {
-                                boxWidth: 10,
-                                usePointStyle: true,
-                                pointStyle: 'circle',
-                                font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '600' }
+            // PERUBAHAN: Cek jika chart sudah ada, lakukan update() untuk animasi
+            if (chartInstances[id]) {
+                const chart = chartInstances[id];
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = dataTotal;
+                chart.data.datasets[1].data = dataGustiadi;
+                chart.update(); // Trigger animasi transisi smooth
+            } else {
+                // Jika belum ada, buat baru
+                chartInstances[id] = new Chart(ctx, {
+                    type: 'line', 
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Total AWB',
+                                data: dataTotal,
+                                borderColor: '#0f172a', 
+                                backgroundColor: gradientTotal,
+                                borderWidth: 2,
+                                pointBackgroundColor: '#0f172a',
+                                pointBorderColor: '#fff',
+                                pointRadius: 3,
+                                pointHoverRadius: 5,
+                                fill: true,
+                                tension: 0.4,
+                                order: 2 
+                            },
+                            {
+                                label: 'Inprogress',
+                                data: dataGustiadi,
+                                borderColor: '#6366f1', 
+                                backgroundColor: gradientGustiadi,
+                                borderWidth: 2,
+                                pointBackgroundColor: '#6366f1',
+                                pointBorderColor: '#fff',
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                fill: true,
+                                tension: 0.4,
+                                order: 1 
                             }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
                         },
-                        tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                            titleColor: '#1e293b',
-                            bodyColor: '#475569',
-                            borderColor: '#e2e8f0',
-                            borderWidth: 1,
-                            padding: 10,
-                            boxPadding: 4,
-                            usePointStyle: true,
-                            callbacks: {
-                                label: function(context) {
-                                    return ` ${context.dataset.label}: ${formatNumber(context.raw)}`;
+                        plugins: {
+                            legend: { 
+                                display: true,
+                                position: 'top',
+                                align: 'end',
+                                labels: {
+                                    boxWidth: 10,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '600' }
                                 }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1e293b',
+                                bodyColor: '#475569',
+                                borderColor: '#e2e8f0',
+                                borderWidth: 1,
+                                padding: 10,
+                                boxPadding: 4,
+                                usePointStyle: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        return ` ${context.dataset.label}: ${formatNumber(context.raw)}`;
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                display: function(context) {
+                                    return context.dataset.data[context.dataIndex] > 0;
+                                },
+                                align: 'top',
+                                anchor: 'end',
+                                color: function(context) {
+                                    return context.dataset.borderColor; 
+                                },
+                                font: { size: 9, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
+                                offset: 4,
+                                formatter: (val) => formatNumber(val)
                             }
                         },
-                        datalabels: {
-                            display: function(context) {
-                                return context.dataset.data[context.dataIndex] > 0;
-                            },
-                            align: 'top',
-                            anchor: 'end',
-                            color: function(context) {
-                                return context.dataset.borderColor; 
-                            },
-                            font: { size: 9, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
-                            offset: 4,
-                            formatter: (val) => formatNumber(val)
-                        }
-                    },
-                    scales: { 
-                        y: { 
-                            display: false, 
-                            beginAtZero: true 
-                        }, 
-                        x: { 
-                            grid: { display: false }, 
-                            ticks: { 
-                                font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '500' }, 
-                                color: '#94a3b8' 
+                        scales: { 
+                            y: { 
+                                display: false, 
+                                beginAtZero: true 
+                            }, 
+                            x: { 
+                                grid: { display: false }, 
+                                ticks: { 
+                                    font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '500' }, 
+                                    color: '#94a3b8' 
+                                } 
                             } 
-                        } 
-                    },
-                    layout: { padding: { top: 20 } }
-                }
-            });
+                        },
+                        layout: { padding: { top: 20 } }
+                    }
+                });
+            }
         }
 
         function renderStructuredTable(containerId, theadHTML, tbodyHTML, tfootHTML) {
