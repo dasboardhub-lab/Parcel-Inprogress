@@ -550,6 +550,15 @@
                     <div id="containerOpcode" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
                 </div>
 
+                <!-- BARU: Rincian Feedback Breakdown (Transport & Mid Mile) -->
+                <div class="flex flex-col h-[400px] lg:h-[450px]">
+                    <div class="bg-teal-600 px-5 py-3 rounded-t-3xl border border-teal-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
+                        <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-chat-text"></i></div>
+                        <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Rincian Feedback (Trans & Mid Mile)</h3>
+                    </div>
+                    <div id="containerFeedbackBreakdown" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
+                </div>
+
             </div>
 
             <!-- RIGHT COLUMN WRAPPER (AWB List) - (Dipersempit dari span-4 ke span-3) -->
@@ -800,33 +809,64 @@
                 });
                 pickTable += `\`\`\``;
 
-                // 5. FEEDBACK
-                const feedData = currData.filter(r => {
-                    const pos = (r.Posisi||'').toLowerCase();
-                    const hubX = (r['HUB X']||'').toLowerCase();
-                    return (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi';
+                // --- 5. DETAIL STATUS (MID MILE & TRANSPORT) - COMPACT LIST FORMAT ---
+                // (Sebelumnya Poin 6, sekarang jadi Poin 5 menggantikan Feedback)
+                const detailData = currData.filter(r => {
+                    const pos = (r['Posisi']||'').toLowerCase().trim();
+                    return ['mid mile', 'transport'].includes(pos);
                 });
-                const feedMap = {};
-                feedData.forEach(r => {
+
+                const detailMap = {};
+                detailData.forEach(r => {
                     const h = r.delivery_hub || 'Unknown';
-                    let f = r.Feedback ? r.Feedback.trim() : '';
-                    if(!f) return;
-                    if(!feedMap[h]) feedMap[h] = {};
-                    feedMap[h][f] = (feedMap[h][f]||0)+1;
+                    const pos = (r['Posisi']||'').toLowerCase().trim();
+                    const pKey = pos === 'mid mile' ? 'MM' : 'TR';
+                    
+                    let rawFb = r['Feedback'] ? r['Feedback'].trim() : "";
+                    
+                    let fbLabel = "In Process";
+                    const cleanFb = rawFb.toLowerCase();
+                    if (rawFb && rawFb !== '-' && cleanFb !== 'aman' && cleanFb !== 'lancar' && cleanFb !== 'ok') {
+                        fbLabel = rawFb;
+                    }
+
+                    if (!detailMap[h]) detailMap[h] = { 'MM': {}, 'TR': {} };
+                    detailMap[h][pKey][fbLabel] = (detailMap[h][pKey][fbLabel] || 0) + 1;
                 });
-                const sortedFeedHubs = Object.keys(feedMap).sort((a,b) => {
-                    const sumA = Object.values(feedMap[a]).reduce((x,y)=>x+y,0);
-                    const sumB = Object.values(feedMap[b]).reduce((x,y)=>x+y,0);
-                    return sumB - sumA;
-                });
-                let feedText = `5. FEEDBACK (In Area)\n\`\`\`\nHUB       | Feedback (Count)\n` + "-".repeat(40) + "\n";
-                sortedFeedHubs.forEach(h => {
-                    const topF = Object.entries(feedMap[h]).sort((a,b)=>b[1]-a[1])[0];
-                    if(topF) {
-                        feedText += `${pad(h, 10)}| ${topF[0]} (${topF[1]})\n`;
+
+                const sortedDetailHubs = Object.keys(detailMap).sort();
+
+                let detailText = `5. DETAIL STATUS (Mid Mile & Trans)\n` + "-".repeat(40) + "\n";
+                
+                let hasDetail = false;
+                sortedDetailHubs.forEach(h => {
+                    const d = detailMap[h];
+                    const mmStats = Object.entries(d['MM']);
+                    const trStats = Object.entries(d['TR']);
+                    
+                    if (mmStats.length === 0 && trStats.length === 0) return;
+                    hasDetail = true;
+
+                    detailText += `*${h}*\n`;
+                    
+                    if (mmStats.length > 0) {
+                        const mmStr = mmStats
+                            .sort((a,b) => b[1] - a[1]) 
+                            .map(([k, v]) => `${k} (${v})`)
+                            .join(', ');
+                        detailText += `   🏭 MM: ${mmStr}\n`;
+                    }
+                    
+                    if (trStats.length > 0) {
+                        const trStr = trStats
+                            .sort((a,b) => b[1] - a[1])
+                            .map(([k, v]) => `${k} (${v})`)
+                            .join(', ');
+                        detailText += `   🚚 TR: ${trStr}\n`;
                     }
                 });
-                feedText += `\`\`\``;
+
+                if (!hasDetail) detailText += "_Tidak ada data Mid Mile / Transport._\n";
 
                 const text = `*LAPORAN MONITORING PARCEL INPROGRESS*\n` +
                             `*HUB KAL SULAMP*\n` +
@@ -837,7 +877,7 @@
                             `${hubTable}\n` +
                             `${svcTable}\n` +
                             `${pickTable}\n` +
-                            `${feedText}\n\n` +
+                            `${detailText}\n` +
                             `_Generated by Dashboard System_`;
 
                 fallbackCopyTextToClipboard(text);
@@ -1331,7 +1371,8 @@
             generateServiceRecap(filteredData);
             generateOriginRecap(filteredData);
             generateStagingRecap(filteredData);
-            generateOpcodeRecap(filteredData); // --- CALL FUNCTION BARU ---
+            generateOpcodeRecap(filteredData); 
+            generateFeedbackBreakdown(filteredData); // --- CALL FUNCTION BARU ---
             generateAwbTable(filteredData); 
             
             updateCharts(filteredData);
@@ -2089,11 +2130,14 @@
 
         // --- 4.5 OPCODE RECAP (NEW FEATURE - GROUPED HEADERS) ---
         function generateOpcodeRecap(data) {
-            // 1. Filter Data (Hanya Transport & Mid Mile)
+            // 1. Filter Data (Hanya Transport & Mid Mile AND Gustiadi Only)
             const targetPositions = ['transport', 'mid mile'];
             const relevantData = data.filter(r => {
                 const p = (r['Posisi']||"").toLowerCase().trim();
-                return targetPositions.includes(p);
+                const hubX = (r['HUB X']||"").toLowerCase().trim();
+                
+                // PERBAIKAN: Tambahkan syarat hubX === 'gustiadi' agar sinkron dengan KPI
+                return targetPositions.includes(p) && hubX === 'gustiadi';
             });
 
             // 2. Scan Unique Opcodes & Group Data
@@ -2225,6 +2269,148 @@
             tfootHTML += `</tr>`;
 
             renderStructuredTable('containerOpcode', theadHTML, tbodyHTML, tfootHTML);
+        }
+
+        // --- 4.6 FEEDBACK BREAKDOWN (NEW FEATURE) ---
+        function generateFeedbackBreakdown(data) {
+            // 1. Filter Data (Hanya Transport & Mid Mile AND Gustiadi Only)
+            const targetPositions = ['transport', 'mid mile'];
+            const relevantData = data.filter(r => {
+                const p = (r['Posisi']||"").toLowerCase().trim();
+                const hubX = (r['HUB X']||"").toLowerCase().trim();
+                
+                // PERBAIKAN: Tambahkan syarat hubX === 'gustiadi' agar sinkron dengan KPI
+                return targetPositions.includes(p) && hubX === 'gustiadi';
+            });
+
+            // 2. Scan Unique Feedbacks & Group Data
+            const hubs = {};
+            const feedbacksByPos = { 'Transport': new Set(), 'Mid Mile': new Set() };
+
+            relevantData.forEach(r => {
+                const h = r['delivery_hub'] || "Unknown";
+                let f = r['Feedback'] ? r['Feedback'].trim() : "No Feedback";
+                if(f === '' || f === '-') f = "No Feedback";
+                
+                let p = (r['Posisi']||"").toLowerCase().trim();
+                let pKey = p === 'transport' ? 'Transport' : 'Mid Mile';
+
+                feedbacksByPos[pKey].add(f);
+
+                if(!hubs[h]) hubs[h] = { 'Transport': {}, 'Mid Mile': {} };
+                if(!hubs[h][pKey][f]) hubs[h][pKey][f] = 0;
+                hubs[h][pKey][f]++;
+            });
+
+            const transFeeds = Array.from(feedbacksByPos['Transport']).sort();
+            const mmFeeds = Array.from(feedbacksByPos['Mid Mile']).sort();
+            const sortedHubs = Object.keys(hubs).sort();
+
+            // 3. Build Header (Multi-Row / Grouped)
+            let theadHTML = `<tr>
+                <th style="min-width:140px; width:140px; z-index:50;" class="text-left pl-4 bg-slate-800 text-white" rowspan="2">HUB</th>`;
+            
+            // Header Group Level 1: Transport
+            if (transFeeds.length > 0) {
+                theadHTML += `<th colspan="${transFeeds.length}" class="text-center bg-cyan-100 text-cyan-800 border-b border-cyan-200 tracking-widest font-extrabold text-[11px]">TRANSPORT</th>`;
+            } else {
+                theadHTML += `<th class="text-center bg-slate-50 text-slate-400 font-normal italic text-[10px]">Transport (No Data)</th>`;
+            }
+
+            // Divider Header
+            theadHTML += `<th rowspan="2" style="width:6px; min-width:6px; padding:0; background:#f1f5f9; border-left:1px solid #e2e8f0; border-right:1px solid #e2e8f0;"></th>`;
+
+            // Header Group Level 1: Mid Mile
+            if (mmFeeds.length > 0) {
+                theadHTML += `<th colspan="${mmFeeds.length}" class="text-center bg-orange-100 text-orange-800 border-b border-orange-200 tracking-widest font-extrabold text-[11px]">MID MILE</th>`;
+            } else {
+                theadHTML += `<th class="text-center bg-slate-50 text-slate-400 font-normal italic text-[10px]">Mid Mile (No Data)</th>`;
+            }
+            theadHTML += `</tr><tr>`;
+
+            // Header Group Level 2: Specific Feedbacks
+            // Transport Feedbacks
+            if (transFeeds.length > 0) {
+                transFeeds.forEach(f => {
+                    theadHTML += `<th style="min-width:110px; top:44px;" class="text-center bg-cyan-50 text-cyan-700 border-b-2 border-cyan-100 text-[9px] font-bold uppercase truncate" title="${f}">${f}</th>`;
+                });
+            } else {
+                theadHTML += `<th style="min-width:50px; top:44px;" class="bg-slate-50"></th>`;
+            }
+
+            // Mid Mile Feedbacks
+            if (mmFeeds.length > 0) {
+                mmFeeds.forEach(f => {
+                    theadHTML += `<th style="min-width:110px; top:44px;" class="text-center bg-orange-50 text-orange-700 border-b-2 border-orange-100 text-[9px] font-bold uppercase truncate" title="${f}">${f}</th>`;
+                });
+            } else {
+                theadHTML += `<th style="min-width:50px; top:44px;" class="bg-slate-50"></th>`;
+            }
+            theadHTML += `</tr>`;
+
+            // 4. Build Body
+            let tbodyHTML = "";
+            sortedHubs.forEach(h => {
+                tbodyHTML += `<tr><td class="font-bold text-slate-700 pl-4 border-r border-slate-100 bg-white sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] text-[11px]">${h}</td>`;
+                
+                // Transport Values
+                if (transFeeds.length > 0) {
+                    transFeeds.forEach(f => {
+                        const val = hubs[h]['Transport'][f] || 0;
+                        const bg = val > 0 ? 'bg-cyan-50/30' : '';
+                        const text = val > 0 ? 'text-cyan-700 font-bold' : 'text-slate-300';
+                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? formatNumber(val) : '-'}</td>`;
+                    });
+                } else {
+                    tbodyHTML += `<td class="bg-slate-50/50"></td>`;
+                }
+
+                // Divider Body
+                tbodyHTML += `<td style="padding:0; background:#f1f5f9; border-left:1px solid #e2e8f0; border-right:1px solid #e2e8f0;"></td>`;
+
+                // Mid Mile Values
+                if (mmFeeds.length > 0) {
+                    mmFeeds.forEach(f => {
+                        const val = hubs[h]['Mid Mile'][f] || 0;
+                        const bg = val > 0 ? 'bg-orange-50/30' : '';
+                        const text = val > 0 ? 'text-orange-700 font-bold' : 'text-slate-300';
+                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? formatNumber(val) : '-'}</td>`;
+                    });
+                } else {
+                    tbodyHTML += `<td class="bg-slate-50/50"></td>`;
+                }
+
+                tbodyHTML += `</tr>`;
+            });
+
+            // 5. Build Footer (Totals)
+            let tfootHTML = `<tr><td class="px-4 text-left font-extrabold sticky left-0 bg-teal-50 text-teal-900 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">TOTAL</td>`;
+            
+            if (transFeeds.length > 0) {
+                transFeeds.forEach(f => {
+                    let sum = 0;
+                    sortedHubs.forEach(h => sum += (hubs[h]['Transport'][f] || 0));
+                    tfootHTML += `<td class="text-center font-bold text-cyan-800 bg-cyan-100/50 border-t-2 border-cyan-200">${formatNumber(sum)}</td>`;
+                });
+            } else {
+                tfootHTML += `<td></td>`;
+            }
+
+            // Divider Footer
+            tfootHTML += `<td style="padding:0; background:#cbd5e1; border-left:1px solid #94a3b8; border-right:1px solid #94a3b8;"></td>`;
+
+            if (mmFeeds.length > 0) {
+                mmFeeds.forEach(f => {
+                    let sum = 0;
+                    sortedHubs.forEach(h => sum += (hubs[h]['Mid Mile'][f] || 0));
+                    tfootHTML += `<td class="text-center font-bold text-orange-800 bg-orange-100/50 border-t-2 border-orange-200">${formatNumber(sum)}</td>`;
+                });
+            } else {
+                tfootHTML += `<td></td>`;
+            }
+            tfootHTML += `</tr>`;
+
+            renderStructuredTable('containerFeedbackBreakdown', theadHTML, tbodyHTML, tfootHTML);
         }
 
         // --- 5. AWB DATA MANAGEMENT TABLE ---
@@ -2430,31 +2616,45 @@
                 else if(p==='first mile') counts.first++;
             });
             
-            // PREVIOUS PERIOD LOGIC
+            // PREVIOUS PERIOD LOGIC (PERBAIKAN: Menggunakan Logika Full Day)
             const startDateEl = document.getElementById('filterStartDate');
             const endDateEl = document.getElementById('filterEndDate');
             
             let prevData = [];
             let showComp = false;
 
-            if (data.length > 0) {
+            // Hitung Previous Period jika ada input tanggal atau data tampil
+            if (data.length > 0 || (startDateEl.value && endDateEl.value)) {
                 let start, end;
                 if (startDateEl.value && endDateEl.value) {
                     start = new Date(startDateEl.value);
                     end = new Date(endDateEl.value);
                 } else {
                     let maxDate = new Date(0);
-                    data.forEach(r => {
+                    // Gunakan allData untuk mencari maxDate agar konsisten
+                    allData.forEach(r => {
                         const d = parseDateStr(r['Tanggal']);
                         if (d && d > maxDate) maxDate = d;
                     });
-                    start = maxDate; 
-                    end = maxDate;
+                    start = maxDate ? new Date(maxDate) : new Date(); 
+                    end = maxDate ? new Date(maxDate) : new Date();
                 }
 
-                const duration = end - start; 
-                const prevEnd = new Date(start.getTime() - 86400000);
+                // --- PERBAIKAN LOGIKA DISINI ---
+                // Set Jam agar mencakup satu hari penuh (00:00:00 s.d 23:59:59)
+                start.setHours(0, 0, 0, 0);
+                end.setHours(23, 59, 59, 999);
+
+                // Hitung durasi (selisih waktu)
+                const duration = end.getTime() - start.getTime(); 
+                
+                // Periode sebelumnya berakhir 1 ms sebelum periode saat ini dimulai
+                const prevEnd = new Date(start.getTime() - 1);
+                // Periode sebelumnya dimulai sebesar 'duration' mundur ke belakang
                 const prevStart = new Date(prevEnd.getTime() - duration);
+                
+                // Pastikan prevStart mulai dari jam 00:00:00
+                prevStart.setHours(0, 0, 0, 0);
 
                 const hubVal = document.getElementById('filterHub').value;
                 const svcVal = document.getElementById('filterService').value;
@@ -2469,7 +2669,9 @@
 
                     const d = parseDateStr(row['Tanggal']);
                     if (!d) return false;
-                    return d >= prevStart && d <= prevEnd;
+                    
+                    // Gunakan getTime() untuk perbandingan yang akurat
+                    return d.getTime() >= prevStart.getTime() && d.getTime() <= prevEnd.getTime();
                 });
                 showComp = true;
             }
