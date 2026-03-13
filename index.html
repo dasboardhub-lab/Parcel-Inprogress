@@ -1169,14 +1169,18 @@
         // --- AUTH & INIT ---
         signInAnonymously(auth).catch(e => showIsland('error', "Auth Error"));
 
+        // PERBAIKAN: Tampilkan tombol "Masuk Mode Offline" secara paksa setelah 5 detik 
+        // sebagai langkah antisipasi jika jaringan lemot atau database terblokir.
+        setTimeout(() => {
+            const btn = document.getElementById('skipLoadingBtn');
+            if(btn && document.getElementById('initialLoading').style.opacity !== '0') {
+                btn.classList.remove('hidden-section');
+            }
+        }, 5000);
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 initRealtimeListener();
-            } else {
-                setTimeout(() => {
-                    const btn = document.getElementById('skipLoadingBtn');
-                    if(btn) btn.classList.remove('hidden-section');
-                }, 5000);
             }
         });
 
@@ -1187,6 +1191,7 @@
         }
 
         function initRealtimeListener() {
+            // PERBAIKAN: Menambahkan (error) handler agar jika database limit/error, loading tetap ditutup
             onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
                 allData = [];
                 snapshot.forEach(doc => allData.push(doc.data()));
@@ -1196,6 +1201,10 @@
                 populateDropdowns(allData);
                 renderDashboard();
                 forceHideLoading();
+            }, (error) => {
+                console.error("Firestore Error:", error);
+                showIsland('error', 'Koneksi DB Gagal/Limit Habis.');
+                forceHideLoading(); // Paksa tutup loading meski error
             });
         }
 
