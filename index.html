@@ -62,14 +62,14 @@
             color: #0f172a; 
             font-size: 13px; 
             -webkit-font-smoothing: antialiased;
-            overflow-x: hidden; /* Prevent horizontal scroll on body */
+            overflow-x: hidden;
         }
         
         .hidden-section { display: none !important; }
         
         /* Glass Effect */
         .glass {
-            background: rgba(255, 255, 255, 0.95); /* Increased opacity for mobile readability */
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
@@ -105,7 +105,6 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* Hide Scrollbar for Horizontal Scrollers but allow functionality */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -118,9 +117,9 @@
         }
         .table-scroll-area { 
             overflow: auto; flex: 1; position: relative; 
-            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+            -webkit-overflow-scrolling: touch;
         }
-        .pivot-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; } /* Slightly smaller font for mobile */
+        .pivot-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; }
         
         .pivot-table thead th { 
             position: sticky; top: 0; z-index: 20;
@@ -175,7 +174,7 @@
             padding: 8px 12px;
             font-size: 11px; font-weight: 600; color: #334155;
             transition: all 0.2s; outline: none;
-            width: 100%; /* Default full width on mobile */
+            width: 100%;
         }
         .input-glass:focus { background: white; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
 
@@ -185,7 +184,7 @@
             background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px);
             z-index: 200; display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
-            padding: 1rem; /* Padding for mobile */
+            padding: 1rem;
         }
         #summaryModalOverlay.open, #deleteModalOverlay.open { opacity: 1; pointer-events: auto; }
         
@@ -200,7 +199,6 @@
         .toggle-checkbox:checked { background: #4f46e5; }
         .toggle-checkbox:checked::after { left: 18px; }
 
-        /* Desktop Overrides */
         @media (min-width: 1024px) {
             .input-glass { width: auto; font-size: 12px; }
             .pivot-table { font-size: 12px; }
@@ -220,7 +218,7 @@
         <h2 class="text-sm font-display font-bold text-slate-800 tracking-widest uppercase">Memuat Dashboard</h2>
         <p class="text-xs text-slate-400 mt-1 font-medium">Sinkronisasi data real-time...</p>
         
-        <button id="skipLoadingBtn" class="mt-6 px-6 py-2 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm hidden-section animate-fade-in-up" onclick="forceHideLoading()">
+        <button id="skipLoadingBtn" class="mt-6 px-6 py-2 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm hidden-section animate-fade-in-up" onclick="window.forceHideLoading()">
             Masuk Mode Offline
         </button>
     </div>
@@ -241,11 +239,10 @@
                         <p class="text-[10px] text-slate-400 font-medium">Performa HUB dan Feedback Konsumen</p>
                     </div>
                 </div>
-                <button onclick="closeSummary()" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"><i class="ph-bold ph-x text-lg"></i></button>
+                <button onclick="window.closeSummary()" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"><i class="ph-bold ph-x text-lg"></i></button>
             </div>
             
             <div class="p-6 overflow-y-auto bg-slate-50/50">
-                <!-- Top Origins -->
                 <div class="mb-6">
                     <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                         <i class="ph-fill ph-map-pin text-orange-500"></i> Top Origin Contributor
@@ -254,14 +251,12 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Feedback -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                         <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                             <i class="ph-fill ph-chat-text text-indigo-500"></i> Isu & Feedback
                         </h4>
                         <div class="space-y-3" id="feedbackBreakdown"></div>
                     </div>
-                    <!-- Services -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                         <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                             <i class="ph-fill ph-tag text-emerald-500"></i> Tipe Layanan
@@ -287,25 +282,22 @@
             <h3 class="text-lg font-display font-bold text-slate-800 mb-2">Hapus Data Permanen</h3>
             <p class="text-xs text-slate-500 mb-6 leading-relaxed">Pilih metode penghapusan data:</p>
             
-            <!-- TOGGLE MODE HAPUS -->
             <div class="flex justify-center gap-2 mb-6 bg-slate-50 p-1 rounded-xl border border-slate-200 w-full sm:w-fit mx-auto">
                 <label class="cursor-pointer flex-1 sm:flex-none">
-                    <input type="radio" name="deleteMode" value="month" checked onchange="toggleDeleteInput()" class="peer sr-only">
+                    <input type="radio" name="deleteMode" value="month" checked onchange="window.toggleDeleteInput()" class="peer sr-only">
                     <span class="block px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-500 peer-checked:bg-white peer-checked:text-red-600 peer-checked:shadow-sm transition-all text-center">Per Bulan</span>
                 </label>
                 <label class="cursor-pointer flex-1 sm:flex-none">
-                    <input type="radio" name="deleteMode" value="date" onchange="toggleDeleteInput()" class="peer sr-only">
+                    <input type="radio" name="deleteMode" value="date" onchange="window.toggleDeleteInput()" class="peer sr-only">
                     <span class="block px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-500 peer-checked:bg-white peer-checked:text-red-600 peer-checked:shadow-sm transition-all text-center">Per Tanggal</span>
                 </label>
             </div>
 
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6 text-left">
-                <!-- INPUT BULAN -->
                 <div id="deleteMonthContainer">
                     <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block tracking-wider ml-1">Periode Bulan</label>
                     <input type="month" id="deleteMonthInput" class="w-full bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 transition-all cursor-pointer">
                 </div>
-                <!-- INPUT TANGGAL (Hidden by default) -->
                 <div id="deleteDateContainer" class="hidden-section">
                     <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block tracking-wider ml-1">Spesifik Tanggal</label>
                     <input type="date" id="deleteDateInput" class="w-full bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:ring-2 focus:ring-red-100 focus:border-red-400 transition-all cursor-pointer">
@@ -313,17 +305,16 @@
             </div>
             
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">Batal</button>
-                <button onclick="processDeleteRequest()" class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold hover:bg-red-700 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all transform active:scale-95">Hapus</button>
+                <button onclick="window.closeDeleteModal()" class="flex-1 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">Batal</button>
+                <button onclick="window.processDeleteRequest()" class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold hover:bg-red-700 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all transform active:scale-95">Hapus</button>
             </div>
         </div>
     </div>
 
-    <!-- NAVBAR FLOATING - RESPONSIVE UPDATE -->
+    <!-- NAVBAR FLOATING -->
     <div class="fixed top-0 left-0 w-full z-40 px-2 py-2 sm:px-4 sm:py-4 pointer-events-none">
         <nav class="pointer-events-auto max-w-[1600px] mx-auto glass rounded-2xl px-3 py-3 flex flex-col lg:flex-row items-center justify-between gap-3 shadow-glass transition-all duration-300 animate-fade-in-up">
             
-            <!-- Brand & Mobile Header -->
             <div class="flex items-center justify-between w-full lg:w-auto px-1 lg:px-2">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
@@ -341,27 +332,23 @@
                         </div>
                     </div>
                 </div>
-                <!-- Mobile only actions placeholder if needed -->
             </div>
 
             <!-- Toolbar & Actions -->
             <div class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto">
                 
-                <!-- Date Filter -->
                 <div class="flex items-center justify-between w-full md:w-auto bg-slate-100 rounded-xl p-1 border border-slate-200 group focus-within:border-indigo-300 transition-all">
                     <input type="date" id="filterStartDate" class="bg-transparent text-[10px] font-bold text-slate-600 px-2 py-1.5 outline-none border-none cursor-pointer w-full text-center">
                     <span class="text-slate-300 text-[10px] mx-1"><i class="ph-bold ph-arrow-right"></i></span>
                     <input type="date" id="filterEndDate" class="bg-transparent text-[10px] font-bold text-slate-600 px-2 py-1.5 outline-none border-none cursor-pointer w-full text-center">
                 </div>
 
-                <!-- Dropdowns (Scrollable on mobile) -->
                 <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 no-scrollbar">
                     <select id="filterHub" class="input-glass min-w-[120px] cursor-pointer"><option value="">Semua HUB</option></select>
                     <select id="filterService" class="input-glass min-w-[100px] cursor-pointer"><option value="">Semua Svc</option></select>
                     <select id="filterPosisi" class="input-glass min-w-[110px] cursor-pointer"><option value="">Semua Posisi</option></select>
                 </div>
 
-                <!-- Actions -->
                 <div class="flex items-center justify-between w-full md:w-auto gap-2 border-t md:border-t-0 border-slate-100 pt-2 md:pt-0 mt-1 md:mt-0">
                     <div class="flex items-center gap-2 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl mr-auto md:mr-1" title="Toggle In Area">
                         <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 w-10 text-right transition-colors" id="toggleLabel">Semua</span>
@@ -369,20 +356,19 @@
                     </div>
 
                     <div class="flex gap-2">
-                        <button onclick="copyReport()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100 transition-all active:scale-95" title="Salin Laporan WA">
+                        <button onclick="window.copyReport()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100 transition-all active:scale-95" title="Salin Laporan WA">
                             <i class="ph-bold ph-whatsapp-logo text-lg"></i>
                         </button>
                         
-                        <!-- TOMBOL BARU: DOWNLOAD CSV -->
-                        <button onclick="downloadCSV()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 transition-all active:scale-95" title="Download Data CSV">
+                        <button onclick="window.downloadCSV()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 transition-all active:scale-95" title="Download Data CSV">
                             <i class="ph-bold ph-download-simple text-lg"></i>
                         </button>
                         
-                        <button onclick="openDeleteModal()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition-all active:scale-95" title="Hapus Data">
+                        <button onclick="window.openDeleteModal()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition-all active:scale-95" title="Hapus Data">
                             <i class="ph-bold ph-trash text-lg"></i>
                         </button>
                         
-                        <button onclick="initiateUpload()" class="h-9 px-3 flex items-center gap-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all active:scale-95" title="Upload CSV">
+                        <button onclick="window.initiateUpload()" class="h-9 px-3 flex items-center gap-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all active:scale-95" title="Upload CSV">
                             <i class="ph-bold ph-upload-simple text-lg"></i>
                             <span class="hidden sm:inline text-[10px] font-bold">Upload</span>
                         </button>
@@ -393,13 +379,17 @@
         </nav>
     </div>
 
-    <!-- MAIN CONTENT - Adjusted padding for taller navbar on mobile -->
+    <!-- MAIN CONTENT -->
     <div class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-48 lg:pt-28 pb-12">
         
-        <!-- 1. KPI CARDS (Staggered Animation) -->
+        <div id="dbErrorBanner" class="hidden-section bg-red-50 border border-red-200 text-red-700 p-4 mb-6 rounded-2xl shadow-sm animate-fade-in-up">
+            <h3 class="font-bold text-sm flex items-center gap-2"><i class="ph-fill ph-warning-circle text-lg"></i> Error Skema Database</h3>
+            <p class="text-xs mt-1 ml-7 text-red-600 leading-relaxed" id="dbErrorText"></p>
+        </div>
+
+        <!-- 1. KPI CARDS -->
         <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
             <script>
-                // Modern KPI Card
                 const renderKpi = (id, label, color, icon, delay) => {
                     const colorMap = {
                         'slate': { bg: 'bg-slate-50', text: 'text-slate-600' },
@@ -446,7 +436,7 @@
             </script>
         </div>
 
-        <!-- 2. ANALYTICS (Combined Trend) -->
+        <!-- 2. ANALYTICS -->
         <div class="grid grid-cols-1 mb-6">
             <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 500ms">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
@@ -455,13 +445,11 @@
                         <p class="text-[10px] text-slate-400 font-medium">Analisis volume pengiriman berdasarkan periode</p>
                     </div>
                     
-                    <!-- Toggle Button Group -->
                     <div class="bg-slate-100 p-1 rounded-xl flex items-center shadow-inner scale-90 sm:scale-100 origin-right">
-                        <button onclick="setTrendMode('monthly')" id="btnMonthly" class="px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 bg-white text-indigo-600 shadow-sm transform scale-100">
+                        <button onclick="window.setTrendMode('monthly')" id="btnMonthly" class="px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 bg-white text-indigo-600 shadow-sm transform scale-100">
                             Bulanan
                         </button>
-                        <!-- CHANGE: Tahunan to Mingguan -->
-                        <button onclick="setTrendMode('weekly')" id="btnWeekly" class="px-4 py-1.5 rounded-lg text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-all duration-300">
+                        <button onclick="window.setTrendMode('weekly')" id="btnWeekly" class="px-4 py-1.5 rounded-lg text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-all duration-300">
                             Mingguan
                         </button>
                     </div>
@@ -472,7 +460,7 @@
             </div>
         </div>
 
-        <!-- 3. DAILY TREND & DATA TABLES -->
+        <!-- 3. DAILY TREND -->
         <div class="grid grid-cols-12 gap-4 mb-6">
             <div class="col-span-12 bg-white rounded-3xl p-5 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 700ms">
                 <div class="flex justify-between items-center mb-4">
@@ -488,7 +476,6 @@
         <!-- BARIS 1: KPI, Origin, Service -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 800ms">
             
-            <!-- KPI -->
             <div class="xl:col-span-6 flex flex-col h-[400px] lg:h-[400px]">
                 <div class="bg-indigo-600 px-5 py-3 rounded-t-3xl border border-indigo-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
                     <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-monitor"></i></div>
@@ -497,7 +484,6 @@
                 <div id="containerKPI" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
-            <!-- Top 5 Origin -->
             <div class="xl:col-span-3 flex flex-col h-[400px] lg:h-[400px]">
                 <div class="bg-pink-600 px-5 py-3 rounded-t-3xl border border-pink-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
                     <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-map-pin"></i></div>
@@ -506,7 +492,6 @@
                 <div id="containerOrigin" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
             </div>
 
-            <!-- Service Breakdown -->
             <div class="xl:col-span-3 flex flex-col h-[400px] lg:h-[400px]">
                 <div class="bg-emerald-600 px-5 py-3 rounded-t-3xl border border-emerald-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
                     <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-tag"></i></div>
@@ -520,10 +505,8 @@
         <!-- NEW COMBINED ROW: HUB & Staging (Left) vs AWB (Right) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 850ms">
             
-            <!-- LEFT COLUMN WRAPPER (Diperlebar dari span-8 ke span-9) -->
             <div class="lg:col-span-9 flex flex-col gap-4">
                 
-                <!-- Rekapan HUB -->
                 <div class="flex flex-col h-[400px] lg:h-[400px]">
                     <div class="bg-orange-600 px-5 py-3 rounded-t-3xl border border-orange-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
                         <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-buildings"></i></div>
@@ -532,7 +515,6 @@
                     <div id="containerHub" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
                 </div>
 
-                <!-- Rekapan Staging -->
                 <div class="flex flex-col h-[500px] lg:h-[600px]">
                     <div class="bg-blue-600 px-5 py-3 rounded-t-3xl border border-blue-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
                         <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-warehouse"></i></div>
@@ -541,7 +523,6 @@
                     <div id="containerStaging" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
                 </div>
 
-                <!-- BARU: Rincian Last Opcode (Transport & Mid Mile) -->
                 <div class="flex flex-col h-[400px] lg:h-[450px]">
                     <div class="bg-violet-600 px-5 py-3 rounded-t-3xl border border-violet-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
                         <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-list-checks"></i></div>
@@ -550,7 +531,6 @@
                     <div id="containerOpcode" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1"></div>
                 </div>
 
-                <!-- BARU: Rincian Feedback Breakdown (Transport & Mid Mile) -->
                 <div class="flex flex-col h-[400px] lg:h-[450px]">
                     <div class="bg-teal-600 px-5 py-3 rounded-t-3xl border border-teal-600 border-b-0 flex items-center justify-start gap-3 shadow-sm shrink-0 relative z-10">
                         <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-chat-text"></i></div>
@@ -561,23 +541,20 @@
 
             </div>
 
-            <!-- RIGHT COLUMN WRAPPER (AWB List) - (Dipersempit dari span-4 ke span-3) -->
+            <!-- RIGHT COLUMN WRAPPER (AWB List) -->
             <div class="lg:col-span-3 h-[500px] lg:h-auto"> 
                 <div class="flex flex-col h-full"> 
                     <div class="bg-slate-800 px-5 py-3 rounded-t-3xl border border-slate-800 border-b-0 flex flex-col gap-3 shadow-sm shrink-0 relative z-10">
-                        <!-- HEADER BARU: FLEX BETWEEN UNTUK JUDUL & TOMBOL COPY -->
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="w-7 h-7 bg-white/20 text-white rounded-lg flex items-center justify-center backdrop-blur-sm"><i class="ph-bold ph-table"></i></div>
                                 <h3 class="text-[10px] font-display font-bold text-white uppercase tracking-widest">Daftar Data AWB</h3>
                             </div>
-                            <!-- TOMBOL COPY LIST -->
-                            <button onclick="copyAwbList()" class="w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all active:scale-95" title="Salin Data Tampil">
+                            <button onclick="window.copyAwbList()" class="w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all active:scale-95" title="Salin Data Tampil">
                                 <i class="ph-bold ph-copy-simple text-sm"></i>
                             </button>
                         </div>
                         
-                        <!-- SEARCH INPUT AWB -->
                         <div class="relative w-full">
                             <input type="text" id="awbSearchInput" placeholder="Cari No Resi..." 
                                 class="w-full bg-slate-700/50 border border-slate-600 text-white text-[10px] rounded-lg px-3 py-2 pl-8 focus:outline-none focus:border-slate-500 transition-colors placeholder-slate-400">
@@ -592,19 +569,11 @@
 
         </div>
 
-        <!-- Hidden Elements for Processing -->
-        <div class="hidden-section">
-            <table id="tableRawBody"></table>
-            <div id="rawCount"></div>
-        </div>
-
     </div>
 
-    <!-- JAVASCRIPT LOGIC (Unchanged) -->
+    <!-- JAVASCRIPT LOGIC -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, writeBatch, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
         Chart.register(ChartDataLabels);
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
@@ -612,19 +581,12 @@
         Chart.defaults.scale.grid.color = '#f1f5f9';
         Chart.defaults.scale.grid.borderColor = 'transparent';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDXOfZbVDqtfGB0abQkTeILo-XC6a9xxKI",
-            authDomain: "hub-dashboard-92428.firebaseapp.com",
-            projectId: "hub-dashboard-92428",
-            storageBucket: "hub-dashboard-92428.firebasestorage.app",
-            messagingSenderId: "827243064075",
-            appId: "1:827243064075:web:7a4ce8b927d3ec7e33d00e"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const COLLECTION_NAME = "parcel_data";
+        // --- GLOBAL VARIABLES & CONFIG ---
+        const supabaseUrl = 'https://brkdtxnfpakqbhhrtraw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJya2R0eG5mcGFrcWJoaHJ0cmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMzkwODIsImV4cCI6MjA4ODYxNTA4Mn0.v5aI110arDKYgLXa19J7P7fMskV9DT3IC3bBmWa34D8';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        
+        const COLLECTION_NAME = "parcel_data"; 
         const APP_PASSWORD = "TAB123";
 
         let allData = [];
@@ -632,28 +594,161 @@
         let chartInstances = {};
         
         let currentTrendMode = 'monthly';
-        // CHANGE: Initialize with weekly instead of yearly
         let cachedTrendData = { weekly: {}, monthly: {} };
 
+        // AWB Table State
+        let awbDataCache = []; 
+        let filteredAwbCache = []; 
+        let awbRenderedCount = 0; 
+        const AWB_CHUNK_SIZE = 60; 
+        const AWB_MAX_LIMIT = 10000;
+
+        // --- HELPER FUNCTIONS ---
         function formatNumber(num) {
             return num ? num.toLocaleString('id-ID') : '0';
         }
 
-        // --- HELPER: GET ISO WEEK NUMBER (Senin-Minggu) ---
         function getISOWeekNumber(d) {
-            // Copy date so don't modify original
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-            // Set to nearest Thursday: current date + 4 - current day number
-            // Make Sunday's day number 7
             d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
-            // Get first day of year
             var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-            // Calculate full weeks to nearest Thursday
             var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
             return [d.getUTCFullYear(), weekNo];
         }
 
-        // --- PASSWORD HANDLER ---
+        function parseDateStr(dateStr) {
+            if (!dateStr) return null;
+            dateStr = String(dateStr).trim();
+            if (dateStr.includes('-')) {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    if (parts[0].length === 4) return new Date(parts[0], parts[1] - 1, parts[2]); 
+                    return new Date(parts[2], parts[1] - 1, parts[0]); 
+                }
+            }
+            if (dateStr.includes('/')) {
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    if (parts[2].length === 4) return new Date(parts[2], parts[1] - 1, parts[0]); 
+                    return new Date(parts[0], parts[1] - 1, parts[2]); 
+                }
+            }
+            return new Date(dateStr);
+        }
+
+        function getGradient(val, min, max, isBold = false) {
+            if(!val) return 'transparent';
+            if(min===max) return isBold ? '#dcfce7' : '#f0fdf4'; 
+            
+            const ratio = (val-min)/(max-min);
+            const hue = 120 - (ratio*120);
+            
+            if (isBold) {
+                return `hsla(${hue}, 90%, 88%, 0.85)`; 
+            }
+            
+            return `hsla(${hue}, 85%, 96%, 0.6)`;
+        }
+
+        function getSafeVal(row, primaryKey) {
+            if (!row) return undefined;
+            if (row[primaryKey] !== undefined && row[primaryKey] !== null && row[primaryKey] !== "") return row[primaryKey];
+            
+            const searchKey = primaryKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+            for (let key in row) {
+                if (key.toLowerCase().replace(/[^a-z0-9]/g, '') === searchKey) {
+                    if (row[key] !== null && row[key] !== "") return row[key];
+                }
+            }
+            return undefined;
+        }
+
+        // --- UI & NOTIFICATION FUNCTIONS ---
+        const island = document.getElementById('dynamicIsland');
+        function showIsland(type, msg, onConfirm = null) {
+            island.className = 'active'; 
+            if (type === 'loading') {
+                island.innerHTML = `<div class="island-content"><div class="island-spinner"></div><span>${msg}</span></div>`;
+            } else if (type === 'progress') {
+                island.className = 'expanded';
+                island.innerHTML = `
+                    <div class="text-center w-full">
+                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-2 text-blue-400"><i class="ph-bold ph-upload-simple text-lg animate-bounce"></i></div>
+                        <h4 class="text-sm font-bold text-white mb-1">${msg}</h4>
+                        <div class="w-full bg-slate-700 rounded-full h-2.5 mb-1 mt-3">
+                            <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" id="uploadProgressBar" style="width: 0%"></div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1 font-mono" id="uploadProgressText">Memulai upload...</p>
+                    </div>
+                `;
+            } else if (type === 'summary') {
+                island.className = 'expanded';
+                island.innerHTML = `
+                    <div class="text-center w-full">
+                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-2 text-emerald-400"><i class="ph-bold ph-check-circle text-lg"></i></div>
+                        <h4 class="text-sm font-bold text-white mb-3 border-b border-slate-700 pb-2">Laporan Upload</h4>
+                        ${msg}
+                        <button id="islCloseSum" class="w-full mt-3 py-2.5 rounded-xl bg-white text-[11px] font-bold text-slate-900 hover:bg-slate-200 transition">Selesai</button>
+                    </div>
+                `;
+                document.getElementById('islCloseSum').onclick = () => { island.className = ''; island.style.opacity = '0'; };
+            } else if (type === 'success') {
+                island.innerHTML = `<div class="island-content"><i class="ph-fill ph-check-circle text-emerald-400 text-lg"></i><span>${msg}</span></div>`;
+                setTimeout(() => { island.className = ''; island.style.opacity = '0'; }, 3000);
+            } else if (type === 'error') {
+                island.innerHTML = `<div class="island-content"><i class="ph-fill ph-warning-circle text-red-400 text-lg"></i><span>${msg}</span></div>`;
+                setTimeout(() => { island.className = ''; island.style.opacity = '0'; }, 5000);
+            } else if (type === 'confirm') {
+                island.className = 'expanded';
+                island.innerHTML = `
+                    <div class="text-center mb-4">
+                        <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-400 border border-slate-700"><i class="ph-fill ph-question text-2xl"></i></div>
+                        <h4 class="text-sm font-bold text-white">Konfirmasi Upload</h4>
+                        <p class="text-xs text-slate-400 mt-1">${msg}</p>
+                    </div>
+                    <div class="flex gap-3 w-full">
+                        <button id="islCancel" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">Batal</button>
+                        <button id="islOk" class="flex-1 py-2.5 rounded-xl bg-white text-xs font-bold text-slate-900 hover:bg-slate-100 transition">Ya, Proses</button>
+                    </div>
+                `;
+                document.getElementById('islCancel').onclick = () => { island.className = ''; island.style.opacity = '0'; document.getElementById('csvFileInput').value=''; };
+                document.getElementById('islOk').onclick = () => { onConfirm(); };
+            } else if (type === 'password') {
+                island.className = 'expanded';
+                island.innerHTML = `
+                    <div class="text-center mb-3">
+                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-2 text-orange-400"><i class="ph-fill ph-lock-key text-lg"></i></div>
+                        <h4 class="text-sm font-bold text-white">Akses Terkunci</h4>
+                    </div>
+                    <input type="password" id="islPass" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mb-3 focus:ring-1 focus:ring-orange-500 outline-none text-center tracking-widest" placeholder="Password">
+                    <div class="flex gap-2 w-full">
+                        <button id="islCancel" class="flex-1 py-2.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-400 hover:bg-slate-700">Batal</button>
+                        <button id="islAuth" class="flex-1 py-2.5 rounded-lg bg-white text-[10px] font-bold text-slate-900 hover:bg-slate-200">Verifikasi</button>
+                    </div>
+                `;
+                const input = document.getElementById('islPass');
+                input.focus();
+                
+                document.getElementById('islCancel').onclick = () => { island.className = ''; island.style.opacity = '0'; document.getElementById('csvFileInput').value=''; };
+                const verify = () => {
+                    if (input.value === APP_PASSWORD) {
+                        if (onConfirm) onConfirm();
+                    } else {
+                        showIsland('error', 'Password Salah!');
+                    }
+                };
+                document.getElementById('islAuth').onclick = verify;
+                input.addEventListener('keypress', (e) => { if (e.key === 'Enter') verify(); });
+            }
+            island.style.opacity = '1';
+        }
+
+        window.forceHideLoading = () => {
+            const ov = document.getElementById('initialLoading');
+            ov.style.opacity = '0';
+            setTimeout(() => ov.style.display = 'none', 500);
+        }
+
         function requestPassword(onSuccess) {
             showIsland('password', null, onSuccess);
         }
@@ -662,37 +757,248 @@
             requestPassword(() => document.getElementById('csvFileInput').click());
         }
 
-        // --- DOWNLOAD CSV FEATURE ---
+        function handleSchemaError(error) {
+            const banner = document.getElementById('dbErrorBanner');
+            const errorText = document.getElementById('dbErrorText');
+
+            if (error.code === 'PGRST205') {
+                showIsland('error', 'Gagal: Tabel parcel_data belum ada!');
+                if(banner) {
+                    errorText.innerHTML = `Sistem mendeteksi tabel <b>parcel_data</b> belum dibuat di dalam project Supabase Anda.<br><b>Solusi Cepat:</b> Buka dashboard Supabase Anda > <b>Table Editor</b> > <b>Create a new table</b> > Beri nama <b>parcel_data</b> (huruf kecil semua) > Buat kolom bernama <b>awb</b> (tipe text) dan jadikan sebagai <b>Primary Key</b> > Matikan opsi RLS (Enable Row Level Security di-uncheck) > Save.`;
+                    banner.classList.remove('hidden-section');
+                }
+            } else if (error.code === 'PGRST204') {
+                const colMatch = error.message.match(/Could not find the '(.*?)' column/i);
+                const colName = colMatch ? colMatch[1] : 'tertentu';
+                showIsland('error', `Kolom '${colName}' tidak ditemukan di tabel!`);
+                
+                if(banner) {
+                    errorText.innerHTML = `Sistem gagal mengupload karena kolom <b>${colName}</b> ada di file CSV tapi belum dibuat di tabel Supabase Anda.<br><b>Solusi:</b> Buka dashboard Supabase Anda > <b>Table Editor</b> > pilih tabel <b>parcel_data</b> > Klik ikon <b>+ (Add Column)</b> > Beri nama <b>${colName}</b> persis seperti ini (perhatikan huruf besar/kecil/spasi) dengan tipe <b>text</b> > Save. Lalu coba upload lagi.`;
+                    banner.classList.remove('hidden-section');
+                }
+            } else {
+                showIsland('error', 'Sebagian Gagal. Cek Konsol.');
+            }
+        }
+
+        // --- INIT & REALTIME SUBSCRIPTION ---
+        function updateLastUpdated() {
+            const now = new Date();
+            const lastUpd = document.getElementById('lastUpdated');
+            if(lastUpd) lastUpd.innerText = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+        }
+
+        async function initDataFetch() {
+            const { data, error } = await supabase.from(COLLECTION_NAME).select('*').limit(50000);
+            
+            if (error) {
+                console.error("Supabase Error:", error);
+                handleSchemaError(error);
+                window.forceHideLoading();
+                return;
+            }
+
+            allData = data || [];
+            
+            updateLastUpdated();
+            populateDropdowns(allData);
+            window.renderDashboard();
+            window.forceHideLoading();
+
+            supabase.channel('public:parcel_data')
+                .on('postgres_changes', { event: '*', schema: 'public', table: COLLECTION_NAME }, payload => {
+                    const payloadAwb = payload.new?.awb || payload.old?.awb;
+                    if (!payloadAwb) return;
+
+                    if (payload.eventType === 'INSERT') {
+                        const exists = allData.some(r => getSafeVal(r, 'awb') === payload.new.awb);
+                        if(!exists) allData.push(payload.new);
+                    } else if (payload.eventType === 'UPDATE') {
+                        const idx = allData.findIndex(r => getSafeVal(r, 'awb') === payload.new.awb);
+                        if (idx > -1) allData[idx] = payload.new;
+                        else allData.push(payload.new);
+                    } else if (payload.eventType === 'DELETE') {
+                        allData = allData.filter(r => getSafeVal(r, 'awb') !== payload.old.awb);
+                    }
+                    
+                    updateLastUpdated();
+                    populateDropdowns(allData);
+                    window.renderDashboard();
+                })
+                .subscribe();
+        }
+
+        setTimeout(() => {
+            const btn = document.getElementById('skipLoadingBtn');
+            if(btn && document.getElementById('initialLoading').style.opacity !== '0') {
+                btn.classList.remove('hidden-section');
+            }
+        }, 5000);
+
+        // --- UPLOAD CSV LOGIC (BATCH & DUPLICATE HANDLING) ---
+        const csvInput = document.getElementById('csvFileInput');
+        const newCsvInput = csvInput.cloneNode(true);
+        csvInput.parentNode.replaceChild(newCsvInput, csvInput);
+
+        newCsvInput.addEventListener('change', e => {
+            const f = e.target.files[0]; if(!f) return;
+            Papa.parse(f, { 
+                header: true, 
+                skipEmptyLines: true, 
+                transformHeader: function(h) {
+                    return h.replace(/[\r\n"]+/g, ' ').replace(/^\uFEFF/, '').trim();
+                },
+                complete: res => {
+                    saveData(res.data);
+                }
+            });
+        });
+
+        async function saveData(data) {
+            showIsland('loading', 'Menganalisis Data...');
+            
+            const sampleRow = data[0] || {};
+            const awbKey = Object.keys(sampleRow).find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === 'awb' || k.toLowerCase().replace(/[^a-z0-9]/g, '') === 'noresi');
+
+            if (!awbKey) {
+                showIsland('error', 'Kolom AWB / No Resi tidak ditemukan di file!');
+                return;
+            }
+
+            const valid = data.filter(r => r[awbKey] && r[awbKey].toString().trim() !== '');
+            if (valid.length === 0) {
+                showIsland('error', 'Tidak ada data valid (AWB kosong).');
+                return;
+            }
+
+            const existingAwbs = new Set(allData.map(item => getSafeVal(item, 'awb') || getSafeVal(item, 'No Resi')));
+            const currentFileAwbs = new Set(); 
+
+            const rowsToUpload = [];
+            let skippedCount = 0; 
+            let duplicateInFileCount = 0; 
+
+            valid.forEach(row => {
+                const docId = row[awbKey].toString().trim();
+                
+                if (existingAwbs.has(docId)) {
+                    skippedCount++; 
+                } else if (currentFileAwbs.has(docId)) {
+                    duplicateInFileCount++;
+                } else {
+                    const cleanRow = { ...row }; 
+                    cleanRow['awb'] = docId; 
+                    rowsToUpload.push(cleanRow);
+                    currentFileAwbs.add(docId); 
+                }
+            });
+
+            const totalSkipped = skippedCount + duplicateInFileCount;
+
+            if (rowsToUpload.length === 0) {
+                const msg = `
+                    <div class="text-left text-[11px] bg-slate-800 p-3 rounded-lg w-full border border-slate-700">
+                        <div class="flex justify-between mb-1"><span class="text-slate-300">Tersimpan:</span> <b class="text-emerald-400">0</b></div>
+                        <div class="flex justify-between mb-1"><span class="text-slate-300">Gagal:</span> <b class="text-red-400">0</b></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Duplikat (Diabaikan):</span> <b class="text-yellow-400">${formatNumber(totalSkipped)}</b></div>
+                    </div>
+                `;
+                showIsland('summary', msg);
+                return;
+            }
+            
+            let confirmMsg = `
+                <div class="text-left text-[11px] bg-slate-50 p-2 rounded-lg mb-2">
+                    <div class="flex justify-between"><span>Total File:</span> <b>${formatNumber(valid.length)}</b></div>
+                    <div class="flex justify-between text-slate-400"><span>Duplikat (Skip):</span> <b>${formatNumber(totalSkipped)}</b></div>
+                    <div class="flex justify-between text-emerald-600 font-bold border-t border-slate-200 mt-1 pt-1">
+                        <span>Akan Diupload:</span> <span>${formatNumber(rowsToUpload.length)}</span>
+                    </div>
+                </div>
+            `;
+            confirmMsg += `<span class="text-slate-400 text-[10px]">Lanjutkan upload batch?</span>`;
+
+            showIsland('confirm', confirmMsg, () => executeBatchUpload(rowsToUpload, totalSkipped));
+        }
+
+        async function executeBatchUpload(rows, skippedCount) {
+            showIsland('progress', `Menyimpan ${formatNumber(rows.length)} data...`);
+            const batchSize = 1000; 
+            const totalBatches = Math.ceil(rows.length / batchSize);
+            
+            let successCount = 0;
+            let failedCount = 0;
+
+            for(let i=0; i<totalBatches; i++) {
+                const chunk = rows.slice(i*batchSize, (i+1)*batchSize);
+                const { error } = await supabase.from(COLLECTION_NAME).upsert(chunk, { onConflict: 'awb' });
+                
+                if (error) {
+                    console.error(`Batch ${i+1} Failed:`, error);
+                    if (error.code === 'PGRST205' || error.code === 'PGRST204') {
+                        failedCount += (rows.length - successCount);
+                        handleSchemaError(error);
+                        break; 
+                    } else {
+                        failedCount += chunk.length;
+                    }
+                } else {
+                    successCount += chunk.length;
+                    
+                    chunk.forEach(newRow => {
+                        const idx = allData.findIndex(r => getSafeVal(r, 'awb') === newRow.awb);
+                        if (idx > -1) allData[idx] = newRow;
+                        else allData.push(newRow);
+                    });
+
+                    updateLastUpdated();
+                    populateDropdowns(allData);
+                    window.renderDashboard();
+                }
+
+                const processedCount = Math.min((i + 1) * batchSize, rows.length);
+                const progressPct = Math.round((processedCount / rows.length) * 100);
+                
+                const progressBar = document.getElementById('uploadProgressBar');
+                const progressText = document.getElementById('uploadProgressText');
+                
+                if(progressBar) progressBar.style.width = `${progressPct}%`;
+                if(progressText) progressText.innerText = `${formatNumber(processedCount)} / ${formatNumber(rows.length)} (${progressPct}%)`;
+            }
+            
+            setTimeout(() => {
+                const msg = `
+                    <div class="text-left text-[11px] bg-slate-800 p-3 rounded-lg w-full border border-slate-700">
+                        <div class="flex justify-between mb-1"><span class="text-slate-300">Tersimpan:</span> <b class="text-emerald-400">${formatNumber(successCount)}</b></div>
+                        <div class="flex justify-between mb-1"><span class="text-slate-300">Gagal:</span> <b class="text-red-400">${formatNumber(failedCount)}</b></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Duplikat (Diabaikan):</span> <b class="text-yellow-400">${formatNumber(skippedCount)}</b></div>
+                    </div>
+                `;
+                showIsland('summary', msg);
+            }, 600);
+        }
+
+        // --- EXPORT & COPY FUNCTIONS ---
         window.downloadCSV = () => {
             const data = getFilteredData();
-            
             if (!data || data.length === 0) {
                 showIsland('error', 'Tidak ada data untuk didownload.');
                 return;
             }
-
             showIsland('loading', 'Menyiapkan file CSV...');
-
             setTimeout(() => {
                 try {
-                    // Konversi JSON ke CSV menggunakan PapaParse
                     const csv = Papa.unparse(data);
-                    
-                    // Buat Blob dan Link Download
                     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement("a");
-                    
-                    // Nama file dinamis dengan tanggal hari ini
                     const dateStr = new Date().toISOString().slice(0,10);
                     link.setAttribute("href", url);
                     link.setAttribute("download", `parcel_data_filtered_${dateStr}.csv`);
                     link.style.visibility = 'hidden';
-                    
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    
                     showIsland('success', 'File CSV berhasil didownload!');
                 } catch (err) {
                     console.error(err);
@@ -701,16 +1007,31 @@
             }, 500);
         }
 
-        // --- REPORT GENERATOR ---
+        window.copyAwbList = () => {
+            if (!filteredAwbCache || filteredAwbCache.length === 0) {
+                showIsland('error', 'List kosong atau tidak ada data.');
+                return;
+            }
+            showIsland('loading', 'Menyalin data ke clipboard...');
+            setTimeout(() => {
+                let clipboardText = "No Resi\tStaging\tPosisi\n";
+                filteredAwbCache.forEach(row => {
+                    const awb = getSafeVal(row, 'awb') || getSafeVal(row, 'No Resi') || "";
+                    const stg = getSafeVal(row, 'delivery_staging') || "-";
+                    const pos = getSafeVal(row, 'Posisi') || "-";
+                    clipboardText += `${awb}\t${stg}\t${pos}\n`;
+                });
+                fallbackCopyTextToClipboard(clipboardText);
+                showIsland('success', `${formatNumber(filteredAwbCache.length)} baris data berhasil disalin!`);
+            }, 300);
+        }
         
         window.copyReport = () => {
             showIsland('loading', 'Menyusun laporan...'); 
-
             setTimeout(() => {
                 const dateStart = document.getElementById('filterStartDate').value || 'Awal';
                 const dateEnd = document.getElementById('filterEndDate').value || 'Akhir';
                 const range = `${dateStart} s/d ${dateEnd}`;
-                const total = document.getElementById('kpiTotal').innerText;
                 
                 const currData = getFilteredData();
                 const totalCurr = currData.length;
@@ -728,19 +1049,18 @@
                 const posList = ['Last Mile', 'Vendor 3PL', 'Mid Mile', 'Mitra Pengusaha', 'Transport', 'First Mile'];
                 let posTable = `1. BREAKDOWN POSISI\n\`\`\`\n${pad('Posisi', 16)}| ${pad('Curr', 5)}| ${pad('Prev', 5)}| %\n` + "-".repeat(40) + "\n";
                 posList.forEach(p => {
-                    const c = currData.filter(r => (r.Posisi||'').toLowerCase() === p.toLowerCase()).length;
-                    const pr = prevData.filter(r => (r.Posisi||'').toLowerCase() === p.toLowerCase()).length;
+                    const c = currData.filter(r => (getSafeVal(r, 'Posisi')||'').toString().toLowerCase() === p.toLowerCase()).length;
+                    const pr = prevData.filter(r => (getSafeVal(r, 'Posisi')||'').toString().toLowerCase() === p.toLowerCase()).length;
                     posTable += `${pad(p, 16)}| ${pad(String(c), 5)}| ${pad(String(pr), 5)}| ${getComp(c, pr)}\n`;
                 });
                 posTable += `\`\`\``;
 
-                // 2. BREAKDOWN HUB (Sorted by In Area)
                 const getHubTrans = (data) => {
                     const map = {};
                     data.forEach(r => {
-                        const h = r.delivery_hub || 'Unknown';
-                        const pos = (r.Posisi||'').toLowerCase();
-                        const hubX = (r['HUB X']||'').toLowerCase();
+                        const h = getSafeVal(r, 'delivery_hub') || 'Unknown';
+                        const pos = (getSafeVal(r, 'Posisi')||'').toString().toLowerCase();
+                        const hubX = (getSafeVal(r, 'HUB X')||'').toString().toLowerCase();
                         if (!map[h]) map[h] = { total: 0, special: 0 };
                         map[h].total++;
                         if ((pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi') {
@@ -755,26 +1075,25 @@
                 let hubTable = `2. BREAKDOWN HUB (Top 10 In Area)\n\`\`\`\n${pad('HUB', 10)}| ${pad('Total', 6)}| In Area\n` + "-".repeat(30) + "\n";
                 sortedHubs.forEach(([h, d]) => {
                     const pct = d.total > 0 ? (d.special / d.total) * 100 : 0;
-                    const warn = pct > 5 ? "⚠️ " : ""; // Icon warning jika > 5%
+                    const warn = pct > 5 ? "⚠️ " : ""; 
                     hubTable += `${pad(h, 10)}| ${pad(String(d.total), 6)}| ${warn}${d.special} (${pct.toFixed(0)}%)\n`;
                 });
                 hubTable += `\`\`\``;
 
-                // 3. BREAKDOWN SERVICE (Matrix)
                 const svcData = currData.filter(r => {
-                    const pos = (r.Posisi||'').toLowerCase();
-                    const hubX = (r['HUB X']||'').toLowerCase();
+                    const pos = (getSafeVal(r, 'Posisi')||'').toString().toLowerCase();
+                    const hubX = (getSafeVal(r, 'HUB X')||'').toString().toLowerCase();
                     return (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi';
                 });
                 
                 const allSvcs = {};
-                svcData.forEach(r => { const s = r.service_code||'?'; allSvcs[s] = (allSvcs[s]||0)+1; });
+                svcData.forEach(r => { const s = getSafeVal(r, 'service_code')||'?'; allSvcs[s] = (allSvcs[s]||0)+1; });
                 const topSvcs = Object.keys(allSvcs).sort((a,b)=>allSvcs[b]-allSvcs[a]).slice(0,3);
                 
                 const svcHubMap = {};
                 svcData.forEach(r => {
-                    const h = r.delivery_hub || 'Unknown';
-                    const s = r.service_code || '?';
+                    const h = getSafeVal(r, 'delivery_hub') || 'Unknown';
+                    const s = getSafeVal(r, 'service_code') || '?';
                     if(!svcHubMap[h]) svcHubMap[h] = {};
                     svcHubMap[h][s] = (svcHubMap[h][s]||0)+1;
                 });
@@ -795,10 +1114,9 @@
                 });
                 svcTable += `\`\`\``;
 
-                // 4. TOP 5 ORIGIN
                 const pickupMap = {};
                 currData.forEach(r => {
-                    const p = r.pickup_hub || 'Unknown';
+                    const p = getSafeVal(r, 'pickup_hub') || 'Unknown';
                     pickupMap[p] = (pickupMap[p]||0)+1;
                 });
                 const topPickups = Object.entries(pickupMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -809,21 +1127,19 @@
                 });
                 pickTable += `\`\`\``;
 
-                // --- 5. DETAIL STATUS (MID MILE & TRANSPORT) - COMPACT LIST FORMAT ---
-                // (Sebelumnya Poin 6, sekarang jadi Poin 5 menggantikan Feedback)
                 const detailData = currData.filter(r => {
-                    const pos = (r['Posisi']||'').toLowerCase().trim();
-                    return ['mid mile', 'transport'].includes(pos);
+                    const pos = (getSafeVal(r, 'Posisi')||'').toString().toLowerCase().trim();
+                    const hubX = (getSafeVal(r, 'HUB X')||'').toString().toLowerCase().trim();
+                    return ['mid mile', 'transport'].includes(pos) && hubX === 'gustiadi';
                 });
 
                 const detailMap = {};
                 detailData.forEach(r => {
-                    const h = r.delivery_hub || 'Unknown';
-                    const pos = (r['Posisi']||'').toLowerCase().trim();
+                    const h = getSafeVal(r, 'delivery_hub') || 'Unknown';
+                    const pos = (getSafeVal(r, 'Posisi')||'').toString().toLowerCase().trim();
                     const pKey = pos === 'mid mile' ? 'MM' : 'TR';
                     
-                    let rawFb = r['Feedback'] ? r['Feedback'].trim() : "";
-                    
+                    let rawFb = (getSafeVal(r, 'Feedback') || "").toString().trim();
                     let fbLabel = "In Process";
                     const cleanFb = rawFb.toLowerCase();
                     if (rawFb && rawFb !== '-' && cleanFb !== 'aman' && cleanFb !== 'lancar' && cleanFb !== 'ok') {
@@ -881,7 +1197,7 @@
                             `_Generated by Dashboard System_`;
 
                 fallbackCopyTextToClipboard(text);
-            }, 500); // Sedikit delay untuk efek "Loading"
+            }, 500); 
         }
 
         function fallbackCopyTextToClipboard(text) {
@@ -906,13 +1222,12 @@
             document.body.removeChild(textArea);
         }
 
-        // --- DELETE LOGIC ---
+        // --- MODAL FUNCTIONS ---
         window.openDeleteModal = () => {
             const modal = document.getElementById('deleteModalOverlay');
             if(modal) {
-                // Reset form saat buka
                 document.querySelector('input[name="deleteMode"][value="month"]').checked = true;
-                toggleDeleteInput();
+                window.toggleDeleteInput();
                 document.getElementById('deleteMonthInput').value = '';
                 document.getElementById('deleteDateInput').value = '';
                 
@@ -929,7 +1244,6 @@
             }
         }
 
-        // Logic Toggle UI Input
         window.toggleDeleteInput = () => {
             const mode = document.querySelector('input[name="deleteMode"]:checked').value;
             const monthCont = document.getElementById('deleteMonthContainer');
@@ -944,75 +1258,6 @@
             }
         }
 
-        window.processDeleteRequest = () => {
-            const mode = document.querySelector('input[name="deleteMode"]:checked').value;
-            let val;
-            
-            if (mode === 'month') {
-                val = document.getElementById('deleteMonthInput').value;
-                if (!val) { showIsland('error', 'Pilih bulan terlebih dahulu!'); return; }
-            } else {
-                val = document.getElementById('deleteDateInput').value;
-                if (!val) { showIsland('error', 'Pilih tanggal terlebih dahulu!'); return; }
-            }
-
-            closeDeleteModal();
-            requestPassword(() => executeDelete(val, mode));
-        }
-
-        async function executeDelete(inputVal, mode) {
-            // Filter target data
-            const targets = allData.filter(row => {
-                const d = parseDateStr(row.Tanggal);
-                if (!d) return false;
-
-                if (mode === 'month') {
-                    // inputVal: YYYY-MM
-                    const [year, month] = inputVal.split('-').map(Number);
-                    return d.getFullYear() === year && (d.getMonth() + 1) === month;
-                } else {
-                    // inputVal: YYYY-MM-DD
-                    const [year, month, day] = inputVal.split('-').map(Number);
-                    return d.getFullYear() === year && (d.getMonth() + 1) === month && d.getDate() === day;
-                }
-            });
-
-            const label = mode === 'month' ? `bulan ${inputVal}` : `tanggal ${inputVal}`;
-
-            if (targets.length === 0) {
-                showIsland('error', `Tidak ada data pada ${label}.`);
-                return;
-            }
-
-            showIsland('loading', `Menghapus ${formatNumber(targets.length)} data...`);
-            const batchSize = 450;
-            const batches = [];
-            let currentBatch = writeBatch(db);
-            let count = 0;
-
-            for (const row of targets) {
-                const ref = doc(db, COLLECTION_NAME, row.awb.trim());
-                currentBatch.delete(ref);
-                count++;
-                if (count % batchSize === 0) {
-                    batches.push(currentBatch.commit());
-                    currentBatch = writeBatch(db);
-                }
-            }
-            if (count % batchSize !== 0) {
-                batches.push(currentBatch.commit());
-            }
-
-            try {
-                await Promise.all(batches);
-                showIsland('success', `Data ${label} berhasil dihapus!`);
-            } catch (e) {
-                console.error(e);
-                showIsland('error', 'Gagal menghapus data.');
-            }
-        }
-
-        // --- MODAL LOGIC ---
         window.openHubSummary = (hubName) => {
             if(!hubName) return;
             const modal = document.getElementById('summaryModalOverlay');
@@ -1022,11 +1267,10 @@
             const originsContainer = document.getElementById('topOriginsContainer');
             const totalAnalyzed = document.getElementById('totalAnalyzed');
 
-            // Logic: HUB & Trans (Gustiadi Context)
             const stuckData = allData.filter(r => 
-                (r['delivery_hub'] === hubName) &&
-                (['mid mile', 'transport'].includes((r['Posisi'] || "").toLowerCase().trim())) &&
-                ((r['HUB X'] || "").toLowerCase().trim() === 'gustiadi')
+                (getSafeVal(r, 'delivery_hub') === hubName) &&
+                (['mid mile', 'transport'].includes((getSafeVal(r, 'Posisi') || "").toString().toLowerCase().trim())) &&
+                ((getSafeVal(r, 'HUB X') || "").toString().toLowerCase().trim() === 'gustiadi')
             );
 
             title.innerText = `Analisis HUB & Trans - ${hubName}`;
@@ -1037,16 +1281,15 @@
             const origins = {};
 
             stuckData.forEach(r => {
-                const origin = r['pickup_hub'] || 'Unknown';
+                const origin = getSafeVal(r, 'pickup_hub') || 'Unknown';
                 origins[origin] = (origins[origin] || 0) + 1;
-                const svc = r['service_code'] || 'Unknown';
+                const svc = getSafeVal(r, 'service_code') || 'Unknown';
                 services[svc] = (services[svc] || 0) + 1;
-                let fb = r['Feedback'] ? r['Feedback'].trim() : "Belum ada Feedback";
+                let fb = getSafeVal(r, 'Feedback') ? getSafeVal(r, 'Feedback').toString().trim() : "Belum ada Feedback";
                 if(!fb) fb = "Belum ada Feedback";
                 feedbacks[fb] = (feedbacks[fb] || 0) + 1;
             });
 
-            // 1. Render Top 3 Origins
             const sortedOrigins = Object.entries(origins).sort((a,b) => b[1] - a[1]).slice(0, 3);
             originsContainer.innerHTML = sortedOrigins.map(([org, count], idx) => {
                 const pct = (count / stuckData.length) * 100;
@@ -1060,7 +1303,6 @@
                 `;
             }).join('') || '<div class="col-span-3 text-center text-slate-400 italic text-[10px]">Data origin tidak tersedia</div>';
 
-            // 2. Render Feedback (Top 5)
             const sortedFeedback = Object.entries(feedbacks).sort((a,b) => b[1] - a[1]).slice(0, 5);
             feedbackList.innerHTML = sortedFeedback.map(([fb, count]) => {
                 const pct = (count / stuckData.length) * 100;
@@ -1081,7 +1323,6 @@
             }).join('');
             if(stuckData.length === 0) feedbackList.innerHTML = `<p class="text-center text-slate-400 italic text-[10px] py-2">Tidak ada data.</p>`;
 
-            // 3. Render Services (Top 5)
             const sortedSvc = Object.entries(services).sort((a,b) => b[1] - a[1]).slice(0, 5);
             breakdown.innerHTML = sortedSvc.map(([svc, count]) => {
                 const pct = (count / stuckData.length) * 100;
@@ -1109,284 +1350,99 @@
             }
         });
 
-        // --- DYNAMIC ISLAND SYSTEM ---
-        const island = document.getElementById('dynamicIsland');
-        function showIsland(type, msg, onConfirm = null) {
-            island.className = 'active'; 
-            if (type === 'loading') {
-                island.innerHTML = `<div class="island-content"><div class="island-spinner"></div><span>${msg}</span></div>`;
-            } else if (type === 'success') {
-                island.innerHTML = `<div class="island-content"><i class="ph-fill ph-check-circle text-emerald-400 text-lg"></i><span>${msg}</span></div>`;
-                setTimeout(() => { island.className = ''; island.style.opacity = '0'; }, 3000);
-            } else if (type === 'error') {
-                island.innerHTML = `<div class="island-content"><i class="ph-fill ph-warning-circle text-red-400 text-lg"></i><span>${msg}</span></div>`;
-                setTimeout(() => { island.className = ''; island.style.opacity = '0'; }, 4000);
-            } else if (type === 'confirm') {
-                island.className = 'expanded';
-                island.innerHTML = `
-                    <div class="text-center mb-4">
-                        <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-400 border border-slate-700"><i class="ph-fill ph-question text-2xl"></i></div>
-                        <h4 class="text-sm font-bold text-white">Konfirmasi Upload</h4>
-                        <p class="text-xs text-slate-400 mt-1">${msg}</p>
-                    </div>
-                    <div class="flex gap-3 w-full">
-                        <button id="islCancel" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-700 transition">Batal</button>
-                        <button id="islOk" class="flex-1 py-2.5 rounded-xl bg-white text-xs font-bold text-slate-900 hover:bg-slate-100 transition">Ya, Proses</button>
-                    </div>
-                `;
-                document.getElementById('islCancel').onclick = () => { island.className = ''; island.style.opacity = '0'; document.getElementById('csvFileInput').value=''; };
-                document.getElementById('islOk').onclick = () => { onConfirm(); };
-            } else if (type === 'password') {
-                island.className = 'expanded';
-                island.innerHTML = `
-                    <div class="text-center mb-3">
-                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-2 text-orange-400"><i class="ph-fill ph-lock-key text-lg"></i></div>
-                        <h4 class="text-sm font-bold text-white">Akses Terkunci</h4>
-                    </div>
-                    <input type="password" id="islPass" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mb-3 focus:ring-1 focus:ring-orange-500 outline-none text-center tracking-widest" placeholder="Password">
-                    <div class="flex gap-2 w-full">
-                        <button id="islCancel" class="flex-1 py-2.5 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-400 hover:bg-slate-700">Batal</button>
-                        <button id="islAuth" class="flex-1 py-2.5 rounded-lg bg-white text-[10px] font-bold text-slate-900 hover:bg-slate-200">Verifikasi</button>
-                    </div>
-                `;
-                const input = document.getElementById('islPass');
-                input.focus();
-                
-                document.getElementById('islCancel').onclick = () => { island.className = ''; island.style.opacity = '0'; document.getElementById('csvFileInput').value=''; };
-                const verify = () => {
-                    if (input.value === APP_PASSWORD) {
-                        if (onConfirm) onConfirm();
-                    } else {
-                        showIsland('error', 'Password Salah!');
-                    }
-                };
-                document.getElementById('islAuth').onclick = verify;
-                input.addEventListener('keypress', (e) => { if (e.key === 'Enter') verify(); });
-            }
-            island.style.opacity = '1';
-        }
-
-        // --- AUTH & INIT ---
-        signInAnonymously(auth).catch(e => showIsland('error', "Auth Error"));
-
-        // PERBAIKAN: Tampilkan tombol "Masuk Mode Offline" secara paksa setelah 5 detik 
-        // sebagai langkah antisipasi jika jaringan lemot atau database terblokir.
-        setTimeout(() => {
-            const btn = document.getElementById('skipLoadingBtn');
-            if(btn && document.getElementById('initialLoading').style.opacity !== '0') {
-                btn.classList.remove('hidden-section');
-            }
-        }, 5000);
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                initRealtimeListener();
-            }
-        });
-
-        window.forceHideLoading = () => {
-            const ov = document.getElementById('initialLoading');
-            ov.style.opacity = '0';
-            setTimeout(() => ov.style.display = 'none', 500);
-        }
-
-        function initRealtimeListener() {
-            // PERBAIKAN: Menambahkan (error) handler agar jika database limit/error, loading tetap ditutup
-            onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
-                allData = [];
-                snapshot.forEach(doc => allData.push(doc.data()));
-                const now = new Date();
-                const lastUpd = document.getElementById('lastUpdated');
-                if(lastUpd) lastUpd.innerText = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-                populateDropdowns(allData);
-                renderDashboard();
-                forceHideLoading();
-            }, (error) => {
-                console.error("Firestore Error:", error);
-                showIsland('error', 'Koneksi DB Gagal/Limit Habis.');
-                forceHideLoading(); // Paksa tutup loading meski error
-            });
-        }
-
-        // --- QUOTA TRACKER SYSTEM (FINAL) ---
-        const DAILY_LIMIT = 20000;
-        
-        function getDailyQuota() {
-            const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
-            const key = `firestore_quota_${today}`;
-            const stored = localStorage.getItem(key);
-            return stored ? parseInt(stored) : 0;
-        }
-
-        function updateDailyQuota(count) {
-            const today = new Date().toISOString().split('T')[0];
-            const key = `firestore_quota_${today}`;
-            const current = getDailyQuota();
-            localStorage.setItem(key, current + count);
-        }
-        
-        function cleanOldQuotaKeys() {
-            const today = new Date().toISOString().split('T')[0];
-            const key = `firestore_quota_${today}`;
-            for (let i = 0; i < localStorage.length; i++) {
-                const k = localStorage.key(i);
-                if (k && k.startsWith('firestore_quota_') && k !== key) {
-                    localStorage.removeItem(k);
-                }
-            }
-        }
-        cleanOldQuotaKeys();
-
-        // --- CSV HANDLER ---
-        const csvInput = document.getElementById('csvFileInput');
-        const newCsvInput = csvInput.cloneNode(true);
-        csvInput.parentNode.replaceChild(newCsvInput, csvInput);
-
-        newCsvInput.addEventListener('change', e => {
-            const f = e.target.files[0]; if(!f) return;
-            Papa.parse(f, { 
-                header: true, 
-                skipEmptyLines: true, 
-                transformHeader: function(h) {
-                    return h.replace(/[\r\n"]+/g, ' ').trim();
-                },
-                complete: res => {
-                    const rows = res.data.length;
-                    const used = getDailyQuota();
-                    const remaining = DAILY_LIMIT - used;
-                    
-                    let msg = `Total baris file: <b>${formatNumber(rows)}</b>.<br>`;
-                    msg += `Estimasi sisa kuota hari ini: <b>${formatNumber(remaining)}</b>.<br>`;
-                    
-                    if (rows > remaining) {
-                        msg += `<br><span class="text-red-400 font-bold">PERINGATAN: File ini mungkin akan gagal di tengah jalan karena kuota habis!</span>`;
-                    } else {
-                        msg += `<span class="text-emerald-400 font-bold">Kuota Aman.</span>`;
-                    }
-
-                    showIsland('confirm', msg, () => saveData(res.data));
-                }
-            });
-        });
-
-        // --- MAIN RENDERER & SAVE ---
-        async function saveData(data) {
-            showIsland('loading', 'Menganalisis Data...');
+        // --- DELETE & DATABASE OPERATIONS ---
+        window.processDeleteRequest = () => {
+            const mode = document.querySelector('input[name="deleteMode"]:checked').value;
+            let val;
             
-            // 1. CARI KOLOM AWB
-            const sampleRow = data[0] || {};
-            const awbKey = Object.keys(sampleRow).find(k => k.toLowerCase() === 'awb' || k.toLowerCase() === 'no resi' || k.toLowerCase().includes('awb'));
-
-            if (!awbKey) {
-                showIsland('error', 'Kolom AWB tidak ditemukan di file!');
-                return;
+            if (mode === 'month') {
+                val = document.getElementById('deleteMonthInput').value;
+                if (!val) { showIsland('error', 'Pilih bulan terlebih dahulu!'); return; }
+            } else {
+                val = document.getElementById('deleteDateInput').value;
+                if (!val) { showIsland('error', 'Pilih tanggal terlebih dahulu!'); return; }
             }
 
-            // 2. FILTER DATA VALID (Hanya yang punya AWB)
-            const valid = data.filter(r => r[awbKey] && r[awbKey].toString().trim() !== '');
-            if (valid.length === 0) {
-                showIsland('error', 'Tidak ada data valid (AWB kosong).');
-                return;
-            }
+            window.closeDeleteModal();
+            requestPassword(() => executeDelete(val, mode));
+        }
 
-            // 3. SIMPLE FILTERING (Cek AWB Saja)
-            const existingAwbs = new Set(allData.map(item => item.awb));
-            
-            const rowsToUpload = [];
-            let skippedCount = 0;
-            let newCount = 0;
+        async function executeDelete(inputVal, mode) {
+            const targets = allData.filter(row => {
+                const d = parseDateStr(getSafeVal(row, 'Tanggal'));
+                if (!d) return false;
 
-            valid.forEach(row => {
-                const docId = row[awbKey].toString().trim();
-
-                if (existingAwbs.has(docId)) {
-                    skippedCount++; 
+                if (mode === 'month') {
+                    const [year, month] = inputVal.split('-').map(Number);
+                    return d.getFullYear() === year && (d.getMonth() + 1) === month;
                 } else {
-                    const cleanRow = JSON.parse(JSON.stringify(row)); 
-                    cleanRow['awb'] = docId; 
-                    rowsToUpload.push(cleanRow);
-                    newCount++;
+                    const [year, month, day] = inputVal.split('-').map(Number);
+                    return d.getFullYear() === year && (d.getMonth() + 1) === month && d.getDate() === day;
                 }
             });
 
-            // 4. KONFIRMASI AKHIR SEBELUM UPLOAD
-            if (rowsToUpload.length === 0) {
-                showIsland('success', `Semua ${formatNumber(skippedCount)} data AWB sudah ada! Tidak ada data baru.`);
+            const label = mode === 'month' ? `bulan ${inputVal}` : `tanggal ${inputVal}`;
+
+            if (targets.length === 0) {
+                showIsland('error', `Tidak ada data pada ${label}.`);
                 return;
             }
 
-            const used = getDailyQuota();
-            const remaining = DAILY_LIMIT - used;
+            showIsland('loading', `Menghapus ${formatNumber(targets.length)} data...`);
             
-            let confirmMsg = `
-                <div class="text-left text-[11px] bg-slate-50 p-2 rounded-lg mb-2">
-                    <div class="flex justify-between"><span>Total File:</span> <b>${formatNumber(valid.length)}</b></div>
-                    <div class="flex justify-between text-slate-400"><span>Sudah Ada (Skip):</span> <b>${formatNumber(skippedCount)}</b></div>
-                    <div class="flex justify-between text-emerald-600 font-bold"><span>Data Baru:</span> <b>${formatNumber(newCount)}</b></div>
-                    <div class="border-t border-slate-200 mt-1 pt-1 flex justify-between font-bold"><span>Akan Diupload:</span> <span>${formatNumber(rowsToUpload.length)}</span></div>
-                </div>
-            `;
+            const awbsToDelete = targets.map(r => (getSafeVal(r, 'awb')||getSafeVal(r, 'No Resi')).toString().trim());
+            const batchSize = 1000;
+            let success = true;
 
-            if (rowsToUpload.length > remaining) {
-                confirmMsg += `<span class="text-red-500 font-bold text-[10px]">Peringatan: Kuota tersisa ${formatNumber(remaining)}, upload mungkin terhenti.</span>`;
-            } else {
-                confirmMsg += `<span class="text-slate-400 text-[10px]">Kuota aman. Lanjutkan?</span>`;
-            }
+            for (let i = 0; i < awbsToDelete.length; i += batchSize) {
+                const chunk = awbsToDelete.slice(i, i + batchSize);
+                const { error } = await supabase
+                    .from(COLLECTION_NAME)
+                    .delete()
+                    .in('awb', chunk);
 
-            showIsland('confirm', confirmMsg, () => executeBatchUpload(rowsToUpload));
-        }
-
-        async function executeBatchUpload(rows) {
-            showIsland('loading', `Mengupload ${rows.length} data...`);
-            
-            const batchSize = 450; 
-            const totalBatches = Math.ceil(rows.length/batchSize);
-            let successCount = 0;
-
-            for(let i=0; i<totalBatches; i++) {
-                const batch = writeBatch(db);
-                const chunk = rows.slice(i*batchSize, (i+1)*batchSize);
-                
-                chunk.forEach(row => {
-                    batch.set(doc(db, COLLECTION_NAME, row.awb), row, {merge:true});
-                });
-                
-                try {
-                    await batch.commit();
-                    successCount += chunk.length;
-                    updateDailyQuota(chunk.length);
-                } catch (err) {
-                    console.error("Upload Error", err);
-                    showIsland('error', 'Gagal sebagian. Cek kuota.');
+                if (error) {
+                    console.error("Supabase Delete Error:", error);
+                    success = false;
                     break;
+                } else {
+                    // Update array lokal secara instan
+                    allData = allData.filter(r => !chunk.includes(getSafeVal(r, 'awb')));
                 }
             }
-            
-            if (successCount > 0) {
-                showIsland('success', `Selesai! ${formatNumber(successCount)} data tersimpan.`);
+
+            if (success) {
+                showIsland('success', `Data ${label} berhasil dihapus!`);
+                updateLastUpdated();
+                populateDropdowns(allData);
+                window.renderDashboard();
             } else {
-                showIsland('error', 'Gagal menyimpan data.');
+                showIsland('error', 'Sebagian atau seluruh data gagal dihapus.');
             }
         }
 
-        function renderDashboard() {
-            const baseData = getBaseFilteredData();
-            const filteredData = getFilteredData(); 
-
-            calculateKPIs(filteredData);
-            
-            generateKPIRecap(baseData, filteredData); 
-            generateHubRecap(filteredData);
-            generateServiceRecap(filteredData);
-            generateOriginRecap(filteredData);
-            generateStagingRecap(filteredData);
-            generateOpcodeRecap(filteredData); 
-            generateFeedbackBreakdown(filteredData); // --- CALL FUNCTION BARU ---
-            generateAwbTable(filteredData); 
-            
-            updateCharts(filteredData);
+        window.confirmDeleteAwb = (awb) => {
+            showIsland('confirm', `Hapus permanen resi <b>${awb}</b>?`, () => deleteSingleAwb(awb));
         }
 
+        async function deleteSingleAwb(awb) {
+            showIsland('loading', `Menghapus ${awb}...`);
+            const { error } = await supabase.from(COLLECTION_NAME).delete().eq('awb', awb);
+            if (error) {
+                console.error("Supabase Delete Error", error);
+                showIsland('error', 'Gagal menghapus. Cek konsol.');
+            } else {
+                showIsland('success', `Resi ${awb} dihapus.`);
+                
+                // Update array lokal secara instan
+                allData = allData.filter(r => getSafeVal(r, 'awb') !== awb);
+                updateLastUpdated();
+                populateDropdowns(allData);
+                window.renderDashboard();
+            }
+        }
+
+        // --- DATA FILTERING LOGIC ---
         function getBaseFilteredData() {
             const startDateEl = document.getElementById('filterStartDate');
             if (!startDateEl) return allData;
@@ -1403,18 +1459,19 @@
             if(endDate) endDate.setHours(23,59,59,999);
 
             return allData.filter(row => {
-                if (!row['delivery_hub'] || row['delivery_hub'].toString().trim() === '' || row['delivery_hub'].toString().toLowerCase() === 'unknown') return false;
+                const hub = getSafeVal(row, 'delivery_hub');
+                if (!hub || hub.toString().trim() === '' || hub.toString().toLowerCase() === 'unknown') return false;
 
                 if (startDate || endDate) {
-                    const rowDate = parseDateStr(row['Tanggal']);
+                    const rowDate = parseDateStr(getSafeVal(row, 'Tanggal'));
                     if (rowDate) {
                         if (startDate && rowDate < startDate) return false;
                         if (endDate && rowDate > endDate) return false;
                     }
                 }
-                if (hubVal && row.delivery_hub !== hubVal) return false;
-                if (serviceVal && row.service_code !== serviceVal) return false;
-                if (posisiVal && row.Posisi !== posisiVal) return false;
+                if (hubVal && hub !== hubVal) return false;
+                if (serviceVal && getSafeVal(row, 'service_code') !== serviceVal) return false;
+                if (posisiVal && getSafeVal(row, 'Posisi') !== posisiVal) return false;
                 return true;
             });
         }
@@ -1422,7 +1479,7 @@
         function getFilteredData() {
             const base = getBaseFilteredData();
             return base.filter(row => {
-                const hubX = (row['HUB X'] || "").toLowerCase().trim();
+                const hubX = (getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
                 if (isGustiadiOnly && hubX !== 'gustiadi') return false;
                 return true;
             });
@@ -1431,7 +1488,6 @@
         function getPrevPeriodData() {
             const startDateEl = document.getElementById('filterStartDate');
             const endDateEl = document.getElementById('filterEndDate');
-            
             if (!allData.length) return [];
             
             let start, end;
@@ -1441,7 +1497,7 @@
             } else {
                 let maxDate = new Date(0);
                 allData.forEach(r => {
-                    const d = parseDateStr(r['Tanggal']);
+                    const d = parseDateStr(getSafeVal(r, 'Tanggal'));
                     if (d && d > maxDate) maxDate = d;
                 });
                 start = maxDate ? new Date(maxDate) : new Date(); 
@@ -1462,15 +1518,16 @@
             const posVal = document.getElementById('filterPosisi').value;
 
             return allData.filter(row => {
-                if (!row['delivery_hub'] || row['delivery_hub'].toString().trim() === '' || row['delivery_hub'].toString().toLowerCase() === 'unknown') return false;
+                const hub = getSafeVal(row, 'delivery_hub');
+                if (!hub || hub.toString().trim() === '' || hub.toString().toLowerCase() === 'unknown') return false;
 
-                const hubX = (row['HUB X'] || "").toLowerCase().trim();
+                const hubX = (getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
                 if (isGustiadiOnly && hubX !== 'gustiadi') return false;
-                if (hubVal && row.delivery_hub !== hubVal) return false;
-                if (svcVal && row.service_code !== svcVal) return false;
-                if (posVal && row.Posisi !== posVal) return false;
+                if (hubVal && hub !== hubVal) return false;
+                if (svcVal && getSafeVal(row, 'service_code') !== svcVal) return false;
+                if (posVal && getSafeVal(row, 'Posisi') !== posVal) return false;
 
-                const d = parseDateStr(row['Tanggal']);
+                const d = parseDateStr(getSafeVal(row, 'Tanggal'));
                 if (!d) return false;
                 
                 return d.getTime() >= prevStart.getTime() && d.getTime() <= prevEnd.getTime();
@@ -1482,9 +1539,13 @@
             const services = new Set();
             const posisis = new Set();
             data.forEach(r => { 
-                if(r.delivery_hub && r.delivery_hub.trim() !== '' && r.delivery_hub.toLowerCase() !== 'unknown') hubs.add(r.delivery_hub);
-                if(r.service_code) services.add(r.service_code);
-                if(r.Posisi) posisis.add(r.Posisi); 
+                const h = getSafeVal(r, 'delivery_hub');
+                const s = getSafeVal(r, 'service_code');
+                const p = getSafeVal(r, 'Posisi');
+                
+                if(h && h.toString().trim() !== '' && h.toString().toLowerCase() !== 'unknown') hubs.add(h);
+                if(s) services.add(s);
+                if(p) posisis.add(p); 
             });
             const fill = (id, label, set) => {
                 const select = document.getElementById(id);
@@ -1501,290 +1562,98 @@
             fill('filterPosisi', 'Posisi', posisis);
         }
 
-        function parseDateStr(dateStr) {
-            if (!dateStr) return null;
-            if (dateStr.includes('-')) {
-                const parts = dateStr.split('-');
-                if (parts.length === 3) return new Date(parts[0], parts[1] - 1, parts[2]); 
-                return new Date(dateStr);
-            }
-            const parts = dateStr.split('/');
-            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]); 
-            return null;
+        // --- DASHBOARD RENDERING ---
+        window.renderDashboard = () => {
+            const baseData = getBaseFilteredData();
+            const filteredData = getFilteredData(); 
+
+            calculateKPIs(filteredData);
+            
+            generateKPIRecap(baseData, filteredData); 
+            generateHubRecap(filteredData);
+            generateServiceRecap(filteredData);
+            generateOriginRecap(filteredData);
+            generateStagingRecap(filteredData);
+            generateOpcodeRecap(filteredData); 
+            generateFeedbackBreakdown(filteredData); 
+            generateAwbTable(filteredData); 
+            
+            updateCharts(filteredData);
         }
 
-        function updateCharts(data) {
-            // CHANGE: Replace yearly with weekly logic
-            const weekly = {}; 
-            const monthly = {}; 
-            const daily = {};
+        function calculateKPIs(data) {
+            const counts = { total: data.length, last:0, vend:0, mid:0, mit:0, trans:0, first:0 };
+            data.forEach(r => {
+                const p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                if(p==='last mile') counts.last++;
+                else if(p==='vendor 3pl') counts.vend++;
+                else if(p==='mid mile') counts.mid++;
+                else if(p==='mitra pengusaha') counts.mit++;
+                else if(p==='transport') counts.trans++;
+                else if(p==='first mile') counts.first++;
+            });
             
-            const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-            const currentYear = new Date().getFullYear();
+            const prevData = getPrevPeriodData();
+            const showComp = prevData.length > 0 || data.length > 0;
+            const prevCounts = { total: prevData.length, last:0, vend:0, mid:0, mit:0, trans:0, first:0 };
             
-            // Init monthly placeholder for current year
-            months.forEach(m => {
-                monthly[`${m} ${currentYear}`] = { total: 0, gustiadi: 0 };
+            prevData.forEach(r => {
+                const p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                if(p==='last mile') prevCounts.last++;
+                else if(p==='vendor 3pl') prevCounts.vend++;
+                else if(p==='mid mile') prevCounts.mid++;
+                else if(p==='mitra pengusaha') prevCounts.mit++;
+                else if(p==='transport') prevCounts.trans++;
+                else if(p==='first mile') prevCounts.first++;
             });
 
-            let latestDate = new Date(0);
-            data.forEach(row => {
-                const d = parseDateStr(row['Tanggal']);
-                if (d && d > latestDate) latestDate = d;
-            });
-            const cmIdx = latestDate.getMonth();
-            const cy = latestDate.getFullYear();
-            
-            const mLabel = document.getElementById('currentMonthLabel');
-            if (mLabel) mLabel.innerText = `${months[cmIdx]} ${cy}`;
-
-            // --- Process Daily Chart Data (Current Month Only) ---
-            data.forEach(row => {
-                const pos = (row['Posisi'] || "").toLowerCase().trim();
-                const hubX = (row['HUB X'] || "").toLowerCase().trim();
+            const updateCard = (id, curr, prev) => {
+                const el = document.getElementById(id);
+                const shareEl = document.getElementById(id+'Share');
+                const compEl = document.getElementById(id+'Comp');
                 
-                const date = parseDateStr(row['Tanggal']);
-                if (date && date.getMonth() === cmIdx && date.getFullYear() === cy) {
-                    const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
-                    if (!daily[dKey]) daily[dKey] = { total: 0, gustiadi: 0 };
-                    daily[dKey].total++;
-                    if (hubX === 'gustiadi' && (pos === 'mid mile' || pos === 'transport')) {
-                        daily[dKey].gustiadi++;
-                    }
-                }
-            });
-
-            // --- Process Trend Charts (Weekly & Monthly) based on Filters ---
-            const hubVal = document.getElementById('filterHub') ? document.getElementById('filterHub').value : '';
-            const serviceVal = document.getElementById('filterService') ? document.getElementById('filterService').value : '';
-            const posisiVal = document.getElementById('filterPosisi') ? document.getElementById('filterPosisi').value : '';
-
-            allData.forEach(row => {
-                const hubX = (row['HUB X'] || "").toLowerCase().trim();
-                const pos = (row['Posisi'] || "").toLowerCase().trim();
-
-                if (isGustiadiOnly && hubX !== 'gustiadi') return;
+                if(el) el.innerText = formatNumber(curr);
                 
-                if (hubVal && row.delivery_hub !== hubVal) return;
-                if (serviceVal && row.service_code !== serviceVal) return;
-                if (posisiVal && row.Posisi !== posisiVal) return;
-
-                const date = parseDateStr(row['Tanggal']);
-                if (date) {
-                    const y = date.getFullYear();
-                    const mKey = `${months[date.getMonth()]} ${y}`; 
-                    
-                    // Weekly Calculation
-                    const [wYear, wNum] = getISOWeekNumber(date);
-                    // Format key: "W01 2025" (padding zero for sorting)
-                    const wKey = `W${wNum.toString().padStart(2,'0')} ${wYear}`;
-
-                    if (!weekly[wKey]) weekly[wKey] = { total: 0, gustiadi: 0 };
-                    if (!monthly[mKey]) monthly[mKey] = { total: 0, gustiadi: 0 };
-
-                    weekly[wKey].total++;
-                    monthly[mKey].total++;
-
-                    if (hubX === 'gustiadi' && (pos === 'mid mile' || pos === 'transport')) {
-                        weekly[wKey].gustiadi++;
-                        monthly[mKey].gustiadi++;
-                    }
+                if(shareEl) {
+                    const share = counts.total > 0 ? (curr / counts.total) * 100 : 0;
+                    shareEl.innerText = share.toFixed(1) + '%';
                 }
-            });
 
-            cachedTrendData.weekly = weekly;
-            cachedTrendData.monthly = monthly;
-
-            renderTrendChart();
-
-            const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
-            const dailyKeys = Object.keys(daily).sort(sortDaily);
-            const dailyTotal = dailyKeys.map(k => daily[k].total);
-            const dailyGustiadi = dailyKeys.map(k => daily[k].gustiadi);
-            
-            renderChart('dailyChart', dailyKeys, dailyTotal, dailyGustiadi);
-        }
-
-        window.setTrendMode = (mode) => {
-            currentTrendMode = mode;
-            
-            const btnActive = "bg-white text-indigo-600 shadow-sm transform scale-100";
-            const btnInactive = "text-slate-400 hover:text-slate-600 bg-transparent shadow-none";
-            
-            document.getElementById('btnMonthly').className = `px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 ${mode === 'monthly' ? btnActive : btnInactive}`;
-            document.getElementById('btnWeekly').className = `px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 ${mode === 'weekly' ? btnActive : btnInactive}`;
-            
-            document.getElementById('trendTitle').innerText = mode === 'monthly' ? "Tren Bulanan" : "Tren Mingguan";
-            
-            renderTrendChart();
-        }
-
-        function renderTrendChart() {
-            const mode = currentTrendMode;
-            const dataObj = cachedTrendData[mode];
-            
-            const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
-            
-            let labels;
-            
-            if (mode === 'monthly') {
-                const sortMonth = (a, b) => {
-                    const partsA = a.split(' ');
-                    const partsB = b.split(' ');
-                    const idxA = monthsOrder.indexOf(partsA[0]);
-                    const idxB = monthsOrder.indexOf(partsB[0]);
-                    const yearA = parseInt(partsA[1]);
-                    const yearB = parseInt(partsB[1]);
-                    return (yearA * 12 + idxA) - (yearB * 12 + idxB);
-                };
-                labels = Object.keys(dataObj).sort(sortMonth);
-            } else {
-                // Sort Weekly: "W05 2025" -> Sort by Year then Week
-                const sortWeekly = (a, b) => {
-                    const [wA, yA] = a.split(' ');
-                    const [wB, yB] = b.split(' ');
-                    const yearA = parseInt(yA);
-                    const yearB = parseInt(yB);
-                    const weekA = parseInt(wA.replace('W',''));
-                    const weekB = parseInt(wB.replace('W',''));
+                if(compEl && showComp) {
+                    let diffPct = 0;
+                    let html = '';
                     
-                    if (yearA !== yearB) return yearA - yearB;
-                    return weekA - weekB;
-                };
-                labels = Object.keys(dataObj).sort(sortWeekly);
-            }
-
-            const dataTotal = labels.map(k => dataObj[k].total);
-            const dataGustiadi = labels.map(k => dataObj[k].gustiadi);
-            
-            renderChart('comboTrendChart', labels, dataTotal, dataGustiadi);
-        }
-
-        function renderChart(id, labels, dataTotal, dataGustiadi) {
-            const canvas = document.getElementById(id);
-            if (!canvas) return; 
-
-            const ctx = canvas.getContext('2d');
-
-            const gradientGustiadi = ctx.createLinearGradient(0, 0, 0, 300);
-            gradientGustiadi.addColorStop(0, 'rgba(99, 102, 241, 0.5)'); 
-            gradientGustiadi.addColorStop(1, 'rgba(99, 102, 241, 0)');
-
-            const gradientTotal = ctx.createLinearGradient(0, 0, 0, 300);
-            gradientTotal.addColorStop(0, 'rgba(15, 23, 42, 0.2)'); 
-            gradientTotal.addColorStop(1, 'rgba(15, 23, 42, 0)');
-
-            // PERUBAHAN: Cek jika chart sudah ada, lakukan update() untuk animasi
-            if (chartInstances[id]) {
-                const chart = chartInstances[id];
-                chart.data.labels = labels;
-                chart.data.datasets[0].data = dataTotal;
-                chart.data.datasets[1].data = dataGustiadi;
-                chart.update(); // Trigger animasi transisi smooth
-            } else {
-                // Jika belum ada, buat baru
-                chartInstances[id] = new Chart(ctx, {
-                    type: 'line', 
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Total AWB',
-                                data: dataTotal,
-                                borderColor: '#0f172a', 
-                                backgroundColor: gradientTotal,
-                                borderWidth: 2,
-                                pointBackgroundColor: '#0f172a',
-                                pointBorderColor: '#fff',
-                                pointRadius: 3,
-                                pointHoverRadius: 5,
-                                fill: true,
-                                tension: 0.4,
-                                order: 2 
-                            },
-                            {
-                                label: 'Inprogress',
-                                data: dataGustiadi,
-                                borderColor: '#6366f1', 
-                                backgroundColor: gradientGustiadi,
-                                borderWidth: 2,
-                                pointBackgroundColor: '#6366f1',
-                                pointBorderColor: '#fff',
-                                pointRadius: 4,
-                                pointHoverRadius: 6,
-                                fill: true,
-                                tension: 0.4,
-                                order: 1 
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            mode: 'index',
-                            intersect: false,
-                        },
-                        plugins: {
-                            legend: { 
-                                display: true,
-                                position: 'top',
-                                align: 'end',
-                                labels: {
-                                    boxWidth: 10,
-                                    usePointStyle: true,
-                                    pointStyle: 'circle',
-                                    font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '600' }
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                titleColor: '#1e293b',
-                                bodyColor: '#475569',
-                                borderColor: '#e2e8f0',
-                                borderWidth: 1,
-                                padding: 10,
-                                boxPadding: 4,
-                                usePointStyle: true,
-                                callbacks: {
-                                    label: function(context) {
-                                        return ` ${context.dataset.label}: ${formatNumber(context.raw)}`;
-                                    }
-                                }
-                            },
-                            datalabels: {
-                                display: function(context) {
-                                    return context.dataset.data[context.dataIndex] > 0;
-                                },
-                                align: 'top',
-                                anchor: 'end',
-                                color: function(context) {
-                                    return context.dataset.borderColor; 
-                                },
-                                font: { size: 9, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
-                                offset: 4,
-                                formatter: (val) => formatNumber(val)
-                            }
-                        },
-                        scales: { 
-                            y: { 
-                                display: false, 
-                                beginAtZero: true 
-                            }, 
-                            x: { 
-                                grid: { display: false }, 
-                                ticks: { 
-                                    font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '500' }, 
-                                    color: '#94a3b8' 
-                                } 
-                            } 
-                        },
-                        layout: { padding: { top: 20 } }
+                    if (prev === 0) {
+                         diffPct = curr > 0 ? 100 : 0; 
+                    } else {
+                         diffPct = ((curr - prev) / prev) * 100;
                     }
-                });
-            }
+
+                    if (curr === prev) {
+                        html = `<span class="text-[9px] font-bold text-slate-400">0%</span>`;
+                    } else {
+                        const isIncrease = diffPct > 0;
+                        const color = isIncrease ? 'text-red-500' : 'text-emerald-500'; 
+                        const icon = isIncrease ? 'ph-trend-up' : 'ph-trend-down';
+                        const sign = isIncrease ? '+' : '';
+                        html = `<i class="ph-bold ${icon} ${color} text-[10px]"></i><span class="text-[9px] font-bold ${color} ml-1">${sign}${diffPct.toFixed(1)}%</span>`;
+                    }
+                    compEl.innerHTML = html;
+                } else if (compEl) {
+                    compEl.innerHTML = `<span class="text-[9px] font-bold text-slate-300">-</span>`;
+                }
+            };
+
+            updateCard('kpiTotal', counts.total, prevCounts.total);
+            updateCard('kpiLastMile', counts.last, prevCounts.last);
+            updateCard('kpiVendor', counts.vend, prevCounts.vend);
+            updateCard('kpiMidMile', counts.mid, prevCounts.mid);
+            updateCard('kpiMitra', counts.mit, prevCounts.mit);
+            updateCard('kpiTransport', counts.trans, prevCounts.trans);
+            updateCard('kpiFirstMile', counts.first, prevCounts.first);
         }
 
+        // --- TABLE GENERATORS ---
         function renderStructuredTable(containerId, theadHTML, tbodyHTML, tfootHTML) {
             const container = document.getElementById(containerId);
             if(!container) return;
@@ -1799,14 +1668,13 @@
             `;
         }
 
-        // 1. KPI 
         function generateKPIRecap(baseData, filteredData) {
             const hubs = {}; const totals = { total: 0, nas: 0, reg: 0, trans: 0, hub: 0 };
             
             baseData.forEach(r => {
-                const h = r['delivery_hub'] || "?";
-                const hubX = (r['HUB X']||"").toLowerCase().trim();
-                const pos = (r['Posisi']||"").toLowerCase().trim();
+                const h = getSafeVal(r, 'delivery_hub') || "?";
+                const hubX = (getSafeVal(r, 'HUB X')||"").toString().toLowerCase().trim();
+                const pos = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
                 
                 if (!hubs[h]) hubs[h] = { t:0, nas:0, reg:0, trans:0, hub:0 };
                 
@@ -1836,7 +1704,7 @@
                     } else {
                         cls = "cursor-pointer hover:bg-slate-50 rounded px-2 transition-colors text-indigo-600 font-bold";
                     }
-                    return `<div class="flex flex-col items-center cursor-pointer group" onclick="openHubSummary('${hubName}')">
+                    return `<div class="flex flex-col items-center cursor-pointer group" onclick="window.openHubSummary('${hubName}')">
                                 <div class="pivot-val ${cls}">${v>0?formatNumber(v):'-'}</div>
                                 <div class="pivot-pct flex items-center group-hover:text-indigo-500 transition-colors">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div>
                             </div>`;
@@ -1865,11 +1733,11 @@
             renderStructuredTable('containerKPI', theadContent, tbodyContent, tfootContent);
         }
 
-        // 2. HUB RECAP 
         function generateHubRecap(data) {
             const hubs = {}; const posTotals = {};
             data.forEach(r => {
-                const h = r['delivery_hub'] || "?"; const p = r['Posisi'] || "?";
+                const h = getSafeVal(r, 'delivery_hub') || "?"; 
+                const p = getSafeVal(r, 'Posisi') || "?";
                 posTotals[p] = (posTotals[p]||0)+1;
                 if(!hubs[h]) hubs[h] = { t:0, c:{} };
                 hubs[h].t++; hubs[h].c[p] = (hubs[h].c[p]||0)+1;
@@ -1932,10 +1800,9 @@
             renderStructuredTable('containerHub', theadContent, tbodyContent, tfootContent);
         }
 
-        // 3. SERVICE RECAP
         function generateServiceRecap(data) {
             const svcMap = {};
-            data.forEach(r => { const s = r['service_code'] || "?"; svcMap[s] = (svcMap[s]||0)+1; });
+            data.forEach(r => { const s = getSafeVal(r, 'service_code') || "?"; svcMap[s] = (svcMap[s]||0)+1; });
             const keys = Object.keys(svcMap).sort((a,b) => svcMap[b] - svcMap[a]);
             let gt = 0;
             
@@ -1953,12 +1820,11 @@
             renderStructuredTable('containerService', theadContent, tbodyContent, tfootContent);
         }
 
-        // 3.5 ORIGIN RECAP 
         function generateOriginRecap(data) {
             const originMap = {};
             data.forEach(r => { 
-                const o = r['pickup_hub']; 
-                if (o && o.trim() !== '' && o.toLowerCase() !== 'unknown') {
+                const o = getSafeVal(r, 'pickup_hub'); 
+                if (o && o.toString().trim() !== '' && o.toString().toLowerCase() !== 'unknown') {
                     originMap[o] = (originMap[o]||0)+1; 
                 }
             });
@@ -2002,16 +1868,15 @@
             renderStructuredTable('containerOrigin', theadContent, tbodyContent, tfootContent);
         }
 
-        // 4. STAGING RECAP
         function generateStagingRecap(data) {
             const table = document.getElementById('tableStaging'); 
             
             const grouping = {}; const posTotals = {};
             
             data.forEach(r => {
-                const h = r['delivery_hub'] || "Unknown"; 
-                const s = r['delivery_staging'] || "Unknown"; 
-                const p = r['Posisi'] || "Unknown";
+                const h = getSafeVal(r, 'delivery_hub') || "Unknown"; 
+                const s = getSafeVal(r, 'delivery_staging') || "Unknown"; 
+                const p = getSafeVal(r, 'Posisi') || "Unknown";
                 
                 posTotals[p] = (posTotals[p]||0)+1;
                 
@@ -2033,7 +1898,6 @@
             
             const title = isGustiadiOnly ? 'Tot Area' : 'Total';
 
-            // ADJUSTED WIDTHS: Reduced by ~60% (120px -> 50px, 130px -> 55px)
             let theadContent = `<tr>
                 <th style="width:50px; min-width:50px;" class="text-left pl-2">HUB</th>
                 <th style="width:55px; min-width:55px;" class="text-left">Staging</th>
@@ -2074,11 +1938,9 @@
 
                     tbodyContent += `<tr>`;
                     if(i===0) {
-                        // Added truncate and max-width to cell content
                         tbodyContent += `<td class="row-group-header border-b border-slate-100 px-2 text-slate-800 font-bold align-top border-r text-[10px] truncate max-w-[50px]" title="${h}" rowspan="${stagings.length + 1}">${h}</td>`;
                     }
                     
-                    // Added truncate and max-width to staging cell
                     tbodyContent += `<td class="text-slate-600 border-r border-slate-50 px-2 font-medium text-[10px] truncate max-w-[55px]" title="${ss}">${ss}</td>
                     <td class="text-center font-bold bg-blue-50/20 text-blue-600 border-r border-slate-50">
                         <div>${formatNumber(d.t)}<div class="text-[10px] font-medium text-blue-400">${stagingPct.toFixed(1)}%</div></div>
@@ -2137,29 +1999,22 @@
             renderStructuredTable('containerStaging', theadContent, tbodyContent, tfootContent);
         }
 
-        // --- 4.5 OPCODE RECAP (NEW FEATURE - GROUPED HEADERS) ---
         function generateOpcodeRecap(data) {
-            // 1. Filter Data (Hanya Transport & Mid Mile AND Gustiadi Only)
             const targetPositions = ['transport', 'mid mile'];
             const relevantData = data.filter(r => {
-                const p = (r['Posisi']||"").toLowerCase().trim();
-                const hubX = (r['HUB X']||"").toLowerCase().trim();
-                
-                // PERBAIKAN: Tambahkan syarat hubX === 'gustiadi' agar sinkron dengan KPI
+                const p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                const hubX = (getSafeVal(r, 'HUB X')||"").toString().toLowerCase().trim();
                 return targetPositions.includes(p) && hubX === 'gustiadi';
             });
 
-            // 2. Scan Unique Opcodes & Group Data
             const hubs = {};
             const opcodesByPos = { 'Transport': new Set(), 'Mid Mile': new Set() };
 
             relevantData.forEach(r => {
-                const h = r['delivery_hub'] || "Unknown";
-                // Cari kolom Last Opcode (Case Insensitive)
-                const opKey = Object.keys(r).find(k => k.toLowerCase().includes('last opcode') || k.toLowerCase() === 'status terakhir') || 'Last Opcode';
-                const op = r[opKey] || "Unknown";
+                const h = getSafeVal(r, 'delivery_hub') || "Unknown";
+                const op = getSafeVal(r, 'Last Opcode') || getSafeVal(r, 'status terakhir') || "Unknown";
                 
-                let p = (r['Posisi']||"").toLowerCase().trim();
+                let p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
                 let pKey = p === 'transport' ? 'Transport' : 'Mid Mile';
 
                 opcodesByPos[pKey].add(op);
@@ -2173,21 +2028,17 @@
             const mmOps = Array.from(opcodesByPos['Mid Mile']).sort();
             const sortedHubs = Object.keys(hubs).sort();
 
-            // 3. Build Header (Multi-Row / Grouped)
             let theadHTML = `<tr>
                 <th style="min-width:140px; width:140px; z-index:50;" class="text-left pl-4 bg-slate-800 text-white" rowspan="2">HUB</th>`;
             
-            // Header Group Level 1: Transport
             if (transOps.length > 0) {
                 theadHTML += `<th colspan="${transOps.length}" class="text-center bg-cyan-100 text-cyan-800 border-b border-cyan-200 tracking-widest font-extrabold text-[11px]">TRANSPORT</th>`;
             } else {
                 theadHTML += `<th class="text-center bg-slate-50 text-slate-400 font-normal italic text-[10px]">Transport (No Data)</th>`;
             }
 
-            // --- PEMBATAS (SPACER) HEADER ---
             theadHTML += `<th rowspan="2" style="width:6px; min-width:6px; padding:0; background:#f1f5f9; border-left:1px solid #e2e8f0; border-right:1px solid #e2e8f0;"></th>`;
 
-            // Header Group Level 1: Mid Mile
             if (mmOps.length > 0) {
                 theadHTML += `<th colspan="${mmOps.length}" class="text-center bg-orange-100 text-orange-800 border-b border-orange-200 tracking-widest font-extrabold text-[11px]">MID MILE</th>`;
             } else {
@@ -2195,8 +2046,6 @@
             }
             theadHTML += `</tr><tr>`;
 
-            // Header Group Level 2: Specific Opcodes
-            // Transport Opcodes
             if (transOps.length > 0) {
                 transOps.forEach(op => {
                     theadHTML += `<th style="min-width:110px; top:44px;" class="text-center bg-cyan-50 text-cyan-700 border-b-2 border-cyan-100 text-[9px] font-bold uppercase truncate" title="${op}">${op}</th>`;
@@ -2205,7 +2054,6 @@
                 theadHTML += `<th style="min-width:50px; top:44px;" class="bg-slate-50"></th>`;
             }
 
-            // Mid Mile Opcodes
             if (mmOps.length > 0) {
                 mmOps.forEach(op => {
                     theadHTML += `<th style="min-width:110px; top:44px;" class="text-center bg-orange-50 text-orange-700 border-b-2 border-orange-100 text-[9px] font-bold uppercase truncate" title="${op}">${op}</th>`;
@@ -2215,12 +2063,10 @@
             }
             theadHTML += `</tr>`;
 
-            // 4. Build Body
             let tbodyHTML = "";
             sortedHubs.forEach(h => {
                 tbodyHTML += `<tr><td class="font-bold text-slate-700 pl-4 border-r border-slate-100 bg-white sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] text-[11px]">${h}</td>`;
                 
-                // Transport Values
                 if (transOps.length > 0) {
                     transOps.forEach(op => {
                         const val = hubs[h]['Transport'][op] || 0;
@@ -2232,10 +2078,8 @@
                     tbodyHTML += `<td class="bg-slate-50/50"></td>`;
                 }
 
-                // --- PEMBATAS (SPACER) BODY ---
                 tbodyHTML += `<td style="padding:0; background:#f1f5f9; border-left:1px solid #e2e8f0; border-right:1px solid #e2e8f0;"></td>`;
 
-                // Mid Mile Values
                 if (mmOps.length > 0) {
                     mmOps.forEach(op => {
                         const val = hubs[h]['Mid Mile'][op] || 0;
@@ -2250,7 +2094,6 @@
                 tbodyHTML += `</tr>`;
             });
 
-            // 5. Build Footer (Totals)
             let tfootHTML = `<tr><td class="px-4 text-left font-extrabold sticky left-0 bg-indigo-50 text-indigo-900 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">TOTAL</td>`;
             
             if (transOps.length > 0) {
@@ -2263,7 +2106,6 @@
                 tfootHTML += `<td></td>`;
             }
 
-            // --- PEMBATAS (SPACER) FOOTER ---
             tfootHTML += `<td style="padding:0; background:#cbd5e1; border-left:1px solid #94a3b8; border-right:1px solid #94a3b8;"></td>`;
 
             if (mmOps.length > 0) {
@@ -2280,28 +2122,23 @@
             renderStructuredTable('containerOpcode', theadHTML, tbodyHTML, tfootHTML);
         }
 
-        // --- 4.6 FEEDBACK BREAKDOWN (NEW FEATURE) ---
         function generateFeedbackBreakdown(data) {
-            // 1. Filter Data (Hanya Transport & Mid Mile AND Gustiadi Only)
             const targetPositions = ['transport', 'mid mile'];
             const relevantData = data.filter(r => {
-                const p = (r['Posisi']||"").toLowerCase().trim();
-                const hubX = (r['HUB X']||"").toLowerCase().trim();
-                
-                // PERBAIKAN: Tambahkan syarat hubX === 'gustiadi' agar sinkron dengan KPI
+                const p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                const hubX = (getSafeVal(r, 'HUB X')||"").toString().toLowerCase().trim();
                 return targetPositions.includes(p) && hubX === 'gustiadi';
             });
 
-            // 2. Scan Unique Feedbacks & Group Data
             const hubs = {};
             const feedbacksByPos = { 'Transport': new Set(), 'Mid Mile': new Set() };
 
             relevantData.forEach(r => {
-                const h = r['delivery_hub'] || "Unknown";
-                let f = r['Feedback'] ? r['Feedback'].trim() : "No Feedback";
+                const h = getSafeVal(r, 'delivery_hub') || "Unknown";
+                let f = (getSafeVal(r, 'Feedback') || "No Feedback").toString().trim();
                 if(f === '' || f === '-') f = "No Feedback";
                 
-                let p = (r['Posisi']||"").toLowerCase().trim();
+                let p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
                 let pKey = p === 'transport' ? 'Transport' : 'Mid Mile';
 
                 feedbacksByPos[pKey].add(f);
@@ -2315,21 +2152,17 @@
             const mmFeeds = Array.from(feedbacksByPos['Mid Mile']).sort();
             const sortedHubs = Object.keys(hubs).sort();
 
-            // 3. Build Header (Multi-Row / Grouped)
             let theadHTML = `<tr>
                 <th style="min-width:140px; width:140px; z-index:50;" class="text-left pl-4 bg-slate-800 text-white" rowspan="2">HUB</th>`;
             
-            // Header Group Level 1: Transport
             if (transFeeds.length > 0) {
                 theadHTML += `<th colspan="${transFeeds.length}" class="text-center bg-cyan-100 text-cyan-800 border-b border-cyan-200 tracking-widest font-extrabold text-[11px]">TRANSPORT</th>`;
             } else {
                 theadHTML += `<th class="text-center bg-slate-50 text-slate-400 font-normal italic text-[10px]">Transport (No Data)</th>`;
             }
 
-            // Divider Header
             theadHTML += `<th rowspan="2" style="width:6px; min-width:6px; padding:0; background:#f1f5f9; border-left:1px solid #e2e8f0; border-right:1px solid #e2e8f0;"></th>`;
 
-            // Header Group Level 1: Mid Mile
             if (mmFeeds.length > 0) {
                 theadHTML += `<th colspan="${mmFeeds.length}" class="text-center bg-orange-100 text-orange-800 border-b border-orange-200 tracking-widest font-extrabold text-[11px]">MID MILE</th>`;
             } else {
@@ -2337,8 +2170,6 @@
             }
             theadHTML += `</tr><tr>`;
 
-            // Header Group Level 2: Specific Feedbacks
-            // Transport Feedbacks
             if (transFeeds.length > 0) {
                 transFeeds.forEach(f => {
                     theadHTML += `<th style="min-width:110px; top:44px;" class="text-center bg-cyan-50 text-cyan-700 border-b-2 border-cyan-100 text-[9px] font-bold uppercase truncate" title="${f}">${f}</th>`;
@@ -2347,7 +2178,6 @@
                 theadHTML += `<th style="min-width:50px; top:44px;" class="bg-slate-50"></th>`;
             }
 
-            // Mid Mile Feedbacks
             if (mmFeeds.length > 0) {
                 mmFeeds.forEach(f => {
                     theadHTML += `<th style="min-width:110px; top:44px;" class="text-center bg-orange-50 text-orange-700 border-b-2 border-orange-100 text-[9px] font-bold uppercase truncate" title="${f}">${f}</th>`;
@@ -2357,12 +2187,10 @@
             }
             theadHTML += `</tr>`;
 
-            // 4. Build Body
             let tbodyHTML = "";
             sortedHubs.forEach(h => {
                 tbodyHTML += `<tr><td class="font-bold text-slate-700 pl-4 border-r border-slate-100 bg-white sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] text-[11px]">${h}</td>`;
                 
-                // Transport Values
                 if (transFeeds.length > 0) {
                     transFeeds.forEach(f => {
                         const val = hubs[h]['Transport'][f] || 0;
@@ -2374,10 +2202,8 @@
                     tbodyHTML += `<td class="bg-slate-50/50"></td>`;
                 }
 
-                // Divider Body
                 tbodyHTML += `<td style="padding:0; background:#f1f5f9; border-left:1px solid #e2e8f0; border-right:1px solid #e2e8f0;"></td>`;
 
-                // Mid Mile Values
                 if (mmFeeds.length > 0) {
                     mmFeeds.forEach(f => {
                         const val = hubs[h]['Mid Mile'][f] || 0;
@@ -2392,7 +2218,6 @@
                 tbodyHTML += `</tr>`;
             });
 
-            // 5. Build Footer (Totals)
             let tfootHTML = `<tr><td class="px-4 text-left font-extrabold sticky left-0 bg-teal-50 text-teal-900 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">TOTAL</td>`;
             
             if (transFeeds.length > 0) {
@@ -2405,7 +2230,6 @@
                 tfootHTML += `<td></td>`;
             }
 
-            // Divider Footer
             tfootHTML += `<td style="padding:0; background:#cbd5e1; border-left:1px solid #94a3b8; border-right:1px solid #94a3b8;"></td>`;
 
             if (mmFeeds.length > 0) {
@@ -2422,70 +2246,13 @@
             renderStructuredTable('containerFeedbackBreakdown', theadHTML, tbodyHTML, tfootHTML);
         }
 
-        // --- 5. AWB DATA MANAGEMENT TABLE ---
-        let awbDataCache = []; 
-        let filteredAwbCache = []; 
-        let awbRenderedCount = 0; 
-        const AWB_CHUNK_SIZE = 60; 
-        const AWB_MAX_LIMIT = 10000; 
-
-        // FUNGSI BARU: COPY DATA AWB TAMPIL
-        window.copyAwbList = () => {
-            if (!filteredAwbCache || filteredAwbCache.length === 0) {
-                showIsland('error', 'List kosong atau tidak ada data.');
-                return;
-            }
-            
-            showIsland('loading', 'Menyalin data ke clipboard...');
-            
-            setTimeout(() => {
-                // Header TSV (Tab Separated Values) agar rapi di Excel
-                let clipboardText = "No Resi\tStaging\tPosisi\n";
-                
-                // Loop data yang sedang difilter
-                filteredAwbCache.forEach(row => {
-                    const awb = row['awb'] || row['No Resi'] || "";
-                    const stg = row['delivery_staging'] || "-";
-                    const pos = row['Posisi'] || "-";
-                    // Gunakan Tab (\t) sebagai pemisah kolom
-                    clipboardText += `${awb}\t${stg}\t${pos}\n`;
-                });
-                
-                // Gunakan fungsi copy global yang sudah ada
-                fallbackCopyTextToClipboard(clipboardText);
-                showIsland('success', `${formatNumber(filteredAwbCache.length)} baris data berhasil disalin!`);
-            }, 300); // Sedikit delay agar UI tidak freeze
-        }
-
-        function generateAwbTable(data) {
-            const container = document.getElementById('containerAwbList');
-            if(!container) return;
-
-            awbDataCache = data;
-            
-            const searchInput = document.getElementById('awbSearchInput');
-            if(searchInput) {
-                const currentSearch = searchInput.value.toLowerCase();
-                filterAwbData(currentSearch);
-                
-                if (!searchInput.dataset.hasListener) {
-                    searchInput.addEventListener('input', (e) => {
-                        filterAwbData(e.target.value.toLowerCase());
-                    });
-                    searchInput.dataset.hasListener = 'true';
-                }
-            } else {
-                filteredAwbCache = awbDataCache; 
-                resetAwbTable();
-            }
-        }
-
+        // --- AWB TABLE LIST ---
         function filterAwbData(searchTerm) {
             if (!searchTerm) {
                 filteredAwbCache = awbDataCache;
             } else {
                 filteredAwbCache = awbDataCache.filter(row => {
-                    const awb = (row['awb'] || row['No Resi'] || "").toLowerCase();
+                    const awb = (getSafeVal(row, 'awb') || getSafeVal(row, 'No Resi') || "").toString().toLowerCase();
                     return awb.includes(searchTerm);
                 });
             }
@@ -2499,7 +2266,7 @@
             awbRenderedCount = 0;
             
             container.innerHTML = `
-                <div class="absolute inset-0 overflow-y-auto custom-scrollbar" id="awbScrollArea">
+                <div class="absolute inset-0 overflow-y-auto no-scrollbar" id="awbScrollArea">
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-slate-100 sticky top-0 z-20 shadow-sm text-slate-600 text-[10px] uppercase font-bold tracking-wider">
                             <tr>
@@ -2510,10 +2277,8 @@
                             </tr>
                         </thead>
                         <tbody id="awbTableBody" class="divide-y divide-slate-100 text-[11px]">
-                            <!-- Rows will be appended here -->
                         </tbody>
                         <tfoot id="awbTableFooter">
-                            <!-- Footer info -->
                         </tfoot>
                     </table>
                 </div>
@@ -2547,19 +2312,19 @@
 
             let rowsHTML = "";
             nextBatch.forEach(row => {
-                const awb = row['awb'] || row['No Resi'] || "?";
-                const staging = row['delivery_staging'] || "-";
-                const posisi = row['Posisi'] || "-";
+                const awb = getSafeVal(row, 'awb') || getSafeVal(row, 'No Resi') || "?";
+                const staging = getSafeVal(row, 'delivery_staging') || "-";
+                const posisi = getSafeVal(row, 'Posisi') || "-";
                 
                 rowsHTML += `
                     <tr class="hover:bg-red-50/30 transition-colors group">
                         <td class="font-bold text-slate-700 pl-3 border-r border-slate-100 font-mono text-[10px] select-all py-1.5">
-                            ${awb.replace(document.getElementById('awbSearchInput')?.value || '', match => `<span class="bg-yellow-200 text-slate-900">${match}</span>`)}
+                            ${awb.toString().replace(document.getElementById('awbSearchInput')?.value || '', match => `<span class="bg-yellow-200 text-slate-900">${match}</span>`)}
                         </td>
                         <td class="text-center text-slate-500 border-r border-slate-50 text-[10px] px-1">${staging}</td>
                         <td class="text-center text-slate-500 border-r border-slate-50 text-[10px] px-1 truncate max-w-[80px]" title="${posisi}">${posisi}</td>
                         <td class="text-center py-1 px-1">
-                            <button onclick="confirmDeleteAwb('${awb}')" class="w-7 h-7 flex items-center justify-center bg-white border border-red-200 text-red-500 hover:bg-red-500 hover:text-white rounded-lg shadow-sm transition-all active:scale-95 mx-auto" title="Hapus Data">
+                            <button onclick="window.confirmDeleteAwb('${awb}')" class="w-7 h-7 flex items-center justify-center bg-white border border-red-200 text-red-500 hover:bg-red-500 hover:text-white rounded-lg shadow-sm transition-all active:scale-95 mx-auto" title="Hapus Data">
                                 <i class="ph-bold ph-trash text-sm"></i>
                             </button>
                         </td>
@@ -2583,180 +2348,322 @@
             `;
         }
 
-        // --- DELETE SINGLE AWB LOGIC ---
-        window.confirmDeleteAwb = (awb) => {
-            showIsland('confirm', `Hapus permanen resi <b>${awb}</b>?`, () => deleteSingleAwb(awb));
-        }
+        function generateAwbTable(data) {
+            const container = document.getElementById('containerAwbList');
+            if(!container) return;
 
-        async function deleteSingleAwb(awb) {
-            showIsland('loading', `Menghapus ${awb}...`);
-            try {
-                await deleteDoc(doc(db, COLLECTION_NAME, awb));
-                showIsland('success', `Resi ${awb} dihapus.`);
-            } catch (error) {
-                console.error("Delete Error", error);
-                showIsland('error', 'Gagal menghapus. Cek konsol.');
-            }
-        }
-
-        function getGradient(val, min, max, isBold = false) {
-            if(!val) return 'transparent';
-            if(min===max) return isBold ? '#dcfce7' : '#f0fdf4'; 
+            awbDataCache = data;
             
-            const ratio = (val-min)/(max-min);
-            const hue = 120 - (ratio*120);
-            
-            if (isBold) {
-                return `hsla(${hue}, 90%, 88%, 0.85)`; 
-            }
-            
-            return `hsla(${hue}, 85%, 96%, 0.6)`;
-        }
-
-        function calculateKPIs(data) {
-            const counts = { total: data.length, last:0, vend:0, mid:0, mit:0, trans:0, first:0 };
-            data.forEach(r => {
-                const p = (r.Posisi||"").toLowerCase().trim();
-                if(p==='last mile') counts.last++;
-                else if(p==='vendor 3pl') counts.vend++;
-                else if(p==='mid mile') counts.mid++;
-                else if(p==='mitra pengusaha') counts.mit++;
-                else if(p==='transport') counts.trans++;
-                else if(p==='first mile') counts.first++;
-            });
-            
-            // PREVIOUS PERIOD LOGIC (PERBAIKAN: Menggunakan Logika Full Day)
-            const startDateEl = document.getElementById('filterStartDate');
-            const endDateEl = document.getElementById('filterEndDate');
-            
-            let prevData = [];
-            let showComp = false;
-
-            // Hitung Previous Period jika ada input tanggal atau data tampil
-            if (data.length > 0 || (startDateEl.value && endDateEl.value)) {
-                let start, end;
-                if (startDateEl.value && endDateEl.value) {
-                    start = new Date(startDateEl.value);
-                    end = new Date(endDateEl.value);
-                } else {
-                    let maxDate = new Date(0);
-                    // Gunakan allData untuk mencari maxDate agar konsisten
-                    allData.forEach(r => {
-                        const d = parseDateStr(r['Tanggal']);
-                        if (d && d > maxDate) maxDate = d;
+            const searchInput = document.getElementById('awbSearchInput');
+            if(searchInput) {
+                const currentSearch = searchInput.value.toLowerCase();
+                filterAwbData(currentSearch);
+                
+                if (!searchInput.dataset.hasListener) {
+                    searchInput.addEventListener('input', (e) => {
+                        filterAwbData(e.target.value.toLowerCase());
                     });
-                    start = maxDate ? new Date(maxDate) : new Date(); 
-                    end = maxDate ? new Date(maxDate) : new Date();
+                    searchInput.dataset.hasListener = 'true';
                 }
-
-                // --- PERBAIKAN LOGIKA DISINI ---
-                // Set Jam agar mencakup satu hari penuh (00:00:00 s.d 23:59:59)
-                start.setHours(0, 0, 0, 0);
-                end.setHours(23, 59, 59, 999);
-
-                // Hitung durasi (selisih waktu)
-                const duration = end.getTime() - start.getTime(); 
-                
-                // Periode sebelumnya berakhir 1 ms sebelum periode saat ini dimulai
-                const prevEnd = new Date(start.getTime() - 1);
-                // Periode sebelumnya dimulai sebesar 'duration' mundur ke belakang
-                const prevStart = new Date(prevEnd.getTime() - duration);
-                
-                // Pastikan prevStart mulai dari jam 00:00:00
-                prevStart.setHours(0, 0, 0, 0);
-
-                const hubVal = document.getElementById('filterHub').value;
-                const svcVal = document.getElementById('filterService').value;
-                const posVal = document.getElementById('filterPosisi').value;
-
-                prevData = allData.filter(row => {
-                    const hubX = (row['HUB X'] || "").toLowerCase().trim();
-                    if (isGustiadiOnly && hubX !== 'gustiadi') return false;
-                    if (hubVal && row.delivery_hub !== hubVal) return false;
-                    if (svcVal && row.service_code !== svcVal) return false;
-                    if (posVal && row.Posisi !== posVal) return false;
-
-                    const d = parseDateStr(row['Tanggal']);
-                    if (!d) return false;
-                    
-                    // Gunakan getTime() untuk perbandingan yang akurat
-                    return d.getTime() >= prevStart.getTime() && d.getTime() <= prevEnd.getTime();
-                });
-                showComp = true;
+            } else {
+                filteredAwbCache = awbDataCache; 
+                resetAwbTable();
             }
+        }
 
-            const prevCounts = { total: prevData.length, last:0, vend:0, mid:0, mit:0, trans:0, first:0 };
-            prevData.forEach(r => {
-                const p = (r.Posisi||"").toLowerCase().trim();
-                if(p==='last mile') prevCounts.last++;
-                else if(p==='vendor 3pl') prevCounts.vend++;
-                else if(p==='mid mile') prevCounts.mid++;
-                else if(p==='mitra pengusaha') prevCounts.mit++;
-                else if(p==='transport') prevCounts.trans++;
-                else if(p==='first mile') prevCounts.first++;
+        // --- TREND CHARTS LOGIC ---
+        function updateCharts(data) {
+            const weekly = {}; 
+            const monthly = {}; 
+            const daily = {};
+            
+            const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            const currentYear = new Date().getFullYear();
+            
+            months.forEach(m => {
+                monthly[`${m} ${currentYear}`] = { total: 0, gustiadi: 0 };
             });
 
-            const updateCard = (id, curr, prev) => {
-                const el = document.getElementById(id);
-                const shareEl = document.getElementById(id+'Share');
-                const compEl = document.getElementById(id+'Comp');
+            let latestDate = new Date(0);
+            data.forEach(row => {
+                const d = parseDateStr(getSafeVal(row, 'Tanggal'));
+                if (d && d > latestDate) latestDate = d;
+            });
+            const cmIdx = latestDate.getMonth();
+            const cy = latestDate.getFullYear();
+            
+            const mLabel = document.getElementById('currentMonthLabel');
+            if (mLabel) mLabel.innerText = `${months[cmIdx]} ${cy}`;
+
+            data.forEach(row => {
+                const pos = (getSafeVal(row, 'Posisi') || "").toString().toLowerCase().trim();
+                const hubX = (getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
                 
-                if(el) el.innerText = formatNumber(curr);
-                
-                if(shareEl) {
-                    const share = counts.total > 0 ? (curr / counts.total) * 100 : 0;
-                    shareEl.innerText = share.toFixed(1) + '%';
+                const date = parseDateStr(getSafeVal(row, 'Tanggal'));
+                if (date && date.getMonth() === cmIdx && date.getFullYear() === cy) {
+                    const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
+                    if (!daily[dKey]) daily[dKey] = { total: 0, gustiadi: 0 };
+                    daily[dKey].total++;
+                    if (hubX === 'gustiadi' && (pos === 'mid mile' || pos === 'transport')) {
+                        daily[dKey].gustiadi++;
+                    }
                 }
+            });
 
-                if(compEl && showComp) {
-                    let diffPct = 0;
-                    let html = '';
+            const hubVal = document.getElementById('filterHub') ? document.getElementById('filterHub').value : '';
+            const serviceVal = document.getElementById('filterService') ? document.getElementById('filterService').value : '';
+            const posisiVal = document.getElementById('filterPosisi') ? document.getElementById('filterPosisi').value : '';
+
+            allData.forEach(row => {
+                const hubX = (getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
+                const pos = (getSafeVal(row, 'Posisi') || "").toString().toLowerCase().trim();
+                const hub = getSafeVal(row, 'delivery_hub');
+                const svc = getSafeVal(row, 'service_code');
+
+                if (isGustiadiOnly && hubX !== 'gustiadi') return;
+                if (hubVal && hub !== hubVal) return;
+                if (serviceVal && svc !== serviceVal) return;
+                if (posisiVal && pos !== posisiVal) return;
+
+                const date = parseDateStr(getSafeVal(row, 'Tanggal'));
+                if (date) {
+                    const y = date.getFullYear();
+                    const mKey = `${months[date.getMonth()]} ${y}`; 
                     
-                    if (prev === 0) {
-                         diffPct = curr > 0 ? 100 : 0; 
-                    } else {
-                         diffPct = ((curr - prev) / prev) * 100;
-                    }
+                    const [wYear, wNum] = getISOWeekNumber(date);
+                    const wKey = `W${wNum.toString().padStart(2,'0')} ${wYear}`;
 
-                    if (curr === prev) {
-                        html = `<span class="text-[9px] font-bold text-slate-400">0%</span>`;
-                    } else {
-                        const isIncrease = diffPct > 0;
-                        const color = isIncrease ? 'text-red-500' : 'text-emerald-500'; 
-                        const icon = isIncrease ? 'ph-trend-up' : 'ph-trend-down';
-                        const sign = isIncrease ? '+' : '';
-                        html = `<i class="ph-bold ${icon} ${color} text-[10px]"></i><span class="text-[9px] font-bold ${color} ml-1">${sign}${diffPct.toFixed(1)}%</span>`;
+                    if (!weekly[wKey]) weekly[wKey] = { total: 0, gustiadi: 0 };
+                    if (!monthly[mKey]) monthly[mKey] = { total: 0, gustiadi: 0 };
+
+                    weekly[wKey].total++;
+                    monthly[mKey].total++;
+
+                    if (hubX === 'gustiadi' && (pos === 'mid mile' || pos === 'transport')) {
+                        weekly[wKey].gustiadi++;
+                        monthly[mKey].gustiadi++;
                     }
-                    compEl.innerHTML = html;
-                } else if (compEl) {
-                    compEl.innerHTML = `<span class="text-[9px] font-bold text-slate-300">-</span>`;
+                }
+            });
+
+            cachedTrendData.weekly = weekly;
+            cachedTrendData.monthly = monthly;
+
+            window.renderTrendChart();
+
+            const sortDaily = (a,b) => parseInt(a.split(' ')[0]) - parseInt(b.split(' ')[0]);
+            const dailyKeys = Object.keys(daily).sort(sortDaily);
+            const dailyTotal = dailyKeys.map(k => daily[k].total);
+            const dailyGustiadi = dailyKeys.map(k => daily[k].gustiadi);
+            
+            renderChart('dailyChart', dailyKeys, dailyTotal, dailyGustiadi);
+        }
+
+        window.setTrendMode = (mode) => {
+            currentTrendMode = mode;
+            
+            const btnActive = "bg-white text-indigo-600 shadow-sm transform scale-100";
+            const btnInactive = "text-slate-400 hover:text-slate-600 bg-transparent shadow-none";
+            
+            document.getElementById('btnMonthly').className = `px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 ${mode === 'monthly' ? btnActive : btnInactive}`;
+            document.getElementById('btnWeekly').className = `px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-300 ${mode === 'weekly' ? btnActive : btnInactive}`;
+            
+            document.getElementById('trendTitle').innerText = mode === 'monthly' ? "Tren Bulanan" : "Tren Mingguan";
+            
+            window.renderTrendChart();
+        }
+
+        window.renderTrendChart = () => {
+            const mode = currentTrendMode;
+            const dataObj = cachedTrendData[mode];
+            
+            const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            
+            let labels;
+            
+            if (mode === 'monthly') {
+                const sortMonth = (a, b) => {
+                    const partsA = a.split(' ');
+                    const partsB = b.split(' ');
+                    const idxA = monthsOrder.indexOf(partsA[0]);
+                    const idxB = monthsOrder.indexOf(partsB[0]);
+                    const yearA = parseInt(partsA[1]);
+                    const yearB = parseInt(partsB[1]);
+                    return (yearA * 12 + idxA) - (yearB * 12 + idxB);
+                };
+                labels = Object.keys(dataObj).sort(sortMonth);
+            } else {
+                const sortWeekly = (a, b) => {
+                    const [wA, yA] = a.split(' ');
+                    const [wB, yB] = b.split(' ');
+                    const yearA = parseInt(yA);
+                    const yearB = parseInt(yB);
+                    const weekA = parseInt(wA.replace('W',''));
+                    const weekB = parseInt(wB.replace('W',''));
+                    
+                    if (yearA !== yearB) return yearA - yearB;
+                    return weekA - weekB;
+                };
+                labels = Object.keys(dataObj).sort(sortWeekly);
+            }
+
+            const dataTotal = labels.map(k => dataObj[k].total);
+            const dataGustiadi = labels.map(k => dataObj[k].gustiadi);
+            
+            renderChart('comboTrendChart', labels, dataTotal, dataGustiadi);
+        }
+
+        function renderChart(id, labels, dataTotal, dataGustiadi) {
+            const canvas = document.getElementById(id);
+            if (!canvas) return; 
+
+            if (chartInstances[id]) {
+                chartInstances[id].destroy();
+            }
+            
+            const ctx = canvas.getContext('2d');
+
+            const gradientGustiadi = ctx.createLinearGradient(0, 0, 0, 300);
+            gradientGustiadi.addColorStop(0, 'rgba(99, 102, 241, 0.5)'); 
+            gradientGustiadi.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+            const gradientTotal = ctx.createLinearGradient(0, 0, 0, 300);
+            gradientTotal.addColorStop(0, 'rgba(15, 23, 42, 0.2)'); 
+            gradientTotal.addColorStop(1, 'rgba(15, 23, 42, 0)');
+
+            const simpleProgressive = {
+                duration: 1000,
+                easing: 'easeOutQuart',
+                delay: (context) => {
+                    let delay = 0;
+                    if (context.type === 'data' && context.mode === 'default') {
+                        delay = context.dataIndex * 30; 
+                    }
+                    return delay;
                 }
             };
 
-            updateCard('kpiTotal', counts.total, prevCounts.total);
-            updateCard('kpiLastMile', counts.last, prevCounts.last);
-            updateCard('kpiVendor', counts.vend, prevCounts.vend);
-            updateCard('kpiMidMile', counts.mid, prevCounts.mid);
-            updateCard('kpiMitra', counts.mit, prevCounts.mit);
-            updateCard('kpiTransport', counts.trans, prevCounts.trans);
-            updateCard('kpiFirstMile', counts.first, prevCounts.first);
+            chartInstances[id] = new Chart(ctx, {
+                type: 'line', 
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Total AWB',
+                            data: dataTotal,
+                            borderColor: '#0f172a', 
+                            backgroundColor: gradientTotal,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#0f172a',
+                            pointBorderColor: '#fff',
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            fill: true,
+                            tension: 0.4,
+                            order: 2 
+                        },
+                        {
+                            label: 'Inprogress',
+                            data: dataGustiadi,
+                            borderColor: '#6366f1', 
+                            backgroundColor: gradientGustiadi,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#6366f1',
+                            pointBorderColor: '#fff',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4,
+                            order: 1 
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: simpleProgressive, 
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 10,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#475569',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 10,
+                            boxPadding: 4,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${formatNumber(context.raw)}`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            display: function(context) {
+                                return context.dataset.data[context.dataIndex] > 0;
+                            },
+                            align: 'top',
+                            anchor: 'end',
+                            color: function(context) {
+                                return context.dataset.borderColor; 
+                            },
+                            font: { size: 9, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
+                            offset: 4,
+                            formatter: (val) => formatNumber(val)
+                        }
+                    },
+                    scales: { 
+                        y: { 
+                            display: false, 
+                            beginAtZero: true 
+                        }, 
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { 
+                                font: { size: 10, family: "'Plus Jakarta Sans', sans-serif", weight: '500' }, 
+                                color: '#94a3b8' 
+                            } 
+                        } 
+                    },
+                    layout: { padding: { top: 20 } }
+                }
+            });
         }
 
+        // --- INIT EVENT LISTENERS ---
         document.getElementById('statusToggle').addEventListener('change', e => {
             isGustiadiOnly = e.target.checked;
             document.getElementById('toggleLabel').innerText = isGustiadiOnly ? "In Area" : "Semua";
             document.getElementById('toggleLabel').className = isGustiadiOnly ? "text-[9px] font-bold text-indigo-600 uppercase tracking-wide transition-colors w-10 text-right" : "text-[9px] font-bold text-slate-400 uppercase tracking-wide transition-colors w-10 text-right";
-            renderDashboard();
+            window.renderDashboard();
         });
 
-        const filterIds = ['filterStartDate', 'filterEndDate', 'filterHub', 'filterService', 'filterPosisi', 'searchInput'];
+        const filterIds = ['filterStartDate', 'filterEndDate', 'filterHub', 'filterService', 'filterPosisi'];
         filterIds.forEach(id => {
             const el = document.getElementById(id);
-            if(el) el.addEventListener(id==='searchInput'?'keyup':'change', renderDashboard);
+            if(el) el.addEventListener('change', window.renderDashboard);
         });
 
         const dateEl = document.getElementById('currentDate');
         if(dateEl) dateEl.innerText = new Date().toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'short', year:'numeric'});
+
+        initDataFetch();
+
     </script>
 </body>
 </html>
