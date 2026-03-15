@@ -216,7 +216,7 @@
             <div class="absolute -bottom-2 w-full h-1 bg-black/10 rounded-full blur-sm animate-pulse"></div>
         </div>
         <h2 class="text-sm font-display font-bold text-slate-800 tracking-widest uppercase">Memuat Dashboard</h2>
-        <p class="text-xs text-slate-400 mt-1 font-medium">Sinkronisasi data real-time...</p>
+        <p class="text-xs text-slate-400 mt-1 font-medium" id="loadingTextStatus">Sinkronisasi data real-time...</p>
         
         <button id="skipLoadingBtn" class="mt-6 px-6 py-2 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm hidden-section animate-fade-in-up" onclick="window.forceHideLoading()">
             Masuk Mode Offline
@@ -781,7 +781,7 @@
             }
         }
 
-        // --- INIT & REALTIME SUBSCRIPTION ---
+        // --- INIT & REALTIME SUBSCRIPTION DENGAN PAGINATION LOOP ---
         function updateLastUpdated() {
             const now = new Date();
             const lastUpd = document.getElementById('lastUpdated');
@@ -789,22 +789,56 @@
         }
 
         async function initDataFetch() {
-            const { data, error } = await supabase.from(COLLECTION_NAME).select('*').limit(50000);
+            let allFetchedData = [];
+            let from = 0;
+            const step = 1000;
+            let keepFetching = true;
+            let hasError = false;
             
-            if (error) {
-                console.error("Supabase Error:", error);
-                handleSchemaError(error);
-                window.forceHideLoading();
-                return;
+            const loadingText = document.getElementById('loadingTextStatus');
+            if(loadingText) loadingText.innerText = "Mengambil data dari server...";
+
+            while (keepFetching) {
+                const { data, error } = await supabase
+                    .from(COLLECTION_NAME)
+                    .select('*')
+                    .range(from, from + step - 1);
+                
+                if (error) {
+                    console.error("Supabase Error:", error);
+                    handleSchemaError(error);
+                    window.forceHideLoading();
+                    hasError = true;
+                    break;
+                }
+
+                if (data && data.length > 0) {
+                    // Push data yang ditarik ke penampung utama
+                    allFetchedData.push(...data);
+                    from += step;
+                    
+                    // Update text loading agar pengguna tahu proses berjalan
+                    if(loadingText) loadingText.innerText = `Menyinkronkan ${formatNumber(allFetchedData.length)} data...`;
+                    
+                    // Jika data yang diterima kurang dari batas step (1000), berarti sudah habis
+                    if (data.length < step) {
+                        keepFetching = false;
+                    }
+                } else {
+                    keepFetching = false;
+                }
             }
 
-            allData = data || [];
+            if (hasError) return;
+
+            allData = allFetchedData;
             
             updateLastUpdated();
             populateDropdowns(allData);
             window.renderDashboard();
             window.forceHideLoading();
 
+            // Jalankan listener real-time untuk perubahan data satuan setelah pull data awal selesai
             supabase.channel('public:parcel_data')
                 .on('postgres_changes', { event: '*', schema: 'public', table: COLLECTION_NAME }, payload => {
                     const payloadAwb = payload.new?.awb || payload.old?.awb;
