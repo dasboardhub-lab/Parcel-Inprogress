@@ -5,19 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard Parcel Inprogress</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Chart.js & Plugins -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     
-    <!-- PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
-    <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
@@ -67,7 +62,6 @@
         
         .hidden-section { display: none !important; }
         
-        /* Glass Effect */
         .glass {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
@@ -75,7 +69,6 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* Loading Animation */
         #initialLoading {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #ffffff; z-index: 9999;
@@ -86,7 +79,6 @@
         .loader-truck { animation: drive 2s ease-in-out infinite; }
         @keyframes drive { 0%, 100% { transform: translateX(-5px) rotate(-1deg); } 50% { transform: translateX(5px) rotate(1deg); } }
 
-        /* Dynamic Island */
         #dynamicIsland {
             position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
             background: #0f172a; color: white;
@@ -99,7 +91,6 @@
         #dynamicIsland.active { width: auto; min-width: 180px; height: 48px; padding: 0 24px; opacity: 1; }
         #dynamicIsland.expanded { border-radius: 28px; width: 90%; max-width: 360px; height: auto; padding: 28px; flex-direction: column; }
         
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -108,7 +99,6 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Table Styling */
         .modern-table-container { 
             background: white; border-radius: 20px; 
             border: 1px solid #e2e8f0; overflow: hidden;
@@ -178,7 +168,6 @@
         }
         .input-glass:focus { background: white; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
 
-        /* Modals */
         #summaryModalOverlay, #deleteModalOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px);
@@ -207,7 +196,6 @@
 </head>
 <body class="overflow-x-hidden">
 
-    <!-- INITIAL LOADING -->
     <div id="initialLoading">
         <div class="relative mb-6">
             <div class="w-20 h-20 bg-gradient-to-tr from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-200 loader-truck">
@@ -223,10 +211,8 @@
         </button>
     </div>
 
-    <!-- DYNAMIC ISLAND (Notification Hub) -->
     <div id="dynamicIsland"></div>
 
-    <!-- SUMMARY MODAL -->
     <div id="summaryModalOverlay">
         <div class="summary-card bg-white w-full max-w-4xl max-h-[85vh] rounded-[2rem] shadow-2xl border border-slate-100 flex flex-col modal-animate">
             <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white/80 backdrop-blur-md rounded-t-[2rem] sticky top-0 z-10">
@@ -273,7 +259,6 @@
         </div>
     </div>
 
-    <!-- DELETE MODAL -->
     <div id="deleteModalOverlay" class="hidden-section">
         <div id="deleteModalContent" class="bg-white w-full max-w-xs sm:max-w-sm rounded-[2rem] p-6 sm:p-8 text-center shadow-2xl modal-animate border border-slate-100">
             <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-sm border border-red-100">
@@ -311,7 +296,6 @@
         </div>
     </div>
 
-    <!-- NAVBAR FLOATING -->
     <div class="fixed top-0 left-0 w-full z-40 px-2 py-2 sm:px-4 sm:py-4 pointer-events-none">
         <nav class="pointer-events-auto max-w-[1600px] mx-auto glass rounded-2xl px-3 py-3 flex flex-col lg:flex-row items-center justify-between gap-3 shadow-glass transition-all duration-300 animate-fade-in-up">
             
@@ -334,7 +318,6 @@
                 </div>
             </div>
 
-            <!-- Toolbar & Actions -->
             <div class="flex flex-col md:flex-row items-center gap-2 w-full lg:w-auto">
                 
                 <div class="flex items-center justify-between w-full md:w-auto bg-slate-100 rounded-xl p-1 border border-slate-200 group focus-within:border-indigo-300 transition-all">
@@ -379,7 +362,6 @@
         </nav>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-48 lg:pt-28 pb-12">
         
         <div id="dbErrorBanner" class="hidden-section bg-red-50 border border-red-200 text-red-700 p-4 mb-6 rounded-2xl shadow-sm animate-fade-in-up">
@@ -387,7 +369,6 @@
             <p class="text-xs mt-1 ml-7 text-red-600 leading-relaxed" id="dbErrorText"></p>
         </div>
 
-        <!-- 1. KPI CARDS -->
         <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
             <script>
                 const renderKpi = (id, label, color, icon, delay) => {
@@ -436,7 +417,6 @@
             </script>
         </div>
 
-        <!-- 2. ANALYTICS -->
         <div class="grid grid-cols-1 mb-6">
             <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 500ms">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
@@ -460,7 +440,6 @@
             </div>
         </div>
 
-        <!-- 3. DAILY TREND -->
         <div class="grid grid-cols-12 gap-4 mb-6">
             <div class="col-span-12 bg-white rounded-3xl p-5 border border-slate-100 shadow-sm opacity-0 animate-fade-in-up" style="animation-delay: 700ms">
                 <div class="flex justify-between items-center mb-4">
@@ -473,7 +452,6 @@
             </div>
         </div>
 
-        <!-- BARIS 1: KPI, Origin, Service -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-6 opacity-0 animate-fade-in-up" style="animation-delay: 800ms">
             
             <div class="xl:col-span-6 flex flex-col h-[400px] lg:h-[400px]">
@@ -502,7 +480,6 @@
 
         </div>
 
-        <!-- NEW COMBINED ROW: HUB & Staging (Left) vs AWB (Right) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8 opacity-0 animate-fade-in-up" style="animation-delay: 850ms">
             
             <div class="lg:col-span-9 flex flex-col gap-4">
@@ -541,7 +518,6 @@
 
             </div>
 
-            <!-- RIGHT COLUMN WRAPPER (AWB List) -->
             <div class="lg:col-span-3 h-[500px] lg:h-auto"> 
                 <div class="flex flex-col h-full"> 
                     <div class="bg-slate-800 px-5 py-3 rounded-t-3xl border border-slate-800 border-b-0 flex flex-col gap-3 shadow-sm shrink-0 relative z-10">
@@ -562,7 +538,6 @@
                         </div>
                     </div>
                     <div id="containerAwbList" class="modern-table-container rounded-t-none border-t border-slate-100 flex-1 relative h-full">
-                        <!-- Table will be injected here -->
                     </div>
                 </div>
             </div>
@@ -571,7 +546,6 @@
 
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -581,7 +555,6 @@
         Chart.defaults.scale.grid.color = '#f1f5f9';
         Chart.defaults.scale.grid.borderColor = 'transparent';
 
-        // --- GLOBAL VARIABLES & CONFIG ---
         const supabaseUrl = 'https://brkdtxnfpakqbhhrtraw.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJya2R0eG5mcGFrcWJoaHJ0cmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMzkwODIsImV4cCI6MjA4ODYxNTA4Mn0.v5aI110arDKYgLXa19J7P7fMskV9DT3IC3bBmWa34D8';
         const supabase = createClient(supabaseUrl, supabaseKey);
@@ -589,26 +562,24 @@
         const COLLECTION_NAME = "parcel_data"; 
         const APP_PASSWORD = "TAB123";
 
-        let allData = [];
-        let isGustiadiOnly = false;
+        window.allData = [];
+        window.isGustiadiOnly = false;
         let chartInstances = {};
         
-        let currentTrendMode = 'monthly';
-        let cachedTrendData = { weekly: {}, monthly: {} };
+        window.currentTrendMode = 'monthly';
+        window.cachedTrendData = { weekly: {}, monthly: {} };
 
-        // AWB Table State
-        let awbDataCache = []; 
-        let filteredAwbCache = []; 
-        let awbRenderedCount = 0; 
+        window.awbDataCache = []; 
+        window.filteredAwbCache = []; 
+        window.awbRenderedCount = 0; 
         const AWB_CHUNK_SIZE = 60; 
         const AWB_MAX_LIMIT = 10000;
 
-        // --- HELPER FUNCTIONS ---
-        function formatNumber(num) {
+        window.formatNumber = function(num) {
             return num ? num.toLocaleString('id-ID') : '0';
         }
 
-        function getISOWeekNumber(d) {
+        window.getISOWeekNumber = function(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
             d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
             var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
@@ -616,7 +587,7 @@
             return [d.getUTCFullYear(), weekNo];
         }
 
-        function parseDateStr(dateStr) {
+        window.parseDateStr = function(dateStr) {
             if (!dateStr) return null;
             dateStr = String(dateStr).trim();
             if (dateStr.includes('-')) {
@@ -636,7 +607,7 @@
             return new Date(dateStr);
         }
 
-        function getGradient(val, min, max, isBold = false) {
+        window.getGradient = function(val, min, max, isBold = false) {
             if(!val) return 'transparent';
             if(min===max) return isBold ? '#dcfce7' : '#f0fdf4'; 
             
@@ -650,7 +621,7 @@
             return `hsla(${hue}, 85%, 96%, 0.6)`;
         }
 
-        function getSafeVal(row, primaryKey) {
+        window.getSafeVal = function(row, primaryKey) {
             if (!row) return undefined;
             if (row[primaryKey] !== undefined && row[primaryKey] !== null && row[primaryKey] !== "") return row[primaryKey];
             
@@ -663,9 +634,8 @@
             return undefined;
         }
 
-        // --- UI & NOTIFICATION FUNCTIONS ---
         const island = document.getElementById('dynamicIsland');
-        function showIsland(type, msg, onConfirm = null) {
+        window.showIsland = function(type, msg, onConfirm = null) {
             island.className = 'active'; 
             if (type === 'loading') {
                 island.innerHTML = `<div class="island-content"><div class="island-spinner"></div><span>${msg}</span></div>`;
@@ -734,7 +704,7 @@
                     if (input.value === APP_PASSWORD) {
                         if (onConfirm) onConfirm();
                     } else {
-                        showIsland('error', 'Password Salah!');
+                        window.showIsland('error', 'Password Salah!');
                     }
                 };
                 document.getElementById('islAuth').onclick = verify;
@@ -743,52 +713,56 @@
             island.style.opacity = '1';
         }
 
-        window.forceHideLoading = () => {
+        window.forceHideLoading = function() {
             const ov = document.getElementById('initialLoading');
             ov.style.opacity = '0';
             setTimeout(() => ov.style.display = 'none', 500);
         }
 
-        function requestPassword(onSuccess) {
-            showIsland('password', null, onSuccess);
+        window.requestPassword = function(onSuccess) {
+            window.showIsland('password', null, onSuccess);
         }
         
-        window.initiateUpload = () => {
-            requestPassword(() => document.getElementById('csvFileInput').click());
+        window.initiateUpload = function() {
+            window.requestPassword(() => document.getElementById('csvFileInput').click());
         }
 
-        function handleSchemaError(error) {
+        window.handleSchemaError = function(error) {
             const banner = document.getElementById('dbErrorBanner');
             const errorText = document.getElementById('dbErrorText');
 
-            if (error.code === 'PGRST205') {
-                showIsland('error', 'Gagal: Tabel parcel_data belum ada!');
-                if(banner) {
-                    errorText.innerHTML = `Sistem mendeteksi tabel <b>parcel_data</b> belum dibuat di dalam project Supabase Anda.<br><b>Solusi Cepat:</b> Buka dashboard Supabase Anda > <b>Table Editor</b> > <b>Create a new table</b> > Beri nama <b>parcel_data</b> (huruf kecil semua) > Buat kolom bernama <b>awb</b> (tipe text) dan jadikan sebagai <b>Primary Key</b> > Matikan opsi RLS (Enable Row Level Security di-uncheck) > Save.`;
+            if (error.message && error.message.includes('Failed to fetch')) {
+                window.showIsland('error', 'Koneksi database terblokir/terputus!');
+                if(banner && errorText) {
+                    errorText.innerHTML = `Sistem gagal menghubungi server Supabase.<br><b>Penyebab Umum:</b><br>1. Koneksi internet tidak stabil / terputus.<br>2. Jaringan WiFi Kantor memblokir akses ke database luar.<br>3. Ekstensi browser memblokir aliran data.<br><b>Solusi:</b> Gunakan koneksi lain, atau klik tombol <b>Masuk Mode Offline</b>.`;
+                    banner.classList.remove('hidden-section');
+                }
+            } else if (error.code === 'PGRST205') {
+                window.showIsland('error', 'Gagal: Tabel parcel_data belum ada!');
+                if(banner && errorText) {
+                    errorText.innerHTML = `Sistem mendeteksi tabel <b>parcel_data</b> belum dibuat di dalam project Supabase Anda.`;
                     banner.classList.remove('hidden-section');
                 }
             } else if (error.code === 'PGRST204') {
                 const colMatch = error.message.match(/Could not find the '(.*?)' column/i);
                 const colName = colMatch ? colMatch[1] : 'tertentu';
-                showIsland('error', `Kolom '${colName}' tidak ditemukan di tabel!`);
-                
-                if(banner) {
-                    errorText.innerHTML = `Sistem gagal mengupload karena kolom <b>${colName}</b> ada di file CSV tapi belum dibuat di tabel Supabase Anda.<br><b>Solusi:</b> Buka dashboard Supabase Anda > <b>Table Editor</b> > pilih tabel <b>parcel_data</b> > Klik ikon <b>+ (Add Column)</b> > Beri nama <b>${colName}</b> persis seperti ini (perhatikan huruf besar/kecil/spasi) dengan tipe <b>text</b> > Save. Lalu coba upload lagi.`;
+                window.showIsland('error', `Kolom '${colName}' tidak ditemukan di tabel!`);
+                if(banner && errorText) {
+                    errorText.innerHTML = `Sistem gagal mengupload karena kolom <b>${colName}</b> belum dibuat di tabel Supabase Anda.`;
                     banner.classList.remove('hidden-section');
                 }
             } else {
-                showIsland('error', 'Sebagian Gagal. Cek Konsol.');
+                window.showIsland('error', 'Sebagian Gagal. Cek Konsol.');
             }
         }
 
-        // --- INIT & REALTIME SUBSCRIPTION DENGAN PAGINATION LOOP ---
-        function updateLastUpdated() {
+        window.updateLastUpdated = function() {
             const now = new Date();
             const lastUpd = document.getElementById('lastUpdated');
             if(lastUpd) lastUpd.innerText = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
         }
 
-        async function initDataFetch() {
+        window.initDataFetch = async function() {
             let allFetchedData = [];
             let from = 0;
             const step = 1000;
@@ -799,30 +773,48 @@
             if(loadingText) loadingText.innerText = "Mengambil data dari server...";
 
             while (keepFetching) {
-                const { data, error } = await supabase
-                    .from(COLLECTION_NAME)
-                    .select('*')
-                    .range(from, from + step - 1);
+                let data = null;
+                let error = null;
+                let retries = 3;
+                
+                while(retries > 0) {
+                    const res = await supabase
+                        .from(COLLECTION_NAME)
+                        .select('*')
+                        .order('awb', { ascending: true })
+                        .range(from, from + step - 1);
+                    
+                    if (res.error && res.error.message && res.error.message.includes('Failed to fetch')) {
+                        retries--;
+                        await new Promise(r => setTimeout(r, 2000));
+                        if(retries === 0) {
+                            error = res.error;
+                        }
+                    } else {
+                        data = res.data;
+                        error = res.error;
+                        break;
+                    }
+                }
                 
                 if (error) {
                     console.error("Supabase Error:", error);
-                    handleSchemaError(error);
+                    window.handleSchemaError(error);
                     window.forceHideLoading();
                     hasError = true;
                     break;
                 }
 
                 if (data && data.length > 0) {
-                    // Push data yang ditarik ke penampung utama
                     allFetchedData.push(...data);
                     from += step;
                     
-                    // Update text loading agar pengguna tahu proses berjalan
-                    if(loadingText) loadingText.innerText = `Menyinkronkan ${formatNumber(allFetchedData.length)} data...`;
+                    if(loadingText) loadingText.innerText = "Menyinkronkan " + window.formatNumber(allFetchedData.length) + " data...";
                     
-                    // Jika data yang diterima kurang dari batas step (1000), berarti sudah habis
                     if (data.length < step) {
                         keepFetching = false;
+                    } else {
+                        await new Promise(r => setTimeout(r, 50));
                     }
                 } else {
                     keepFetching = false;
@@ -831,32 +823,31 @@
 
             if (hasError) return;
 
-            allData = allFetchedData;
+            window.allData = allFetchedData;
             
-            updateLastUpdated();
-            populateDropdowns(allData);
+            window.updateLastUpdated();
+            window.populateDropdowns(window.allData);
             window.renderDashboard();
             window.forceHideLoading();
 
-            // Jalankan listener real-time untuk perubahan data satuan setelah pull data awal selesai
             supabase.channel('public:parcel_data')
                 .on('postgres_changes', { event: '*', schema: 'public', table: COLLECTION_NAME }, payload => {
                     const payloadAwb = payload.new?.awb || payload.old?.awb;
                     if (!payloadAwb) return;
 
                     if (payload.eventType === 'INSERT') {
-                        const exists = allData.some(r => getSafeVal(r, 'awb') === payload.new.awb);
-                        if(!exists) allData.push(payload.new);
+                        const exists = window.allData.some(r => window.getSafeVal(r, 'awb') === payload.new.awb);
+                        if(!exists) window.allData.push(payload.new);
                     } else if (payload.eventType === 'UPDATE') {
-                        const idx = allData.findIndex(r => getSafeVal(r, 'awb') === payload.new.awb);
-                        if (idx > -1) allData[idx] = payload.new;
-                        else allData.push(payload.new);
+                        const idx = window.allData.findIndex(r => window.getSafeVal(r, 'awb') === payload.new.awb);
+                        if (idx > -1) window.allData[idx] = payload.new;
+                        else window.allData.push(payload.new);
                     } else if (payload.eventType === 'DELETE') {
-                        allData = allData.filter(r => getSafeVal(r, 'awb') !== payload.old.awb);
+                        window.allData = window.allData.filter(r => window.getSafeVal(r, 'awb') !== payload.old.awb);
                     }
                     
-                    updateLastUpdated();
-                    populateDropdowns(allData);
+                    window.updateLastUpdated();
+                    window.populateDropdowns(window.allData);
                     window.renderDashboard();
                 })
                 .subscribe();
@@ -869,7 +860,6 @@
             }
         }, 5000);
 
-        // --- UPLOAD CSV LOGIC (BATCH & DUPLICATE HANDLING) ---
         const csvInput = document.getElementById('csvFileInput');
         const newCsvInput = csvInput.cloneNode(true);
         csvInput.parentNode.replaceChild(newCsvInput, csvInput);
@@ -883,29 +873,29 @@
                     return h.replace(/[\r\n"]+/g, ' ').replace(/^\uFEFF/, '').trim();
                 },
                 complete: res => {
-                    saveData(res.data);
+                    window.saveData(res.data);
                 }
             });
         });
 
-        async function saveData(data) {
-            showIsland('loading', 'Menganalisis Data...');
+        window.saveData = async function(data) {
+            window.showIsland('loading', 'Menganalisis Data...');
             
             const sampleRow = data[0] || {};
             const awbKey = Object.keys(sampleRow).find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === 'awb' || k.toLowerCase().replace(/[^a-z0-9]/g, '') === 'noresi');
 
             if (!awbKey) {
-                showIsland('error', 'Kolom AWB / No Resi tidak ditemukan di file!');
+                window.showIsland('error', 'Kolom AWB / No Resi tidak ditemukan di file!');
                 return;
             }
 
             const valid = data.filter(r => r[awbKey] && r[awbKey].toString().trim() !== '');
             if (valid.length === 0) {
-                showIsland('error', 'Tidak ada data valid (AWB kosong).');
+                window.showIsland('error', 'Tidak ada data valid (AWB kosong).');
                 return;
             }
 
-            const existingAwbs = new Set(allData.map(item => getSafeVal(item, 'awb') || getSafeVal(item, 'No Resi')));
+            const existingAwbs = new Set(window.allData.map(item => window.getSafeVal(item, 'awb') || window.getSafeVal(item, 'No Resi')));
             const currentFileAwbs = new Set(); 
 
             const rowsToUpload = [];
@@ -934,30 +924,30 @@
                     <div class="text-left text-[11px] bg-slate-800 p-3 rounded-lg w-full border border-slate-700">
                         <div class="flex justify-between mb-1"><span class="text-slate-300">Tersimpan:</span> <b class="text-emerald-400">0</b></div>
                         <div class="flex justify-between mb-1"><span class="text-slate-300">Gagal:</span> <b class="text-red-400">0</b></div>
-                        <div class="flex justify-between"><span class="text-slate-300">Duplikat (Diabaikan):</span> <b class="text-yellow-400">${formatNumber(totalSkipped)}</b></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Duplikat (Diabaikan):</span> <b class="text-yellow-400">${window.formatNumber(totalSkipped)}</b></div>
                     </div>
                 `;
-                showIsland('summary', msg);
+                window.showIsland('summary', msg);
                 return;
             }
             
             let confirmMsg = `
                 <div class="text-left text-[11px] bg-slate-50 p-2 rounded-lg mb-2">
-                    <div class="flex justify-between"><span>Total File:</span> <b>${formatNumber(valid.length)}</b></div>
-                    <div class="flex justify-between text-slate-400"><span>Duplikat (Skip):</span> <b>${formatNumber(totalSkipped)}</b></div>
+                    <div class="flex justify-between"><span>Total File:</span> <b>${window.formatNumber(valid.length)}</b></div>
+                    <div class="flex justify-between text-slate-400"><span>Duplikat (Skip):</span> <b>${window.formatNumber(totalSkipped)}</b></div>
                     <div class="flex justify-between text-emerald-600 font-bold border-t border-slate-200 mt-1 pt-1">
-                        <span>Akan Diupload:</span> <span>${formatNumber(rowsToUpload.length)}</span>
+                        <span>Akan Diupload:</span> <span>${window.formatNumber(rowsToUpload.length)}</span>
                     </div>
                 </div>
             `;
             confirmMsg += `<span class="text-slate-400 text-[10px]">Lanjutkan upload batch?</span>`;
 
-            showIsland('confirm', confirmMsg, () => executeBatchUpload(rowsToUpload, totalSkipped));
+            window.showIsland('confirm', confirmMsg, () => window.executeBatchUpload(rowsToUpload, totalSkipped));
         }
 
-        async function executeBatchUpload(rows, skippedCount) {
-            showIsland('progress', `Menyimpan ${formatNumber(rows.length)} data...`);
-            const batchSize = 1000; 
+        window.executeBatchUpload = async function(rows, skippedCount) {
+            window.showIsland('progress', `Menyimpan ${window.formatNumber(rows.length)} data...`);
+            const batchSize = 500; 
             const totalBatches = Math.ceil(rows.length / batchSize);
             
             let successCount = 0;
@@ -965,13 +955,27 @@
 
             for(let i=0; i<totalBatches; i++) {
                 const chunk = rows.slice(i*batchSize, (i+1)*batchSize);
-                const { error } = await supabase.from(COLLECTION_NAME).upsert(chunk, { onConflict: 'awb' });
+                
+                let error = null;
+                let retries = 3;
+                
+                while(retries > 0) {
+                    const res = await supabase.from(COLLECTION_NAME).upsert(chunk, { onConflict: 'awb' });
+                    if (res.error && res.error.message && res.error.message.includes('Failed to fetch')) {
+                        retries--;
+                        await new Promise(r => setTimeout(r, 2000));
+                        if(retries === 0) error = res.error;
+                    } else {
+                        error = res.error;
+                        break;
+                    }
+                }
                 
                 if (error) {
                     console.error(`Batch ${i+1} Failed:`, error);
-                    if (error.code === 'PGRST205' || error.code === 'PGRST204') {
+                    if (error.code === 'PGRST205' || error.code === 'PGRST204' || (error.message && error.message.includes('Failed to fetch'))) {
                         failedCount += (rows.length - successCount);
-                        handleSchemaError(error);
+                        window.handleSchemaError(error);
                         break; 
                     } else {
                         failedCount += chunk.length;
@@ -980,13 +984,13 @@
                     successCount += chunk.length;
                     
                     chunk.forEach(newRow => {
-                        const idx = allData.findIndex(r => getSafeVal(r, 'awb') === newRow.awb);
-                        if (idx > -1) allData[idx] = newRow;
-                        else allData.push(newRow);
+                        const idx = window.allData.findIndex(r => window.getSafeVal(r, 'awb') === newRow.awb);
+                        if (idx > -1) window.allData[idx] = newRow;
+                        else window.allData.push(newRow);
                     });
 
-                    updateLastUpdated();
-                    populateDropdowns(allData);
+                    window.updateLastUpdated();
+                    window.populateDropdowns(window.allData);
                     window.renderDashboard();
                 }
 
@@ -997,29 +1001,28 @@
                 const progressText = document.getElementById('uploadProgressText');
                 
                 if(progressBar) progressBar.style.width = `${progressPct}%`;
-                if(progressText) progressText.innerText = `${formatNumber(processedCount)} / ${formatNumber(rows.length)} (${progressPct}%)`;
+                if(progressText) progressText.innerText = `${window.formatNumber(processedCount)} / ${window.formatNumber(rows.length)} (${progressPct}%)`;
             }
             
             setTimeout(() => {
                 const msg = `
                     <div class="text-left text-[11px] bg-slate-800 p-3 rounded-lg w-full border border-slate-700">
-                        <div class="flex justify-between mb-1"><span class="text-slate-300">Tersimpan:</span> <b class="text-emerald-400">${formatNumber(successCount)}</b></div>
-                        <div class="flex justify-between mb-1"><span class="text-slate-300">Gagal:</span> <b class="text-red-400">${formatNumber(failedCount)}</b></div>
-                        <div class="flex justify-between"><span class="text-slate-300">Duplikat (Diabaikan):</span> <b class="text-yellow-400">${formatNumber(skippedCount)}</b></div>
+                        <div class="flex justify-between mb-1"><span class="text-slate-300">Tersimpan:</span> <b class="text-emerald-400">${window.formatNumber(successCount)}</b></div>
+                        <div class="flex justify-between mb-1"><span class="text-slate-300">Gagal:</span> <b class="text-red-400">${window.formatNumber(failedCount)}</b></div>
+                        <div class="flex justify-between"><span class="text-slate-300">Duplikat (Diabaikan):</span> <b class="text-yellow-400">${window.formatNumber(skippedCount)}</b></div>
                     </div>
                 `;
-                showIsland('summary', msg);
+                window.showIsland('summary', msg);
             }, 600);
         }
 
-        // --- EXPORT & COPY FUNCTIONS ---
-        window.downloadCSV = () => {
-            const data = getFilteredData();
+        window.downloadCSV = function() {
+            const data = window.getFilteredData();
             if (!data || data.length === 0) {
-                showIsland('error', 'Tidak ada data untuk didownload.');
+                window.showIsland('error', 'Tidak ada data untuk didownload.');
                 return;
             }
-            showIsland('loading', 'Menyiapkan file CSV...');
+            window.showIsland('loading', 'Menyiapkan file CSV...');
             setTimeout(() => {
                 try {
                     const csv = Papa.unparse(data);
@@ -1033,43 +1036,42 @@
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    showIsland('success', 'File CSV berhasil didownload!');
+                    window.showIsland('success', 'File CSV berhasil didownload!');
                 } catch (err) {
                     console.error(err);
-                    showIsland('error', 'Gagal membuat file CSV.');
+                    window.showIsland('error', 'Gagal membuat file CSV.');
                 }
             }, 500);
         }
 
-        window.copyAwbList = () => {
-            if (!filteredAwbCache || filteredAwbCache.length === 0) {
-                showIsland('error', 'List kosong atau tidak ada data.');
+        window.copyAwbList = function() {
+            if (!window.filteredAwbCache || window.filteredAwbCache.length === 0) {
+                window.showIsland('error', 'List kosong atau tidak ada data.');
                 return;
             }
-            showIsland('loading', 'Menyalin data ke clipboard...');
+            window.showIsland('loading', 'Menyalin data ke clipboard...');
             setTimeout(() => {
                 let clipboardText = "No Resi\tStaging\tPosisi\n";
-                filteredAwbCache.forEach(row => {
-                    const awb = getSafeVal(row, 'awb') || getSafeVal(row, 'No Resi') || "";
-                    const stg = getSafeVal(row, 'delivery_staging') || "-";
-                    const pos = getSafeVal(row, 'Posisi') || "-";
+                window.filteredAwbCache.forEach(row => {
+                    const awb = window.getSafeVal(row, 'awb') || window.getSafeVal(row, 'No Resi') || "";
+                    const stg = window.getSafeVal(row, 'delivery_staging') || "-";
+                    const pos = window.getSafeVal(row, 'Posisi') || "-";
                     clipboardText += `${awb}\t${stg}\t${pos}\n`;
                 });
-                fallbackCopyTextToClipboard(clipboardText);
-                showIsland('success', `${formatNumber(filteredAwbCache.length)} baris data berhasil disalin!`);
+                window.fallbackCopyTextToClipboard(clipboardText);
+                window.showIsland('success', `${window.formatNumber(window.filteredAwbCache.length)} baris data berhasil disalin!`);
             }, 300);
         }
         
-        window.copyReport = () => {
-            showIsland('loading', 'Menyusun laporan...'); 
+        window.copyReport = function() {
+            window.showIsland('loading', 'Menyusun laporan...'); 
             setTimeout(() => {
                 const dateStart = document.getElementById('filterStartDate').value || 'Awal';
                 const dateEnd = document.getElementById('filterEndDate').value || 'Akhir';
                 const range = `${dateStart} s/d ${dateEnd}`;
                 
-                const currData = getFilteredData();
+                const currData = window.getFilteredData();
                 const totalCurr = currData.length;
-                const prevData = getPrevPeriodData();
                 
                 const pad = (str, len) => (str + " ".repeat(len)).slice(0, len);
                 
@@ -1083,8 +1085,8 @@
                 const posList = ['Last Mile', 'Vendor 3PL', 'Mid Mile', 'Mitra Pengusaha', 'Transport', 'First Mile'];
                 let posTable = `1. BREAKDOWN POSISI\n\`\`\`\n${pad('Posisi', 16)}| ${pad('Curr', 5)}| ${pad('Prev', 5)}| %\n` + "-".repeat(40) + "\n";
                 posList.forEach(p => {
-                    const c = currData.filter(r => (getSafeVal(r, 'Posisi')||'').toString().toLowerCase() === p.toLowerCase()).length;
-                    const pr = prevData.filter(r => (getSafeVal(r, 'Posisi')||'').toString().toLowerCase() === p.toLowerCase()).length;
+                    const c = currData.filter(r => (window.getSafeVal(r, 'Posisi')||'').toString().toLowerCase() === p.toLowerCase()).length;
+                    const pr = window.getPrevPeriodData().filter(r => (window.getSafeVal(r, 'Posisi')||'').toString().toLowerCase() === p.toLowerCase()).length;
                     posTable += `${pad(p, 16)}| ${pad(String(c), 5)}| ${pad(String(pr), 5)}| ${getComp(c, pr)}\n`;
                 });
                 posTable += `\`\`\``;
@@ -1092,9 +1094,9 @@
                 const getHubTrans = (data) => {
                     const map = {};
                     data.forEach(r => {
-                        const h = getSafeVal(r, 'delivery_hub') || 'Unknown';
-                        const pos = (getSafeVal(r, 'Posisi')||'').toString().toLowerCase();
-                        const hubX = (getSafeVal(r, 'HUB X')||'').toString().toLowerCase();
+                        const h = window.getSafeVal(r, 'delivery_hub') || 'Unknown';
+                        const pos = (window.getSafeVal(r, 'Posisi')||'').toString().toLowerCase();
+                        const hubX = (window.getSafeVal(r, 'HUB X')||'').toString().toLowerCase();
                         if (!map[h]) map[h] = { total: 0, special: 0 };
                         map[h].total++;
                         if ((pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi') {
@@ -1109,25 +1111,25 @@
                 let hubTable = `2. BREAKDOWN HUB (Top 10 In Area)\n\`\`\`\n${pad('HUB', 10)}| ${pad('Total', 6)}| In Area\n` + "-".repeat(30) + "\n";
                 sortedHubs.forEach(([h, d]) => {
                     const pct = d.total > 0 ? (d.special / d.total) * 100 : 0;
-                    const warn = pct > 5 ? "⚠️ " : ""; 
+                    const warn = pct > 5 ? "  " : ""; 
                     hubTable += `${pad(h, 10)}| ${pad(String(d.total), 6)}| ${warn}${d.special} (${pct.toFixed(0)}%)\n`;
                 });
                 hubTable += `\`\`\``;
 
                 const svcData = currData.filter(r => {
-                    const pos = (getSafeVal(r, 'Posisi')||'').toString().toLowerCase();
-                    const hubX = (getSafeVal(r, 'HUB X')||'').toString().toLowerCase();
+                    const pos = (window.getSafeVal(r, 'Posisi')||'').toString().toLowerCase();
+                    const hubX = (window.getSafeVal(r, 'HUB X')||'').toString().toLowerCase();
                     return (pos === 'mid mile' || pos === 'transport') && hubX === 'gustiadi';
                 });
                 
                 const allSvcs = {};
-                svcData.forEach(r => { const s = getSafeVal(r, 'service_code')||'?'; allSvcs[s] = (allSvcs[s]||0)+1; });
+                svcData.forEach(r => { const s = window.getSafeVal(r, 'service_code')||'?'; allSvcs[s] = (allSvcs[s]||0)+1; });
                 const topSvcs = Object.keys(allSvcs).sort((a,b)=>allSvcs[b]-allSvcs[a]).slice(0,3);
                 
                 const svcHubMap = {};
                 svcData.forEach(r => {
-                    const h = getSafeVal(r, 'delivery_hub') || 'Unknown';
-                    const s = getSafeVal(r, 'service_code') || '?';
+                    const h = window.getSafeVal(r, 'delivery_hub') || 'Unknown';
+                    const s = window.getSafeVal(r, 'service_code') || '?';
                     if(!svcHubMap[h]) svcHubMap[h] = {};
                     svcHubMap[h][s] = (svcHubMap[h][s]||0)+1;
                 });
@@ -1150,7 +1152,7 @@
 
                 const pickupMap = {};
                 currData.forEach(r => {
-                    const p = getSafeVal(r, 'pickup_hub') || 'Unknown';
+                    const p = window.getSafeVal(r, 'pickup_hub') || 'Unknown';
                     pickupMap[p] = (pickupMap[p]||0)+1;
                 });
                 const topPickups = Object.entries(pickupMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -1162,18 +1164,18 @@
                 pickTable += `\`\`\``;
 
                 const detailData = currData.filter(r => {
-                    const pos = (getSafeVal(r, 'Posisi')||'').toString().toLowerCase().trim();
-                    const hubX = (getSafeVal(r, 'HUB X')||'').toString().toLowerCase().trim();
+                    const pos = (window.getSafeVal(r, 'Posisi')||'').toString().toLowerCase().trim();
+                    const hubX = (window.getSafeVal(r, 'HUB X')||'').toString().toLowerCase().trim();
                     return ['mid mile', 'transport'].includes(pos) && hubX === 'gustiadi';
                 });
 
                 const detailMap = {};
                 detailData.forEach(r => {
-                    const h = getSafeVal(r, 'delivery_hub') || 'Unknown';
-                    const pos = (getSafeVal(r, 'Posisi')||'').toString().toLowerCase().trim();
+                    const h = window.getSafeVal(r, 'delivery_hub') || 'Unknown';
+                    const pos = (window.getSafeVal(r, 'Posisi')||'').toString().toLowerCase().trim();
                     const pKey = pos === 'mid mile' ? 'MM' : 'TR';
                     
-                    let rawFb = (getSafeVal(r, 'Feedback') || "").toString().trim();
+                    let rawFb = (window.getSafeVal(r, 'Feedback') || "").toString().trim();
                     let fbLabel = "In Process";
                     const cleanFb = rawFb.toLowerCase();
                     if (rawFb && rawFb !== '-' && cleanFb !== 'aman' && cleanFb !== 'lancar' && cleanFb !== 'ok') {
@@ -1204,7 +1206,7 @@
                             .sort((a,b) => b[1] - a[1]) 
                             .map(([k, v]) => `${k} (${v})`)
                             .join(', ');
-                        detailText += `   🏭 MM: ${mmStr}\n`;
+                        detailText += `   MM: ${mmStr}\n`;
                     }
                     
                     if (trStats.length > 0) {
@@ -1212,29 +1214,29 @@
                             .sort((a,b) => b[1] - a[1])
                             .map(([k, v]) => `${k} (${v})`)
                             .join(', ');
-                        detailText += `   🚚 TR: ${trStr}\n`;
+                        detailText += `   TR: ${trStr}\n`;
                     }
                 });
 
-                if (!hasDetail) detailText += "_Tidak ada data Mid Mile / Transport._\n";
+                if (!hasDetail) detailText += "Tidak ada data Mid Mile / Transport.\n";
 
-                const text = `*LAPORAN MONITORING PARCEL INPROGRESS*\n` +
-                            `*HUB KAL SULAMP*\n` +
+                const text = `LAPORAN MONITORING PARCEL INPROGRESS\n` +
+                            `HUB KAL SULAMP\n` +
                             `Periode: ${range}\n\n` +
-                            `*TOTAL: ${formatNumber(totalCurr)}*\n` +
+                            `TOTAL: ${window.formatNumber(totalCurr)}\n` +
                             `------------------\n` +
                             `${posTable}\n` +
                             `${hubTable}\n` +
                             `${svcTable}\n` +
                             `${pickTable}\n` +
                             `${detailText}\n` +
-                            `_Generated by Dashboard System_`;
+                            `Generated by Dashboard System`;
 
-                fallbackCopyTextToClipboard(text);
+                window.fallbackCopyTextToClipboard(text);
             }, 500); 
         }
 
-        function fallbackCopyTextToClipboard(text) {
+        window.fallbackCopyTextToClipboard = function(text) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
             textArea.style.top = "0";
@@ -1247,17 +1249,16 @@
 
             try {
                 const successful = document.execCommand('copy');
-                if(successful) showIsland('success', 'Laporan WA disalin!');
-                else showIsland('error', 'Gagal menyalin.');
+                if(successful) window.showIsland('success', 'Laporan disalin!');
+                else window.showIsland('error', 'Gagal menyalin.');
             } catch (err) {
                 console.error('Fallback copy failed', err);
-                showIsland('error', 'Gagal menyalin.');
+                window.showIsland('error', 'Gagal menyalin.');
             }
             document.body.removeChild(textArea);
         }
 
-        // --- MODAL FUNCTIONS ---
-        window.openDeleteModal = () => {
+        window.openDeleteModal = function() {
             const modal = document.getElementById('deleteModalOverlay');
             if(modal) {
                 document.querySelector('input[name="deleteMode"][value="month"]').checked = true;
@@ -1270,7 +1271,7 @@
             }
         }
 
-        window.closeDeleteModal = () => {
+        window.closeDeleteModal = function() {
             const modal = document.getElementById('deleteModalOverlay');
             if(modal) {
                 modal.classList.remove('open');
@@ -1278,7 +1279,7 @@
             }
         }
 
-        window.toggleDeleteInput = () => {
+        window.toggleDeleteInput = function() {
             const mode = document.querySelector('input[name="deleteMode"]:checked').value;
             const monthCont = document.getElementById('deleteMonthContainer');
             const dateCont = document.getElementById('deleteDateContainer');
@@ -1292,7 +1293,7 @@
             }
         }
 
-        window.openHubSummary = (hubName) => {
+        window.openHubSummary = function(hubName) {
             if(!hubName) return;
             const modal = document.getElementById('summaryModalOverlay');
             const title = document.getElementById('summaryTitle');
@@ -1301,25 +1302,25 @@
             const originsContainer = document.getElementById('topOriginsContainer');
             const totalAnalyzed = document.getElementById('totalAnalyzed');
 
-            const stuckData = allData.filter(r => 
-                (getSafeVal(r, 'delivery_hub') === hubName) &&
-                (['mid mile', 'transport'].includes((getSafeVal(r, 'Posisi') || "").toString().toLowerCase().trim())) &&
-                ((getSafeVal(r, 'HUB X') || "").toString().toLowerCase().trim() === 'gustiadi')
+            const stuckData = window.allData.filter(r => 
+                (window.getSafeVal(r, 'delivery_hub') === hubName) &&
+                (['mid mile', 'transport'].includes((window.getSafeVal(r, 'Posisi') || "").toString().toLowerCase().trim())) &&
+                ((window.getSafeVal(r, 'HUB X') || "").toString().toLowerCase().trim() === 'gustiadi')
             );
 
             title.innerText = `Analisis HUB & Trans - ${hubName}`;
-            totalAnalyzed.innerText = formatNumber(stuckData.length);
+            totalAnalyzed.innerText = window.formatNumber(stuckData.length);
             
             const services = {};
             const feedbacks = {};
             const origins = {};
 
             stuckData.forEach(r => {
-                const origin = getSafeVal(r, 'pickup_hub') || 'Unknown';
+                const origin = window.getSafeVal(r, 'pickup_hub') || 'Unknown';
                 origins[origin] = (origins[origin] || 0) + 1;
-                const svc = getSafeVal(r, 'service_code') || 'Unknown';
+                const svc = window.getSafeVal(r, 'service_code') || 'Unknown';
                 services[svc] = (services[svc] || 0) + 1;
-                let fb = getSafeVal(r, 'Feedback') ? getSafeVal(r, 'Feedback').toString().trim() : "Belum ada Feedback";
+                let fb = window.getSafeVal(r, 'Feedback') ? window.getSafeVal(r, 'Feedback').toString().trim() : "Belum ada Feedback";
                 if(!fb) fb = "Belum ada Feedback";
                 feedbacks[fb] = (feedbacks[fb] || 0) + 1;
             });
@@ -1374,7 +1375,7 @@
             modal.classList.add('open');
         }
 
-        window.closeSummary = () => {
+        window.closeSummary = function() {
             document.getElementById('summaryModalOverlay').classList.remove('open');
         }
 
@@ -1384,26 +1385,25 @@
             }
         });
 
-        // --- DELETE & DATABASE OPERATIONS ---
-        window.processDeleteRequest = () => {
+        window.processDeleteRequest = function() {
             const mode = document.querySelector('input[name="deleteMode"]:checked').value;
             let val;
             
             if (mode === 'month') {
                 val = document.getElementById('deleteMonthInput').value;
-                if (!val) { showIsland('error', 'Pilih bulan terlebih dahulu!'); return; }
+                if (!val) { window.showIsland('error', 'Pilih bulan terlebih dahulu!'); return; }
             } else {
                 val = document.getElementById('deleteDateInput').value;
-                if (!val) { showIsland('error', 'Pilih tanggal terlebih dahulu!'); return; }
+                if (!val) { window.showIsland('error', 'Pilih tanggal terlebih dahulu!'); return; }
             }
 
             window.closeDeleteModal();
-            requestPassword(() => executeDelete(val, mode));
+            window.requestPassword(() => window.executeDelete(val, mode));
         }
 
-        async function executeDelete(inputVal, mode) {
-            const targets = allData.filter(row => {
-                const d = parseDateStr(getSafeVal(row, 'Tanggal'));
+        window.executeDelete = async function(inputVal, mode) {
+            const targets = window.allData.filter(row => {
+                const d = window.parseDateStr(window.getSafeVal(row, 'Tanggal'));
                 if (!d) return false;
 
                 if (mode === 'month') {
@@ -1418,68 +1418,76 @@
             const label = mode === 'month' ? `bulan ${inputVal}` : `tanggal ${inputVal}`;
 
             if (targets.length === 0) {
-                showIsland('error', `Tidak ada data pada ${label}.`);
+                window.showIsland('error', `Tidak ada data pada ${label}.`);
                 return;
             }
 
-            showIsland('loading', `Menghapus ${formatNumber(targets.length)} data...`);
+            window.showIsland('loading', `Menghapus ${window.formatNumber(targets.length)} data...`);
             
-            const awbsToDelete = targets.map(r => (getSafeVal(r, 'awb')||getSafeVal(r, 'No Resi')).toString().trim());
-            const batchSize = 1000;
+            const awbsToDelete = targets.map(r => (window.getSafeVal(r, 'awb')||window.getSafeVal(r, 'No Resi')).toString().trim());
+            const batchSize = 500;
             let success = true;
 
             for (let i = 0; i < awbsToDelete.length; i += batchSize) {
                 const chunk = awbsToDelete.slice(i, i + batchSize);
-                const { error } = await supabase
-                    .from(COLLECTION_NAME)
-                    .delete()
-                    .in('awb', chunk);
+                
+                let error = null;
+                let retries = 3;
+                
+                while(retries > 0) {
+                    const res = await supabase.from(COLLECTION_NAME).delete().in('awb', chunk);
+                    if (res.error && res.error.message && res.error.message.includes('Failed to fetch')) {
+                        retries--;
+                        await new Promise(r => setTimeout(r, 2000));
+                        if(retries === 0) error = res.error;
+                    } else {
+                        error = res.error;
+                        break;
+                    }
+                }
 
                 if (error) {
                     console.error("Supabase Delete Error:", error);
                     success = false;
                     break;
                 } else {
-                    // Update array lokal secara instan
-                    allData = allData.filter(r => !chunk.includes(getSafeVal(r, 'awb')));
+                    window.allData = window.allData.filter(r => !chunk.includes(window.getSafeVal(r, 'awb')));
                 }
             }
 
             if (success) {
-                showIsland('success', `Data ${label} berhasil dihapus!`);
-                updateLastUpdated();
-                populateDropdowns(allData);
+                window.showIsland('success', `Data ${label} berhasil dihapus!`);
+                window.updateLastUpdated();
+                window.populateDropdowns(window.allData);
                 window.renderDashboard();
             } else {
-                showIsland('error', 'Sebagian atau seluruh data gagal dihapus.');
+                window.showIsland('error', 'Sebagian atau seluruh data gagal dihapus.');
             }
         }
 
-        window.confirmDeleteAwb = (awb) => {
-            showIsland('confirm', `Hapus permanen resi <b>${awb}</b>?`, () => deleteSingleAwb(awb));
+        window.confirmDeleteAwb = function(awb) {
+            window.showIsland('confirm', `Hapus permanen resi ${awb}?`, () => window.deleteSingleAwb(awb));
         }
 
-        async function deleteSingleAwb(awb) {
-            showIsland('loading', `Menghapus ${awb}...`);
+        window.deleteSingleAwb = async function(awb) {
+            window.showIsland('loading', `Menghapus ${awb}...`);
             const { error } = await supabase.from(COLLECTION_NAME).delete().eq('awb', awb);
             if (error) {
                 console.error("Supabase Delete Error", error);
-                showIsland('error', 'Gagal menghapus. Cek konsol.');
+                window.showIsland('error', 'Gagal menghapus. Cek konsol.');
             } else {
-                showIsland('success', `Resi ${awb} dihapus.`);
+                window.showIsland('success', `Resi ${awb} dihapus.`);
                 
-                // Update array lokal secara instan
-                allData = allData.filter(r => getSafeVal(r, 'awb') !== awb);
-                updateLastUpdated();
-                populateDropdowns(allData);
+                window.allData = window.allData.filter(r => window.getSafeVal(r, 'awb') !== awb);
+                window.updateLastUpdated();
+                window.populateDropdowns(window.allData);
                 window.renderDashboard();
             }
         }
 
-        // --- DATA FILTERING LOGIC ---
-        function getBaseFilteredData() {
+        window.getBaseFilteredData = function() {
             const startDateEl = document.getElementById('filterStartDate');
-            if (!startDateEl) return allData;
+            if (!startDateEl) return window.allData;
 
             const startDateVal = startDateEl.value;
             const endDateVal = document.getElementById('filterEndDate').value;
@@ -1492,37 +1500,37 @@
             if(startDate) startDate.setHours(0,0,0,0);
             if(endDate) endDate.setHours(23,59,59,999);
 
-            return allData.filter(row => {
-                const hub = getSafeVal(row, 'delivery_hub');
+            return window.allData.filter(row => {
+                const hub = window.getSafeVal(row, 'delivery_hub');
                 if (!hub || hub.toString().trim() === '' || hub.toString().toLowerCase() === 'unknown') return false;
 
                 if (startDate || endDate) {
-                    const rowDate = parseDateStr(getSafeVal(row, 'Tanggal'));
+                    const rowDate = window.parseDateStr(window.getSafeVal(row, 'Tanggal'));
                     if (rowDate) {
                         if (startDate && rowDate < startDate) return false;
                         if (endDate && rowDate > endDate) return false;
                     }
                 }
                 if (hubVal && hub !== hubVal) return false;
-                if (serviceVal && getSafeVal(row, 'service_code') !== serviceVal) return false;
-                if (posisiVal && getSafeVal(row, 'Posisi') !== posisiVal) return false;
+                if (serviceVal && window.getSafeVal(row, 'service_code') !== serviceVal) return false;
+                if (posisiVal && window.getSafeVal(row, 'Posisi') !== posisiVal) return false;
                 return true;
             });
         }
 
-        function getFilteredData() {
-            const base = getBaseFilteredData();
+        window.getFilteredData = function() {
+            const base = window.getBaseFilteredData();
             return base.filter(row => {
-                const hubX = (getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
-                if (isGustiadiOnly && hubX !== 'gustiadi') return false;
+                const hubX = (window.getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
+                if (window.isGustiadiOnly && hubX !== 'gustiadi') return false;
                 return true;
             });
         }
 
-        function getPrevPeriodData() {
+        window.getPrevPeriodData = function() {
             const startDateEl = document.getElementById('filterStartDate');
             const endDateEl = document.getElementById('filterEndDate');
-            if (!allData.length) return [];
+            if (!window.allData.length) return [];
             
             let start, end;
             if (startDateEl.value && endDateEl.value) {
@@ -1530,8 +1538,8 @@
                 end = new Date(endDateEl.value);
             } else {
                 let maxDate = new Date(0);
-                allData.forEach(r => {
-                    const d = parseDateStr(getSafeVal(r, 'Tanggal'));
+                window.allData.forEach(r => {
+                    const d = window.parseDateStr(window.getSafeVal(r, 'Tanggal'));
                     if (d && d > maxDate) maxDate = d;
                 });
                 start = maxDate ? new Date(maxDate) : new Date(); 
@@ -1551,31 +1559,31 @@
             const svcVal = document.getElementById('filterService').value;
             const posVal = document.getElementById('filterPosisi').value;
 
-            return allData.filter(row => {
-                const hub = getSafeVal(row, 'delivery_hub');
+            return window.allData.filter(row => {
+                const hub = window.getSafeVal(row, 'delivery_hub');
                 if (!hub || hub.toString().trim() === '' || hub.toString().toLowerCase() === 'unknown') return false;
 
-                const hubX = (getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
-                if (isGustiadiOnly && hubX !== 'gustiadi') return false;
+                const hubX = (window.getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
+                if (window.isGustiadiOnly && hubX !== 'gustiadi') return false;
                 if (hubVal && hub !== hubVal) return false;
-                if (svcVal && getSafeVal(row, 'service_code') !== svcVal) return false;
-                if (posVal && getSafeVal(row, 'Posisi') !== posVal) return false;
+                if (svcVal && window.getSafeVal(row, 'service_code') !== svcVal) return false;
+                if (posVal && window.getSafeVal(row, 'Posisi') !== posVal) return false;
 
-                const d = parseDateStr(getSafeVal(row, 'Tanggal'));
+                const d = window.parseDateStr(window.getSafeVal(row, 'Tanggal'));
                 if (!d) return false;
                 
                 return d.getTime() >= prevStart.getTime() && d.getTime() <= prevEnd.getTime();
             });
         }
 
-        function populateDropdowns(data) {
+        window.populateDropdowns = function(data) {
             const hubs = new Set();
             const services = new Set();
             const posisis = new Set();
             data.forEach(r => { 
-                const h = getSafeVal(r, 'delivery_hub');
-                const s = getSafeVal(r, 'service_code');
-                const p = getSafeVal(r, 'Posisi');
+                const h = window.getSafeVal(r, 'delivery_hub');
+                const s = window.getSafeVal(r, 'service_code');
+                const p = window.getSafeVal(r, 'Posisi');
                 
                 if(h && h.toString().trim() !== '' && h.toString().toLowerCase() !== 'unknown') hubs.add(h);
                 if(s) services.add(s);
@@ -1596,29 +1604,28 @@
             fill('filterPosisi', 'Posisi', posisis);
         }
 
-        // --- DASHBOARD RENDERING ---
-        window.renderDashboard = () => {
-            const baseData = getBaseFilteredData();
-            const filteredData = getFilteredData(); 
+        window.renderDashboard = function() {
+            const baseData = window.getBaseFilteredData();
+            const filteredData = window.getFilteredData(); 
 
-            calculateKPIs(filteredData);
+            window.calculateKPIs(filteredData);
             
-            generateKPIRecap(baseData, filteredData); 
-            generateHubRecap(filteredData);
-            generateServiceRecap(filteredData);
-            generateOriginRecap(filteredData);
-            generateStagingRecap(filteredData);
-            generateOpcodeRecap(filteredData); 
-            generateFeedbackBreakdown(filteredData); 
-            generateAwbTable(filteredData); 
+            window.generateKPIRecap(baseData, filteredData); 
+            window.generateHubRecap(filteredData);
+            window.generateServiceRecap(filteredData);
+            window.generateOriginRecap(filteredData);
+            window.generateStagingRecap(filteredData);
+            window.generateOpcodeRecap(filteredData); 
+            window.generateFeedbackBreakdown(filteredData); 
+            window.generateAwbTable(filteredData); 
             
-            updateCharts(filteredData);
+            window.updateCharts(filteredData);
         }
 
-        function calculateKPIs(data) {
+        window.calculateKPIs = function(data) {
             const counts = { total: data.length, last:0, vend:0, mid:0, mit:0, trans:0, first:0 };
             data.forEach(r => {
-                const p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                const p = (window.getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
                 if(p==='last mile') counts.last++;
                 else if(p==='vendor 3pl') counts.vend++;
                 else if(p==='mid mile') counts.mid++;
@@ -1627,12 +1634,12 @@
                 else if(p==='first mile') counts.first++;
             });
             
-            const prevData = getPrevPeriodData();
+            const prevData = window.getPrevPeriodData();
             const showComp = prevData.length > 0 || data.length > 0;
             const prevCounts = { total: prevData.length, last:0, vend:0, mid:0, mit:0, trans:0, first:0 };
             
             prevData.forEach(r => {
-                const p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                const p = (window.getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
                 if(p==='last mile') prevCounts.last++;
                 else if(p==='vendor 3pl') prevCounts.vend++;
                 else if(p==='mid mile') prevCounts.mid++;
@@ -1646,7 +1653,7 @@
                 const shareEl = document.getElementById(id+'Share');
                 const compEl = document.getElementById(id+'Comp');
                 
-                if(el) el.innerText = formatNumber(curr);
+                if(el) el.innerText = window.formatNumber(curr);
                 
                 if(shareEl) {
                     const share = counts.total > 0 ? (curr / counts.total) * 100 : 0;
@@ -1687,8 +1694,7 @@
             updateCard('kpiFirstMile', counts.first, prevCounts.first);
         }
 
-        // --- TABLE GENERATORS ---
-        function renderStructuredTable(containerId, theadHTML, tbodyHTML, tfootHTML) {
+        window.renderStructuredTable = function(containerId, theadHTML, tbodyHTML, tfootHTML) {
             const container = document.getElementById(containerId);
             if(!container) return;
             container.innerHTML = `
@@ -1702,17 +1708,17 @@
             `;
         }
 
-        function generateKPIRecap(baseData, filteredData) {
+        window.generateKPIRecap = function(baseData, filteredData) {
             const hubs = {}; const totals = { total: 0, nas: 0, reg: 0, trans: 0, hub: 0 };
             
             baseData.forEach(r => {
-                const h = getSafeVal(r, 'delivery_hub') || "?";
-                const hubX = (getSafeVal(r, 'HUB X')||"").toString().toLowerCase().trim();
-                const pos = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                const h = window.getSafeVal(r, 'delivery_hub') || "?";
+                const hubX = (window.getSafeVal(r, 'HUB X')||"").toString().toLowerCase().trim();
+                const pos = (window.getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
                 
                 if (!hubs[h]) hubs[h] = { t:0, nas:0, reg:0, trans:0, hub:0 };
                 
-                if (!isGustiadiOnly || hubX === 'gustiadi') {
+                if (!window.isGustiadiOnly || hubX === 'gustiadi') {
                     hubs[h].t++; totals.total++;
                 }
 
@@ -1739,12 +1745,12 @@
                         cls = "cursor-pointer hover:bg-slate-50 rounded px-2 transition-colors text-indigo-600 font-bold";
                     }
                     return `<div class="flex flex-col items-center cursor-pointer group" onclick="window.openHubSummary('${hubName}')">
-                                <div class="pivot-val ${cls}">${v>0?formatNumber(v):'-'}</div>
+                                <div class="pivot-val ${cls}">${v>0?window.formatNumber(v):'-'}</div>
                                 <div class="pivot-pct flex items-center group-hover:text-indigo-500 transition-colors">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div>
                             </div>`;
                 }
 
-                return `<div class="flex flex-col items-center"><div class="pivot-val ${cls}">${v>0?formatNumber(v):'-'}</div><div class="pivot-pct flex items-center">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div></div>`;
+                return `<div class="flex flex-col items-center"><div class="pivot-val ${cls}">${v>0?window.formatNumber(v):'-'}</div><div class="pivot-pct flex items-center">${warnIcon}${pct>0?pct.toFixed(0)+'%':''}</div></div>`;
             }
             
             let theadContent = `<tr>
@@ -1759,26 +1765,26 @@
             let tbodyContent = "";
             keys.forEach(h => {
                 const d = hubs[h];
-                tbodyContent += `<tr><td class="font-bold text-slate-700 pl-4 border-r border-slate-100">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/30">${formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t, true, h)}</td></tr>`;
+                tbodyContent += `<tr><td class="font-bold text-slate-700 pl-4 border-r border-slate-100">${h}</td><td class="text-center font-bold text-indigo-600 bg-indigo-50/30">${window.formatNumber(d.t)}</td><td class="text-center">${cell(d.nas,d.t)}</td><td class="text-center">${cell(d.reg,d.t)}</td><td class="text-center">${cell(d.trans,d.t)}</td><td class="text-center">${cell(d.hub,d.t, true, h)}</td></tr>`;
             });
 
-            let tfootContent = `<tr><td class="px-4">TOTAL</td><td class="text-center">${formatNumber(totals.total)}</td><td class="text-center">${cell(totals.nas,totals.total)}</td><td class="text-center">${cell(totals.reg,totals.total)}</td><td class="text-center">${cell(totals.trans,totals.total)}</td><td class="text-center">${cell(totals.hub,totals.total)}</td></tr>`;
+            let tfootContent = `<tr><td class="px-4">TOTAL</td><td class="text-center">${window.formatNumber(totals.total)}</td><td class="text-center">${cell(totals.nas,totals.total)}</td><td class="text-center">${cell(totals.reg,totals.total)}</td><td class="text-center">${cell(totals.trans,totals.total)}</td><td class="text-center">${cell(totals.hub,totals.total)}</td></tr>`;
 
-            renderStructuredTable('containerKPI', theadContent, tbodyContent, tfootContent);
+            window.renderStructuredTable('containerKPI', theadContent, tbodyContent, tfootContent);
         }
 
-        function generateHubRecap(data) {
+        window.generateHubRecap = function(data) {
             const hubs = {}; const posTotals = {};
             data.forEach(r => {
-                const h = getSafeVal(r, 'delivery_hub') || "?"; 
-                const p = getSafeVal(r, 'Posisi') || "?";
+                const h = window.getSafeVal(r, 'delivery_hub') || "?"; 
+                const p = window.getSafeVal(r, 'Posisi') || "?";
                 posTotals[p] = (posTotals[p]||0)+1;
                 if(!hubs[h]) hubs[h] = { t:0, c:{} };
                 hubs[h].t++; hubs[h].c[p] = (hubs[h].c[p]||0)+1;
             });
             const sortedPos = Object.keys(posTotals).sort((a,b) => posTotals[b]-posTotals[a]);
             const sortedHubs = Object.keys(hubs).sort();
-            const title = isGustiadiOnly ? 'Tot Area' : 'Total';
+            const title = window.isGustiadiOnly ? 'Tot Area' : 'Total';
             
             let gt = data.length; 
 
@@ -1799,11 +1805,11 @@
                 tbodyContent += `<tr>
                     <td class="font-bold text-slate-700 pl-4 border-r border-slate-100">${h}</td>
                     <td class="text-center font-bold bg-orange-50/30 text-orange-600">
-                        <div>${formatNumber(d.t)}<div class="text-[10px] font-medium text-orange-400">${totalPct.toFixed(1)}%</div></div>
+                        <div>${window.formatNumber(d.t)}<div class="text-[10px] font-medium text-orange-400">${totalPct.toFixed(1)}%</div></div>
                     </td>`;
                 
                 sortedPos.forEach(p => {
-                    const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max);
+                    const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = window.getGradient(c, min, max);
                     let content = `<span class="text-slate-300">-</span>`;
                     if(c>0) {
                         let warn = "";
@@ -1813,7 +1819,7 @@
                         else if(c===maxOther) {
                             warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px] mr-1"></i>`;
                         }
-                        content = `<div>${formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
+                        content = `<div>${window.formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
                     }
                     tbodyContent += `<td class="text-center" style="background-color:${bg}">${content}</td>`;
                 });
@@ -1822,21 +1828,21 @@
             
             let tfootContent = `<tr><td class="px-4 text-left">ALL</td>`;
             
-            tfootContent += `<td class="text-center"><div>${formatNumber(sumTotal)}<div class="pivot-pct">100%</div></div></td>`;
+            tfootContent += `<td class="text-center"><div>${window.formatNumber(sumTotal)}<div class="pivot-pct">100%</div></div></td>`;
             
             sortedPos.forEach(p => {
                 const val = posTotals[p] || 0;
                 const pct = sumTotal > 0 ? (val / sumTotal) * 100 : 0;
-                tfootContent += `<td class="text-center"><div>${formatNumber(val)}<div class="pivot-pct">${pct.toFixed(1)}%</div></div></td>`;
+                tfootContent += `<td class="text-center"><div>${window.formatNumber(val)}<div class="pivot-pct">${pct.toFixed(1)}%</div></div></td>`;
             });
             tfootContent += `</tr>`;
 
-            renderStructuredTable('containerHub', theadContent, tbodyContent, tfootContent);
+            window.renderStructuredTable('containerHub', theadContent, tbodyContent, tfootContent);
         }
 
-        function generateServiceRecap(data) {
+        window.generateServiceRecap = function(data) {
             const svcMap = {};
-            data.forEach(r => { const s = getSafeVal(r, 'service_code') || "?"; svcMap[s] = (svcMap[s]||0)+1; });
+            data.forEach(r => { const s = window.getSafeVal(r, 'service_code') || "?"; svcMap[s] = (svcMap[s]||0)+1; });
             const keys = Object.keys(svcMap).sort((a,b) => svcMap[b] - svcMap[a]);
             let gt = 0;
             
@@ -1846,18 +1852,18 @@
             keys.forEach(s => {
                 const c = svcMap[s]; gt += c;
                 const pct = data.length>0?(c/data.length)*100:0;
-                tbodyContent += `<tr><td class="font-bold px-4 text-slate-700">${s}</td><td class="text-center font-bold bg-emerald-50/30 text-emerald-600">${formatNumber(c)}</td><td class="text-center text-[10px] text-slate-400 font-medium">${pct.toFixed(1)}%</td></tr>`;
+                tbodyContent += `<tr><td class="font-bold px-4 text-slate-700">${s}</td><td class="text-center font-bold bg-emerald-50/30 text-emerald-600">${window.formatNumber(c)}</td><td class="text-center text-[10px] text-slate-400 font-medium">${pct.toFixed(1)}%</td></tr>`;
             });
             
-            let tfootContent = `<tr><td class="px-4 text-left">TOTAL</td><td class="text-center">${formatNumber(gt)}</td><td class="text-center">100%</td></tr>`;
+            let tfootContent = `<tr><td class="px-4 text-left">TOTAL</td><td class="text-center">${window.formatNumber(gt)}</td><td class="text-center">100%</td></tr>`;
 
-            renderStructuredTable('containerService', theadContent, tbodyContent, tfootContent);
+            window.renderStructuredTable('containerService', theadContent, tbodyContent, tfootContent);
         }
 
-        function generateOriginRecap(data) {
+        window.generateOriginRecap = function(data) {
             const originMap = {};
             data.forEach(r => { 
-                const o = getSafeVal(r, 'pickup_hub'); 
+                const o = window.getSafeVal(r, 'pickup_hub'); 
                 if (o && o.toString().trim() !== '' && o.toString().toLowerCase() !== 'unknown') {
                     originMap[o] = (originMap[o]||0)+1; 
                 }
@@ -1888,29 +1894,27 @@
                         <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-bold border ${rankColor}">${index+1}</span>
                     </td>
                     <td class="font-bold px-4 text-slate-700 text-[11px] truncate max-w-[150px]" title="${o}">${o}</td>
-                    <td class="text-center font-bold bg-pink-50/30 text-pink-600">${formatNumber(c)}</td>
+                    <td class="text-center font-bold bg-pink-50/30 text-pink-600">${window.formatNumber(c)}</td>
                     <td class="text-center text-[10px] text-slate-400 font-medium">${pct.toFixed(1)}%</td>
                 </tr>`;
             });
             
             let tfootContent = `<tr>
                 <td colspan="2" class="px-4 text-left">TOTAL (Top 5)</td>
-                <td class="text-center">${formatNumber(gt)}</td>
+                <td class="text-center">${window.formatNumber(gt)}</td>
                 <td class="text-center">${data.length>0 ? ((gt/data.length)*100).toFixed(1) : 0}%</td>
             </tr>`;
 
-            renderStructuredTable('containerOrigin', theadContent, tbodyContent, tfootContent);
+            window.renderStructuredTable('containerOrigin', theadContent, tbodyContent, tfootContent);
         }
 
-        function generateStagingRecap(data) {
-            const table = document.getElementById('tableStaging'); 
-            
+        window.generateStagingRecap = function(data) {
             const grouping = {}; const posTotals = {};
             
             data.forEach(r => {
-                const h = getSafeVal(r, 'delivery_hub') || "Unknown"; 
-                const s = getSafeVal(r, 'delivery_staging') || "Unknown"; 
-                const p = getSafeVal(r, 'Posisi') || "Unknown";
+                const h = window.getSafeVal(r, 'delivery_hub') || "Unknown"; 
+                const s = window.getSafeVal(r, 'delivery_staging') || "Unknown"; 
+                const p = window.getSafeVal(r, 'Posisi') || "Unknown";
                 
                 posTotals[p] = (posTotals[p]||0)+1;
                 
@@ -1930,7 +1934,7 @@
             });
             const sortedHubs = Object.keys(grouping).sort((a, b) => hubGrandTotals[b] - hubGrandTotals[a]);
             
-            const title = isGustiadiOnly ? 'Tot Area' : 'Total';
+            const title = window.isGustiadiOnly ? 'Tot Area' : 'Total';
 
             let theadContent = `<tr>
                 <th style="width:50px; min-width:50px;" class="text-left pl-2">HUB</th>
@@ -1977,11 +1981,11 @@
                     
                     tbodyContent += `<td class="text-slate-600 border-r border-slate-50 px-2 font-medium text-[10px] truncate max-w-[55px]" title="${ss}">${ss}</td>
                     <td class="text-center font-bold bg-blue-50/20 text-blue-600 border-r border-slate-50">
-                        <div>${formatNumber(d.t)}<div class="text-[10px] font-medium text-blue-400">${stagingPct.toFixed(1)}%</div></div>
+                        <div>${window.formatNumber(d.t)}<div class="text-[10px] font-medium text-blue-400">${stagingPct.toFixed(1)}%</div></div>
                     </td>`;
                     
                     sortedPos.forEach(p => {
-                        const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = getGradient(c, min, max, true);
+                        const c = d.c[p]||0; const pct = d.t>0?(c/d.t)*100:0; const bg = window.getGradient(c, min, max, true);
                         let content = `<span class="text-slate-300">-</span>`;
                         
                         if(c>0) {
@@ -1991,7 +1995,7 @@
                             } else if(c===maxOther) {
                                 warn = `<i class="ph-bold ph-warning-circle text-orange-500 text-[10px] mr-1"></i>`;
                             }
-                            content = `<div>${formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
+                            content = `<div>${window.formatNumber(c)}<div class="pivot-pct flex justify-center items-center">${warn}${pct.toFixed(0)}%</div></div>`;
                         }
                         tbodyContent += `<td class="text-center border-r border-slate-50" style="background-color:${bg}">${content}</td>`;
                     });
@@ -2003,12 +2007,12 @@
                 tbodyContent += `<tr class="bg-slate-50 font-bold border-b border-slate-200">
                     <td class="text-right px-3 text-slate-500 italic border-r border-slate-200 text-[10px]">Total ${h}</td>
                     <td class="text-center text-slate-700 border-r border-slate-200">
-                        <div>${formatNumber(hubTotalVal)}<div class="text-[10px] font-medium text-slate-400">${hubPct.toFixed(1)}%</div></div>
+                        <div>${window.formatNumber(hubTotalVal)}<div class="text-[10px] font-medium text-slate-400">${hubPct.toFixed(1)}%</div></div>
                     </td>`;
                 
                 sortedPos.forEach(p => {
                     const c = hubPosCounts[p] || 0;
-                    tbodyContent += `<td class="text-center text-slate-400 border-r border-slate-200 text-[11px]">${c > 0 ? formatNumber(c) : '-'}</td>`;
+                    tbodyContent += `<td class="text-center text-slate-400 border-r border-slate-200 text-[11px]">${c > 0 ? window.formatNumber(c) : '-'}</td>`;
                 });
                 tbodyContent += `</tr>`;
             });
@@ -2018,26 +2022,26 @@
             let tfootContent = `<tr>
                 <td colspan="2" class="px-3 text-right">GRAND TOTAL</td>
                 <td class="text-center">
-                    <div>${formatNumber(grandTotal)}<div class="pivot-pct">100%</div></div>
+                    <div>${window.formatNumber(grandTotal)}<div class="pivot-pct">100%</div></div>
                 </td>`;
             
             sortedPos.forEach(p => {
                 const val = posTotals[p]||0;
                 const pct = grandTotal > 0 ? (val / grandTotal) * 100 : 0;
                 tfootContent += `<td class="text-center border-r border-slate-200 text-slate-800">
-                    <div>${formatNumber(val)}<div class="pivot-pct">${pct.toFixed(1)}%</div></div>
+                    <div>${window.formatNumber(val)}<div class="pivot-pct">${pct.toFixed(1)}%</div></div>
                 </td>`;
             });
             tfootContent += `</tr>`;
 
-            renderStructuredTable('containerStaging', theadContent, tbodyContent, tfootContent);
+            window.renderStructuredTable('containerStaging', theadContent, tbodyContent, tfootContent);
         }
 
-        function generateOpcodeRecap(data) {
+        window.generateOpcodeRecap = function(data) {
             const targetPositions = ['transport', 'mid mile'];
             const relevantData = data.filter(r => {
-                const p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
-                const hubX = (getSafeVal(r, 'HUB X')||"").toString().toLowerCase().trim();
+                const p = (window.getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                const hubX = (window.getSafeVal(r, 'HUB X')||"").toString().toLowerCase().trim();
                 return targetPositions.includes(p) && hubX === 'gustiadi';
             });
 
@@ -2045,10 +2049,10 @@
             const opcodesByPos = { 'Transport': new Set(), 'Mid Mile': new Set() };
 
             relevantData.forEach(r => {
-                const h = getSafeVal(r, 'delivery_hub') || "Unknown";
-                const op = getSafeVal(r, 'Last Opcode') || getSafeVal(r, 'status terakhir') || "Unknown";
+                const h = window.getSafeVal(r, 'delivery_hub') || "Unknown";
+                const op = window.getSafeVal(r, 'Last Opcode') || window.getSafeVal(r, 'status terakhir') || "Unknown";
                 
-                let p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                let p = (window.getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
                 let pKey = p === 'transport' ? 'Transport' : 'Mid Mile';
 
                 opcodesByPos[pKey].add(op);
@@ -2106,7 +2110,7 @@
                         const val = hubs[h]['Transport'][op] || 0;
                         const bg = val > 0 ? 'bg-cyan-50/30' : '';
                         const text = val > 0 ? 'text-cyan-700 font-bold' : 'text-slate-300';
-                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? formatNumber(val) : '-'}</td>`;
+                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? window.formatNumber(val) : '-'}</td>`;
                     });
                 } else {
                     tbodyHTML += `<td class="bg-slate-50/50"></td>`;
@@ -2119,7 +2123,7 @@
                         const val = hubs[h]['Mid Mile'][op] || 0;
                         const bg = val > 0 ? 'bg-orange-50/30' : '';
                         const text = val > 0 ? 'text-orange-700 font-bold' : 'text-slate-300';
-                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? formatNumber(val) : '-'}</td>`;
+                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? window.formatNumber(val) : '-'}</td>`;
                     });
                 } else {
                     tbodyHTML += `<td class="bg-slate-50/50"></td>`;
@@ -2134,7 +2138,7 @@
                 transOps.forEach(op => {
                     let sum = 0;
                     sortedHubs.forEach(h => sum += (hubs[h]['Transport'][op] || 0));
-                    tfootHTML += `<td class="text-center font-bold text-cyan-800 bg-cyan-100/50 border-t-2 border-cyan-200">${formatNumber(sum)}</td>`;
+                    tfootHTML += `<td class="text-center font-bold text-cyan-800 bg-cyan-100/50 border-t-2 border-cyan-200">${window.formatNumber(sum)}</td>`;
                 });
             } else {
                 tfootHTML += `<td></td>`;
@@ -2146,21 +2150,21 @@
                 mmOps.forEach(op => {
                     let sum = 0;
                     sortedHubs.forEach(h => sum += (hubs[h]['Mid Mile'][op] || 0));
-                    tfootHTML += `<td class="text-center font-bold text-orange-800 bg-orange-100/50 border-t-2 border-orange-200">${formatNumber(sum)}</td>`;
+                    tfootHTML += `<td class="text-center font-bold text-orange-800 bg-orange-100/50 border-t-2 border-orange-200">${window.formatNumber(sum)}</td>`;
                 });
             } else {
                 tfootHTML += `<td></td>`;
             }
             tfootHTML += `</tr>`;
 
-            renderStructuredTable('containerOpcode', theadHTML, tbodyHTML, tfootHTML);
+            window.renderStructuredTable('containerOpcode', theadHTML, tbodyHTML, tfootHTML);
         }
 
-        function generateFeedbackBreakdown(data) {
+        window.generateFeedbackBreakdown = function(data) {
             const targetPositions = ['transport', 'mid mile'];
             const relevantData = data.filter(r => {
-                const p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
-                const hubX = (getSafeVal(r, 'HUB X')||"").toString().toLowerCase().trim();
+                const p = (window.getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                const hubX = (window.getSafeVal(r, 'HUB X')||"").toString().toLowerCase().trim();
                 return targetPositions.includes(p) && hubX === 'gustiadi';
             });
 
@@ -2168,11 +2172,11 @@
             const feedbacksByPos = { 'Transport': new Set(), 'Mid Mile': new Set() };
 
             relevantData.forEach(r => {
-                const h = getSafeVal(r, 'delivery_hub') || "Unknown";
-                let f = (getSafeVal(r, 'Feedback') || "No Feedback").toString().trim();
+                const h = window.getSafeVal(r, 'delivery_hub') || "Unknown";
+                let f = (window.getSafeVal(r, 'Feedback') || "No Feedback").toString().trim();
                 if(f === '' || f === '-') f = "No Feedback";
                 
-                let p = (getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
+                let p = (window.getSafeVal(r, 'Posisi')||"").toString().toLowerCase().trim();
                 let pKey = p === 'transport' ? 'Transport' : 'Mid Mile';
 
                 feedbacksByPos[pKey].add(f);
@@ -2230,7 +2234,7 @@
                         const val = hubs[h]['Transport'][f] || 0;
                         const bg = val > 0 ? 'bg-cyan-50/30' : '';
                         const text = val > 0 ? 'text-cyan-700 font-bold' : 'text-slate-300';
-                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? formatNumber(val) : '-'}</td>`;
+                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? window.formatNumber(val) : '-'}</td>`;
                     });
                 } else {
                     tbodyHTML += `<td class="bg-slate-50/50"></td>`;
@@ -2243,7 +2247,7 @@
                         const val = hubs[h]['Mid Mile'][f] || 0;
                         const bg = val > 0 ? 'bg-orange-50/30' : '';
                         const text = val > 0 ? 'text-orange-700 font-bold' : 'text-slate-300';
-                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? formatNumber(val) : '-'}</td>`;
+                        tbodyHTML += `<td class="text-center ${bg} ${text} text-[10px] border-r border-slate-50">${val > 0 ? window.formatNumber(val) : '-'}</td>`;
                     });
                 } else {
                     tbodyHTML += `<td class="bg-slate-50/50"></td>`;
@@ -2258,7 +2262,7 @@
                 transFeeds.forEach(f => {
                     let sum = 0;
                     sortedHubs.forEach(h => sum += (hubs[h]['Transport'][f] || 0));
-                    tfootHTML += `<td class="text-center font-bold text-cyan-800 bg-cyan-100/50 border-t-2 border-cyan-200">${formatNumber(sum)}</td>`;
+                    tfootHTML += `<td class="text-center font-bold text-cyan-800 bg-cyan-100/50 border-t-2 border-cyan-200">${window.formatNumber(sum)}</td>`;
                 });
             } else {
                 tfootHTML += `<td></td>`;
@@ -2270,34 +2274,33 @@
                 mmFeeds.forEach(f => {
                     let sum = 0;
                     sortedHubs.forEach(h => sum += (hubs[h]['Mid Mile'][f] || 0));
-                    tfootHTML += `<td class="text-center font-bold text-orange-800 bg-orange-100/50 border-t-2 border-orange-200">${formatNumber(sum)}</td>`;
+                    tfootHTML += `<td class="text-center font-bold text-orange-800 bg-orange-100/50 border-t-2 border-orange-200">${window.formatNumber(sum)}</td>`;
                 });
             } else {
                 tfootHTML += `<td></td>`;
             }
             tfootHTML += `</tr>`;
 
-            renderStructuredTable('containerFeedbackBreakdown', theadHTML, tbodyHTML, tfootHTML);
+            window.renderStructuredTable('containerFeedbackBreakdown', theadHTML, tbodyHTML, tfootHTML);
         }
 
-        // --- AWB TABLE LIST ---
-        function filterAwbData(searchTerm) {
+        window.filterAwbData = function(searchTerm) {
             if (!searchTerm) {
-                filteredAwbCache = awbDataCache;
+                window.filteredAwbCache = window.awbDataCache;
             } else {
-                filteredAwbCache = awbDataCache.filter(row => {
-                    const awb = (getSafeVal(row, 'awb') || getSafeVal(row, 'No Resi') || "").toString().toLowerCase();
+                window.filteredAwbCache = window.awbDataCache.filter(row => {
+                    const awb = (window.getSafeVal(row, 'awb') || window.getSafeVal(row, 'No Resi') || "").toString().toLowerCase();
                     return awb.includes(searchTerm);
                 });
             }
-            resetAwbTable();
+            window.resetAwbTable();
         }
 
-        function resetAwbTable() {
+        window.resetAwbTable = function() {
             const container = document.getElementById('containerAwbList');
             if(!container) return;
 
-            awbRenderedCount = 0;
+            window.awbRenderedCount = 0;
             
             container.innerHTML = `
                 <div class="absolute inset-0 overflow-y-auto no-scrollbar" id="awbScrollArea">
@@ -2318,27 +2321,27 @@
                 </div>
             `;
 
-            appendAwbRows();
+            window.appendAwbRows();
 
             const scrollArea = document.getElementById('awbScrollArea');
             if(scrollArea) {
                 scrollArea.addEventListener('scroll', () => {
                     if (scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 50) {
-                        appendAwbRows();
+                        window.appendAwbRows();
                     }
                 });
             }
         }
 
-        function appendAwbRows() {
-            if (awbRenderedCount >= filteredAwbCache.length || awbRenderedCount >= AWB_MAX_LIMIT) return;
+        window.appendAwbRows = function() {
+            if (window.awbRenderedCount >= window.filteredAwbCache.length || window.awbRenderedCount >= AWB_MAX_LIMIT) return;
 
             const tbody = document.getElementById('awbTableBody');
             const footer = document.getElementById('awbTableFooter');
             
-            const nextBatch = filteredAwbCache.slice(awbRenderedCount, awbRenderedCount + AWB_CHUNK_SIZE);
+            const nextBatch = window.filteredAwbCache.slice(window.awbRenderedCount, window.awbRenderedCount + AWB_CHUNK_SIZE);
             
-            if (awbRenderedCount === 0 && nextBatch.length === 0) {
+            if (window.awbRenderedCount === 0 && nextBatch.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-slate-400 italic">Tidak ada data</td></tr>`;
                 footer.innerHTML = '';
                 return;
@@ -2346,9 +2349,9 @@
 
             let rowsHTML = "";
             nextBatch.forEach(row => {
-                const awb = getSafeVal(row, 'awb') || getSafeVal(row, 'No Resi') || "?";
-                const staging = getSafeVal(row, 'delivery_staging') || "-";
-                const posisi = getSafeVal(row, 'Posisi') || "-";
+                const awb = window.getSafeVal(row, 'awb') || window.getSafeVal(row, 'No Resi') || "?";
+                const staging = window.getSafeVal(row, 'delivery_staging') || "-";
+                const posisi = window.getSafeVal(row, 'Posisi') || "-";
                 
                 rowsHTML += `
                     <tr class="hover:bg-red-50/30 transition-colors group">
@@ -2367,10 +2370,10 @@
             });
 
             tbody.insertAdjacentHTML('beforeend', rowsHTML);
-            awbRenderedCount += nextBatch.length;
+            window.awbRenderedCount += nextBatch.length;
 
-            const remaining = Math.min(filteredAwbCache.length, AWB_MAX_LIMIT) - awbRenderedCount;
-            let footerText = `${formatNumber(awbRenderedCount)} dari ${formatNumber(filteredAwbCache.length)}`;
+            const remaining = Math.min(window.filteredAwbCache.length, AWB_MAX_LIMIT) - window.awbRenderedCount;
+            let footerText = `${window.formatNumber(window.awbRenderedCount)} dari ${window.formatNumber(window.filteredAwbCache.length)}`;
             if (remaining > 0) footerText += ` <span class="text-indigo-400 font-bold ml-1">(Scroll ▼)</span>`;
             
             footer.innerHTML = `
@@ -2382,31 +2385,30 @@
             `;
         }
 
-        function generateAwbTable(data) {
+        window.generateAwbTable = function(data) {
             const container = document.getElementById('containerAwbList');
             if(!container) return;
 
-            awbDataCache = data;
+            window.awbDataCache = data;
             
             const searchInput = document.getElementById('awbSearchInput');
             if(searchInput) {
                 const currentSearch = searchInput.value.toLowerCase();
-                filterAwbData(currentSearch);
+                window.filterAwbData(currentSearch);
                 
                 if (!searchInput.dataset.hasListener) {
                     searchInput.addEventListener('input', (e) => {
-                        filterAwbData(e.target.value.toLowerCase());
+                        window.filterAwbData(e.target.value.toLowerCase());
                     });
                     searchInput.dataset.hasListener = 'true';
                 }
             } else {
-                filteredAwbCache = awbDataCache; 
-                resetAwbTable();
+                window.filteredAwbCache = window.awbDataCache; 
+                window.resetAwbTable();
             }
         }
 
-        // --- TREND CHARTS LOGIC ---
-        function updateCharts(data) {
+        window.updateCharts = function(data) {
             const weekly = {}; 
             const monthly = {}; 
             const daily = {};
@@ -2420,7 +2422,7 @@
 
             let latestDate = new Date(0);
             data.forEach(row => {
-                const d = parseDateStr(getSafeVal(row, 'Tanggal'));
+                const d = window.parseDateStr(window.getSafeVal(row, 'Tanggal'));
                 if (d && d > latestDate) latestDate = d;
             });
             const cmIdx = latestDate.getMonth();
@@ -2430,10 +2432,10 @@
             if (mLabel) mLabel.innerText = `${months[cmIdx]} ${cy}`;
 
             data.forEach(row => {
-                const pos = (getSafeVal(row, 'Posisi') || "").toString().toLowerCase().trim();
-                const hubX = (getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
+                const pos = (window.getSafeVal(row, 'Posisi') || "").toString().toLowerCase().trim();
+                const hubX = (window.getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
                 
-                const date = parseDateStr(getSafeVal(row, 'Tanggal'));
+                const date = window.parseDateStr(window.getSafeVal(row, 'Tanggal'));
                 if (date && date.getMonth() === cmIdx && date.getFullYear() === cy) {
                     const dKey = `${date.getDate()} ${months[date.getMonth()]}`;
                     if (!daily[dKey]) daily[dKey] = { total: 0, gustiadi: 0 };
@@ -2448,23 +2450,23 @@
             const serviceVal = document.getElementById('filterService') ? document.getElementById('filterService').value : '';
             const posisiVal = document.getElementById('filterPosisi') ? document.getElementById('filterPosisi').value : '';
 
-            allData.forEach(row => {
-                const hubX = (getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
-                const pos = (getSafeVal(row, 'Posisi') || "").toString().toLowerCase().trim();
-                const hub = getSafeVal(row, 'delivery_hub');
-                const svc = getSafeVal(row, 'service_code');
+            window.allData.forEach(row => {
+                const hubX = (window.getSafeVal(row, 'HUB X') || "").toString().toLowerCase().trim();
+                const pos = (window.getSafeVal(row, 'Posisi') || "").toString().toLowerCase().trim();
+                const hub = window.getSafeVal(row, 'delivery_hub');
+                const svc = window.getSafeVal(row, 'service_code');
 
-                if (isGustiadiOnly && hubX !== 'gustiadi') return;
+                if (window.isGustiadiOnly && hubX !== 'gustiadi') return;
                 if (hubVal && hub !== hubVal) return;
                 if (serviceVal && svc !== serviceVal) return;
                 if (posisiVal && pos !== posisiVal) return;
 
-                const date = parseDateStr(getSafeVal(row, 'Tanggal'));
+                const date = window.parseDateStr(window.getSafeVal(row, 'Tanggal'));
                 if (date) {
                     const y = date.getFullYear();
                     const mKey = `${months[date.getMonth()]} ${y}`; 
                     
-                    const [wYear, wNum] = getISOWeekNumber(date);
+                    const [wYear, wNum] = window.getISOWeekNumber(date);
                     const wKey = `W${wNum.toString().padStart(2,'0')} ${wYear}`;
 
                     if (!weekly[wKey]) weekly[wKey] = { total: 0, gustiadi: 0 };
@@ -2480,8 +2482,8 @@
                 }
             });
 
-            cachedTrendData.weekly = weekly;
-            cachedTrendData.monthly = monthly;
+            window.cachedTrendData.weekly = weekly;
+            window.cachedTrendData.monthly = monthly;
 
             window.renderTrendChart();
 
@@ -2490,11 +2492,11 @@
             const dailyTotal = dailyKeys.map(k => daily[k].total);
             const dailyGustiadi = dailyKeys.map(k => daily[k].gustiadi);
             
-            renderChart('dailyChart', dailyKeys, dailyTotal, dailyGustiadi);
+            window.renderChart('dailyChart', dailyKeys, dailyTotal, dailyGustiadi);
         }
 
-        window.setTrendMode = (mode) => {
-            currentTrendMode = mode;
+        window.setTrendMode = function(mode) {
+            window.currentTrendMode = mode;
             
             const btnActive = "bg-white text-indigo-600 shadow-sm transform scale-100";
             const btnInactive = "text-slate-400 hover:text-slate-600 bg-transparent shadow-none";
@@ -2507,9 +2509,9 @@
             window.renderTrendChart();
         }
 
-        window.renderTrendChart = () => {
-            const mode = currentTrendMode;
-            const dataObj = cachedTrendData[mode];
+        window.renderTrendChart = function() {
+            const mode = window.currentTrendMode;
+            const dataObj = window.cachedTrendData[mode];
             
             const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             
@@ -2544,10 +2546,10 @@
             const dataTotal = labels.map(k => dataObj[k].total);
             const dataGustiadi = labels.map(k => dataObj[k].gustiadi);
             
-            renderChart('comboTrendChart', labels, dataTotal, dataGustiadi);
+            window.renderChart('comboTrendChart', labels, dataTotal, dataGustiadi);
         }
 
-        function renderChart(id, labels, dataTotal, dataGustiadi) {
+        window.renderChart = function(id, labels, dataTotal, dataGustiadi) {
             const canvas = document.getElementById(id);
             if (!canvas) return; 
 
@@ -2643,7 +2645,7 @@
                             usePointStyle: true,
                             callbacks: {
                                 label: function(context) {
-                                    return ` ${context.dataset.label}: ${formatNumber(context.raw)}`;
+                                    return ` ${context.dataset.label}: ${window.formatNumber(context.raw)}`;
                                 }
                             }
                         },
@@ -2658,7 +2660,7 @@
                             },
                             font: { size: 9, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
                             offset: 4,
-                            formatter: (val) => formatNumber(val)
+                            formatter: (val) => window.formatNumber(val)
                         }
                     },
                     scales: { 
@@ -2681,9 +2683,9 @@
 
         // --- INIT EVENT LISTENERS ---
         document.getElementById('statusToggle').addEventListener('change', e => {
-            isGustiadiOnly = e.target.checked;
-            document.getElementById('toggleLabel').innerText = isGustiadiOnly ? "In Area" : "Semua";
-            document.getElementById('toggleLabel').className = isGustiadiOnly ? "text-[9px] font-bold text-indigo-600 uppercase tracking-wide transition-colors w-10 text-right" : "text-[9px] font-bold text-slate-400 uppercase tracking-wide transition-colors w-10 text-right";
+            window.isGustiadiOnly = e.target.checked;
+            document.getElementById('toggleLabel').innerText = window.isGustiadiOnly ? "In Area" : "Semua";
+            document.getElementById('toggleLabel').className = window.isGustiadiOnly ? "text-[9px] font-bold text-indigo-600 uppercase tracking-wide transition-colors w-10 text-right" : "text-[9px] font-bold text-slate-400 uppercase tracking-wide transition-colors w-10 text-right";
             window.renderDashboard();
         });
 
@@ -2696,7 +2698,7 @@
         const dateEl = document.getElementById('currentDate');
         if(dateEl) dateEl.innerText = new Date().toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'short', year:'numeric'});
 
-        initDataFetch();
+        window.initDataFetch();
 
     </script>
 </body>
